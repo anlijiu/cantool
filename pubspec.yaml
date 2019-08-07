@@ -37,8 +37,6 @@ dependencies:
   url_launcher: ^5.0.0
   url_launcher_fde:
     path: plugins/url_launcher_fde
-  inject:
-    path: vendor/inject.dart/package/inject
 
   flutter:
     sdk: flutter
@@ -52,8 +50,6 @@ dependencies:
 dev_dependencies:
   build_runner: ^1.0.0
   json_serializable: ^3.0.0
-  inject_generator:
-    path: vendor/inject.dart/package/inject_generator
   flutter_test:
     sdk: flutter
 

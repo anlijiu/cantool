@@ -48,7 +48,7 @@ class SignalMeta extends Object {
   final double maximum;
   final String unit;
   final String comment;
-  final List<Map<int, String>> options;
+  final Map<int, String> options;
 
   SignalMeta(this.name, this.start_bit, this.length, this.little_endian, this.is_signed, this.value_type, this.scaling, this.offset, this.minimum, this.maximum, this.unit, this.comment, this.options);
   factory SignalMeta.fromJson(Map<String, dynamic> json) => _$SignalMetaFromJson(json);

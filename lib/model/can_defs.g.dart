@@ -67,11 +67,9 @@ SignalMeta _$SignalMetaFromJson(Map<String, dynamic> json) {
     (json['maximum'] as num)?.toDouble(),
     json['unit'] as String,
     json['comment'] as String,
-    (json['options'] as List)
-        ?.map((e) => (e as Map<String, dynamic>)?.map(
-              (k, e) => MapEntry(int.parse(k), e as String),
-            ))
-        ?.toList(),
+    (json['options'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(int.parse(k), e as String),
+    ),
   );
 }
 
@@ -89,7 +87,5 @@ Map<String, dynamic> _$SignalMetaToJson(SignalMeta instance) =>
       'maximum': instance.maximum,
       'unit': instance.unit,
       'comment': instance.comment,
-      'options': instance.options
-          ?.map((e) => e?.map((k, e) => MapEntry(k.toString(), e)))
-          ?.toList(),
+      'options': instance.options?.map((k, e) => MapEntry(k.toString(), e)),
     };
