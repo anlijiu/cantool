@@ -11,16 +11,41 @@ const String _unloadAmmo = 'UsbCan.UnloadAmmo';
 const String _setConstStrategy = 'UsbCan.SetConstStrategy';
 
 
+class MessageData {
+  static void fromMessage(Map<String, dynamic> message) {
+    print("_handleCanData  ${message["name"]}" );
+    message["signals"].forEach((s) {
+      print("_handleCanData  name: ${s["name"]}, value: ${s["value"]}, mid: ${s["mid"]}, ");
+    });
+  }
+}
+
 /// A singleton object that handles the interaction with the platform channel.
 class UsbCanChannel {
   /// Private constructor.
-  UsbCanChannel._();
+  UsbCanChannel._() {
+    _eventChannel.setMessageHandler(_handleCanData);
+  }
 
   final MethodChannel _platformChannel =
       const MethodChannel(_usbCanChannelName);
+  final BasicMessageChannel<dynamic> _eventChannel = BasicMessageChannel<dynamic>(
+      'flutter/usb_can_event',
+      StandardMessageCodec(),
+  );
 
   /// The static instance of the menu channel.
   static final UsbCanChannel instance = new UsbCanChannel._();
+
+  Future<dynamic> _handleCanData(dynamic message) {
+      MessageData.fromMessage(new Map<String, dynamic>.from(message));
+    return;
+    // for (ValueChanged<RawKeyEvent> listener in List<ValueChanged<RawKeyEvent>>.from(_listeners)) {
+    //   if (_listeners.contains(listener)) {
+    //     listener(event);
+    //   }
+    // }
+  }
 
   /// Returns a list of screens.
   Future<String> syncMetaDatas(Map<String, dynamic> dbc) async {

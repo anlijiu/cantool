@@ -9,6 +9,10 @@
 #define FLUTTER_PLUGIN_EXPORT
 #endif
 
+// #ifndef USE_RAPID_JSON
+// #define USE_RAPID_JSON
+// #endif
+//
 #if defined(__cplusplus)
 extern "C" {
 #endif

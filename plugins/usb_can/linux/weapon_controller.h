@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <functional>
 #include <condition_variable>
 //#include <thread>
@@ -18,10 +19,17 @@
 
 namespace plugins_usb_can {
 
+struct SignalData {
+  std::string name;
+  int value;
+  int mid;
+};
+
 class WeaponController {
 public:
+  using ReceiveAction = std::function<void(const std::vector<SignalData>& signals)>;
   WeaponController() = default;
-  WeaponController(std::string const& name);
+  WeaponController(std::string const& name, const ReceiveAction& action);
   virtual ~WeaponController();
 
   virtual void Fire();
@@ -77,7 +85,10 @@ protected:
   std::condition_variable receive_cv_;
   std::mutex receive_mtx;
   std::thread receive_t_;
+  std::thread receive_process_t_;
 private:
+  void processReceiveThread();
+  void processReceiveData();
 
   std::map<uint32_t, std::shared_ptr<MessageMeta>> mp_message_meta_;
   std::map<std::string, std::shared_ptr<SignalMeta>> mp_signal_meta_;
@@ -91,15 +102,15 @@ private:
   std::vector<std::unique_ptr<AmmoGenerator>> ammo_generators_;
   bool firing_ = false;
 
-  std::map<uint32_t, Message> recv_messages;
+  std::unordered_map<uint32_t, Message> recv_messages;
+  ReceiveAction mReceiveAction;
 
   void Auto_(void);
 };
 
 class CanalystiiController : public WeaponController {
 public:
-  CanalystiiController();
-  explicit CanalystiiController( std::string const& name, int rate);
+  explicit CanalystiiController( std::string const& name, int rate, const ReceiveAction& action);
   int Initialize();
 
   bool Release();
@@ -110,7 +121,6 @@ protected:
   void onStartReceive() override;
   void onStopReceive() override;
 private:
-
 
   CANalystii can_node_;
   std::thread receiver_t_;

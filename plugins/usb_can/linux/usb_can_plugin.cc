@@ -1,11 +1,14 @@
 #include "usb_can_plugin.h"
 
-#include <flutter/method_channel.h>
-#include <flutter/plugin_registrar.h>
-#include <flutter/standard_method_codec.h>
 #include <sys/utsname.h>
 #include <memory>
 #include <sstream>
+#include <flutter/method_channel.h>
+#include <flutter/basic_message_channel.h>
+#include <flutter/binary_messenger.h>
+#include <flutter/plugin_registrar.h>
+#include <flutter/standard_method_codec.h>
+#include <flutter/standard_message_codec.h>
 #include "plugin_interface.h"
 #include "weapon_controller.h"
 
@@ -19,6 +22,7 @@ using flutter::EncodableValue;
 
 // See channel_controller.dart for documentation.
 const char kChannelName[] = "flutter/usb_can";
+const char kEventChannelName[] = "flutter/usb_can_event";
 const char kSyncMetaDatas[] = "UsbCan.SyncMetaDatas";
 const char kFire[] = "UsbCan.Fire";
 const char kCeaseFire[] = "UsbCan.CeaseFire";
@@ -46,11 +50,13 @@ class UsbCan : public flutter::Plugin {
 
   // Creates a plugin that communicates on the given channel.
   UsbCan(
-      std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-      std::unique_ptr<WeaponController> weapon_controller
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
+    std::unique_ptr<flutter::BasicMessageChannel<flutter::EncodableValue>> event_channel
       );
 
   virtual ~UsbCan();
+
+  void onNewCanData(const std::vector<SignalData> signals);
 
  private:
   // Called when a method is called on |channel_|;
@@ -60,14 +66,13 @@ class UsbCan : public flutter::Plugin {
 
   // The MethodChannel used for communication with the Flutter engine.
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel_;
+  std::unique_ptr<flutter::BasicMessageChannel<flutter::EncodableValue>> event_channel_;
   std::unique_ptr<WeaponController> weapon_controller_;
 };
 
 // static
 void UsbCan::RegisterWithRegistrar(flutter::PluginRegistrar *registrar) {
 
-  std::cout << "UsbCan::RegisterWithRegistrar start" << std::endl;
-  auto weapon_controller = std::make_unique<CanalystiiController>("canalystii", 500);
   std::cout << "UsbCan::RegisterWithRegistrar 111" << std::endl;
   auto channel =
       std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
@@ -75,8 +80,11 @@ void UsbCan::RegisterWithRegistrar(flutter::PluginRegistrar *registrar) {
           &flutter::StandardMethodCodec::GetInstance());
   auto *channel_pointer = channel.get();
 
+  auto event_channel = std::make_unique<flutter::BasicMessageChannel<flutter::EncodableValue>>(
+          registrar->messenger(), kEventChannelName,
+                &flutter::StandardMessageCodec::GetInstance());
   std::cout << "UsbCan::RegisterWithRegistrar 222" << std::endl;
-  auto plugin = std::make_unique<UsbCan>(std::move(channel), std::move(weapon_controller));
+  auto plugin = std::make_unique<UsbCan>(std::move(channel), std::move(event_channel));
   std::cout << "UsbCan::RegisterWithRegistrar 333" << std::endl;
 
   channel_pointer->SetMethodCallHandler(
@@ -92,11 +100,35 @@ void UsbCan::RegisterWithRegistrar(flutter::PluginRegistrar *registrar) {
 
 UsbCan::UsbCan(
     std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    std::unique_ptr<WeaponController> weapon_controller
+    std::unique_ptr<flutter::BasicMessageChannel<flutter::EncodableValue>> event_channel
     )
-    : channel_(std::move(channel)), weapon_controller_(std::move(weapon_controller)) {}
+    : channel_(std::move(channel)), event_channel_(std::move(event_channel)), weapon_controller_(std::make_unique<CanalystiiController>("canalystii", 500, std::bind(&UsbCan::onNewCanData, this, std::placeholders::_1)) ) {
+}
 
 UsbCan::~UsbCan(){};
+
+static constexpr char kActionKey[] = "receive";
+static constexpr char kNameKey[] = "name";
+static constexpr char kSignalsKey[] = "signals";
+
+void UsbCan::onNewCanData(const std::vector<SignalData> signals) {
+
+  EncodableValue event(EncodableMap{
+    {EncodableValue("name"), EncodableValue("receive")},
+  });
+  EncodableValue sArray = EncodableValue(EncodableList{});
+  for(auto s : signals) {
+    EncodableValue signal(EncodableMap{
+      {EncodableValue("name"), EncodableValue(s.name)},
+      {EncodableValue("value"), EncodableValue(s.value)},
+      {EncodableValue("mid"), EncodableValue(s.mid)},
+    });
+    sArray.ListValue().push_back(signal);
+  }
+  event.MapValue()[EncodableValue("signals")] = sArray;
+
+  event_channel_->Send(event);
+}
 
 void UsbCan::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,

@@ -14,14 +14,19 @@ using std::cout;
 
 namespace plugins_usb_can {
 
-WeaponController::WeaponController(std::string const &name)
-        : name_(name),
-          frame_property_({}),
-          timer_(std::bind(&WeaponController::Auto_, this))
+bool equal(double num1,double num2) {
+  if((num1-num2>-0.0001)&&(num1-num2)<0.0001) return true;
+  return false;
+}
+
+WeaponController::WeaponController(std::string const &name,  const ReceiveAction& action) : name_(name),
+    mReceiveAction(action),
+    frame_property_({}),
+    timer_(std::bind(&WeaponController::Auto_, this))
 {
   timer_.SetSingleShot(false);
   timer_.SetInterval(Timer::Interval(10));
-  // InitializeReceiver();
+  InitializeReceiver();
 }
 
 WeaponController::~WeaponController()
@@ -50,13 +55,45 @@ WeaponController::CeaseFire()
   firing_ = false;
 }
 
+void WeaponController::processReceiveThread() {
+  while(IsReceiving()) {
+    std::this_thread::sleep_for (std::chrono::milliseconds(50));
+    processReceiveData();
+  }
+}
+
+void WeaponController::processReceiveData() {
+  // receive_mtx.lock();
+  if(recv_messages.empty()) return;
+  std::vector<SignalData> sArray;
+  for(auto& p : recv_messages) {
+    auto iter = mp_message_meta_.find(p.first);
+    if(iter != mp_message_meta_.end()) {
+      for(std::string signal_name : iter->second->signal_names) {
+        SignalData d;
+        d.name = signal_name;
+        std::shared_ptr<SignalMeta> signal_meta = mp_signal_meta_.at(signal_name);
+        uint64_t origvalue = extract(reinterpret_cast<const uint8_t*>(p.second.raw), signal_meta->start_bit, signal_meta->length, UNSIGNED, MOTOROLA);
+        double signal_value = origvalue * signal_meta->scaling;
+        d.value = signal_value;
+        d.mid = iter->second->id;
+        sArray.push_back(d);
+      }
+    }
+  }
+  recv_messages.clear();
+  // receive_mtx.unlock();
+  if(sArray.empty()) return;
+  mReceiveAction(sArray);
+
+}
+
 std::pair< std::vector<Message>,  std::vector<Message>>
 WeaponController::AcquireReceiveData()
 {
-
   std::vector<Message> known;
   std::vector<Message> unknown;
-  receive_mtx.lock();
+  // receive_mtx.lock();
   for(auto& p : recv_messages) {
     stringstream_.clear();
     stringstream_.str("");
@@ -84,7 +121,7 @@ WeaponController::AcquireReceiveData()
   }
   recv_messages.clear();
 
-  receive_mtx.unlock();
+  // receive_mtx.unlock();
 
   return std::make_pair(known, unknown);
 };
@@ -92,10 +129,12 @@ WeaponController::AcquireReceiveData()
 void
 WeaponController::InitializeReceiver() {
   if(!is_receiving_) {
+    is_receiving_ = true;
     receive_t_ = std::thread(
             &WeaponController::StartReceive, this);
+    receive_process_t_ = std::thread(
+            &WeaponController::processReceiveThread, this);
             // &WeaponController::test, this);
-    is_receiving_ = true;
   }
 }
 
@@ -123,11 +162,14 @@ void
 WeaponController::UnInitializeReceiver() {
   is_receiving_ = false;
   receive_t_.detach();
+  receive_process_t_.detach();
 }
 
 void
 WeaponController::OnReceiveMessages(std::vector<Message> & messages)
 {
+  if(messages.empty()) return;
+  
   for (auto& c : messages) {
     // std::cout << " messge id:" << c.id << " data:" << c.raw << "\n";
     recv_messages.emplace(c.id, c);
@@ -262,14 +304,8 @@ WeaponController::Auto_() {
 //  Shoot(ammo_generators_.Generate());
 }
 
-CanalystiiController::CanalystiiController()
-        : WeaponController("Canalystii"), rate_(500)
-{
-  this->Initialize();
-}
-
-CanalystiiController::CanalystiiController(std::string const &name, int rate)
-        : WeaponController(name), rate_(rate)
+CanalystiiController::CanalystiiController(std::string const &name, int rate, const ReceiveAction& action)
+        : WeaponController(name, action), rate_(rate)
 {
   this->Initialize();
 }
@@ -310,6 +346,7 @@ CanalystiiController::onStartReceive()
   //int len = can_node.receive_can_frame(can_idx,can_obj,recv_len,0);
   unsigned int receive_len = 0;
   while(IsReceiving()) {
+
     memset(&can_obj, 0, sizeof can_obj);
     if(is_device_ready && (receive_len = can_node_.receive_can_frame(can_idx,can_obj,recv_len,20)) > 0) {
       // cout << "CanalystiiController::onStartReceive  received " << receive_len << " entries message." << std::endl;
@@ -330,10 +367,11 @@ CanalystiiController::onStartReceive()
         };
         std::memcpy(message.raw, can_obj[i].Data, 8);
         messages.push_back(message);
+
       }
-      receive_mtx.lock();
+      // receive_mtx.lock();
       OnReceiveMessages(messages);
-      receive_mtx.unlock();
+      // receive_mtx.unlock();
 
 //      OnReceiveMessage(can_obj);
       //ROS_INFO("received:%u",can_obj.ID);
