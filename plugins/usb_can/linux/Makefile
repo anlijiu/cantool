@@ -10,6 +10,7 @@ PLUGIN_NAME=usb_can_plugin
 EXTRA_SOURCES= \
 	libwecan.cc \
 	weapon_controller.cc \
+	signal_store.cc \
 	plugin_interface.cc \
 	canalystii.cc \
 	utils.cc \

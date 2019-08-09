@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:core';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'models.dart';
 
 const String _usbCanChannelName = 'flutter/usb_can';
 const String _syncMetaDatas= 'UsbCan.SyncMetaDatas';
@@ -10,15 +13,6 @@ const String _loadAmmo = 'UsbCan.LoadAmmo';
 const String _unloadAmmo = 'UsbCan.UnloadAmmo';
 const String _setConstStrategy = 'UsbCan.SetConstStrategy';
 
-
-class MessageData {
-  static void fromMessage(Map<String, dynamic> message) {
-    print("_handleCanData  ${message["name"]}" );
-    message["signals"].forEach((s) {
-      print("_handleCanData  name: ${s["name"]}, value: ${s["value"]}, mid: ${s["mid"]}, ");
-    });
-  }
-}
 
 /// A singleton object that handles the interaction with the platform channel.
 class UsbCanChannel {
@@ -37,14 +31,29 @@ class UsbCanChannel {
   /// The static instance of the menu channel.
   static final UsbCanChannel instance = new UsbCanChannel._();
 
+  final List<ValueChanged<List<CanSignalData>>> _listeners = <ValueChanged<List<CanSignalData>>>[];
+
+  void addCanDataListener(ValueChanged<List<CanSignalData>> listener) {
+    _listeners.add(listener);
+  }
+
+  void removeCanDataListener(ValueChanged<List<CanSignalData>> listener) {
+    _listeners.remove(listener);
+  }
+
   Future<dynamic> _handleCanData(dynamic message) {
-      MessageData.fromMessage(new Map<String, dynamic>.from(message));
+    var m = new Map<String, dynamic>.from(message);
+    List<CanSignalData> event = <CanSignalData>[];
+    m["signals"].forEach((s) {
+      event.add(CanSignalData(s["name"], s["value"], s["mid"]));
+    });
+
+    for (ValueChanged<List<CanSignalData>> listener in List<ValueChanged<List<CanSignalData>>>.from(_listeners)) {
+      if (_listeners.contains(listener)) {
+        listener(event);
+      }
+    }
     return;
-    // for (ValueChanged<RawKeyEvent> listener in List<ValueChanged<RawKeyEvent>>.from(_listeners)) {
-    //   if (_listeners.contains(listener)) {
-    //     listener(event);
-    //   }
-    // }
   }
 
   /// Returns a list of screens.

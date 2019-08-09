@@ -14,12 +14,8 @@ using std::cout;
 
 namespace plugins_usb_can {
 
-bool equal(double num1,double num2) {
-  if((num1-num2>-0.0001)&&(num1-num2)<0.0001) return true;
-  return false;
-}
-
 WeaponController::WeaponController(std::string const &name,  const ReceiveAction& action) : name_(name),
+    store(new SignalStore()),
     mReceiveAction(action),
     frame_property_({}),
     timer_(std::bind(&WeaponController::Auto_, this))
@@ -33,6 +29,7 @@ WeaponController::~WeaponController()
 {
   timer_.Stop();
   UnInitializeReceiver();
+  delete store;
 }
 
 std::string &
@@ -55,37 +52,35 @@ WeaponController::CeaseFire()
   firing_ = false;
 }
 
-void WeaponController::processReceiveThread() {
-  while(IsReceiving()) {
-    std::this_thread::sleep_for (std::chrono::milliseconds(50));
-    processReceiveData();
-  }
-}
+// void WeaponController::processReceiveThread() {
+//   while(IsReceiving()) {
+//     std::this_thread::sleep_for (std::chrono::milliseconds(50));
+//     processReceiveData();
+//   }
+// }
 
-void WeaponController::processReceiveData() {
-  // receive_mtx.lock();
-  if(recv_messages.empty()) return;
+void WeaponController::processReceiveData(const std::vector<Message>& messages) {
+  if(messages.empty()) return;
   std::vector<SignalData> sArray;
-  for(auto& p : recv_messages) {
-    auto iter = mp_message_meta_.find(p.first);
+  for(auto& p : messages) {
+    auto iter = mp_message_meta_.find(p.id);
     if(iter != mp_message_meta_.end()) {
       for(std::string signal_name : iter->second->signal_names) {
         SignalData d;
         d.name = signal_name;
         std::shared_ptr<SignalMeta> signal_meta = mp_signal_meta_.at(signal_name);
-        uint64_t origvalue = extract(reinterpret_cast<const uint8_t*>(p.second.raw), signal_meta->start_bit, signal_meta->length, UNSIGNED, MOTOROLA);
+        uint64_t origvalue = extract(reinterpret_cast<const uint8_t*>(p.raw), signal_meta->start_bit, signal_meta->length, UNSIGNED, MOTOROLA);
         double signal_value = origvalue * signal_meta->scaling;
         d.value = signal_value;
-        d.mid = iter->second->id;
-        sArray.push_back(d);
+        d.mid = p.id;
+        if(store->writeValue(d.name, d.value)) {
+          sArray.push_back(d);
+        }
       }
     }
   }
-  recv_messages.clear();
-  // receive_mtx.unlock();
   if(sArray.empty()) return;
   mReceiveAction(sArray);
-
 }
 
 std::pair< std::vector<Message>,  std::vector<Message>>
@@ -132,8 +127,8 @@ WeaponController::InitializeReceiver() {
     is_receiving_ = true;
     receive_t_ = std::thread(
             &WeaponController::StartReceive, this);
-    receive_process_t_ = std::thread(
-            &WeaponController::processReceiveThread, this);
+    // receive_process_t_ = std::thread(
+    //         &WeaponController::processReceiveThread, this);
             // &WeaponController::test, this);
   }
 }
@@ -370,7 +365,7 @@ CanalystiiController::onStartReceive()
 
       }
       // receive_mtx.lock();
-      OnReceiveMessages(messages);
+      processReceiveData(messages);
       // receive_mtx.unlock();
 
 //      OnReceiveMessage(can_obj);

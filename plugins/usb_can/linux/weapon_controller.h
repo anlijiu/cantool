@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "can_defs.h"
 #include "canalystii.h"
+#include "signal_store.h"
 
 #include "property.h"
 
@@ -21,7 +22,7 @@ namespace plugins_usb_can {
 
 struct SignalData {
   std::string name;
-  int value;
+  double value;
   int mid;
 };
 
@@ -77,6 +78,7 @@ protected:
   virtual void onStartReceive() = 0;
   virtual void onStopReceive() = 0;
 
+  void processReceiveData(const std::vector<Message>& messages);
   void OnReceiveMessages(std::vector<Message> & messages);
 
   bool is_receiving_ = false;
@@ -87,14 +89,13 @@ protected:
   std::thread receive_t_;
   std::thread receive_process_t_;
 private:
-  void processReceiveThread();
-  void processReceiveData();
 
   std::map<uint32_t, std::shared_ptr<MessageMeta>> mp_message_meta_;
   std::map<std::string, std::shared_ptr<SignalMeta>> mp_signal_meta_;
   std::map<std::string, std::shared_ptr<PartBuildStrategy>> mp_strategies_;
   std::vector<uint32_t> loaded_ammos_;
   std::stringstream stringstream_;
+  SignalStore * store;
 
   Property<can_frame> frame_property_;//TODO
   std::string name_;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:convert' as convert;
+import 'package:flutter/foundation.dart';
 
 import 'package:localstorage/localstorage.dart';
 
@@ -10,6 +11,8 @@ abstract class Repository {
     Future<Map<String, dynamic>> setDbc(String strDbc);
     Future<Map<String, dynamic>> getDbc();
     Future<Map<String, dynamic>> syncMetaDatas(Map<String, dynamic> dbcInJson);
+    void addCanDataListener(ValueChanged<List<usb_can.CanSignalData>> listener);
+    void removeCanDataListener(ValueChanged<List<usb_can.CanSignalData>> listener);
     void startSending();
     void stopSending();
     void loadAmmo(int id);
@@ -81,5 +84,15 @@ class CanRepository implements Repository {
     @override
     void setConstStrategy(String sname, double value) {
         usb_can.setConstStrategy(sname, value);
+    }
+
+    @override
+    void addCanDataListener(ValueChanged<List<usb_can.CanSignalData>> listener) {
+        usb_can.addCanDataListener(listener);
+    }
+
+    @override
+    void removeCanDataListener(ValueChanged<List<usb_can.CanSignalData>> listener) {
+        usb_can.removeCanDataListener(listener);
     }
 }

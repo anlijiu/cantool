@@ -41,7 +41,6 @@ void SyncMetaDatas::excute(
         for(auto e_signal: e_signalValues) {
 
             std::string s_name = e_signal.MapValue()[EncodableValue("name")].StringValue();
-            std::cout << " signal name is " << s_name << std::endl;
             uint32_t s_start = e_signal.MapValue()[EncodableValue("start_bit")].IntValue();
             uint32_t s_length = e_signal.MapValue()[EncodableValue("length")].IntValue();
             double s_scaling = e_signal.MapValue()[EncodableValue("scaling")].DoubleValue();

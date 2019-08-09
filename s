@@ -1,1 +1,1 @@
-flutter run
+flutter run | tee a.log
