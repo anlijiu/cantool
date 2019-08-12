@@ -61,6 +61,7 @@ WeaponController::CeaseFire()
 
 void WeaponController::processReceiveData(const std::vector<Message>& messages) {
   if(messages.empty()) return;
+
   std::vector<SignalData> sArray;
   for(auto& p : messages) {
     auto iter = mp_message_meta_.find(p.id);
@@ -68,13 +69,16 @@ void WeaponController::processReceiveData(const std::vector<Message>& messages) 
       for(std::string signal_name : iter->second->signal_names) {
         SignalData d;
         d.name = signal_name;
-        std::shared_ptr<SignalMeta> signal_meta = mp_signal_meta_.at(signal_name);
-        uint64_t origvalue = extract(reinterpret_cast<const uint8_t*>(p.raw), signal_meta->start_bit, signal_meta->length, UNSIGNED, MOTOROLA);
-        double signal_value = origvalue * signal_meta->scaling;
-        d.value = signal_value;
-        d.mid = p.id;
-        if(store->writeValue(d.name, d.value)) {
-          sArray.push_back(d);
+        auto s_iter = mp_signal_meta_.find(signal_name);
+        if(s_iter != mp_signal_meta_.end()) {
+          std::shared_ptr<SignalMeta> signal_meta = s_iter->second;
+          uint64_t origvalue = extract(reinterpret_cast<const uint8_t*>(p.raw), signal_meta->start_bit, signal_meta->length, UNSIGNED, MOTOROLA);
+          double signal_value = origvalue * signal_meta->scaling;
+          d.value = signal_value;
+          d.mid = p.id;
+          if(store->writeValue(d.name, d.value)) {
+            sArray.push_back(d);
+          }
         }
       }
     }
@@ -335,6 +339,7 @@ int CanalystiiController::Initialize() {
 void
 CanalystiiController::onStartReceive()
 {
+    std::cout<<__func__ <<std::endl;
   VCI_CAN_OBJ can_obj[100];
   unsigned int recv_len = 100;
   unsigned int can_idx = 0;
@@ -346,23 +351,21 @@ CanalystiiController::onStartReceive()
     if(is_device_ready && (receive_len = can_node_.receive_can_frame(can_idx,can_obj,recv_len,20)) > 0) {
       // cout << "CanalystiiController::onStartReceive  received " << receive_len << " entries message." << std::endl;
       if(!IsReceiving()) return;
+      if(!IsReceiving()) return;
       std::vector<Message> messages;
-      auto zonedTime = date::make_zoned(date::current_zone(),
-                                  std::chrono::system_clock::now());
-      std::stringstream stringstream;
-      stringstream << zonedTime;
+    //   auto zonedTime = date::make_zoned(date::current_zone(),
+    //                               std::chrono::system_clock::now());
+    //   std::stringstream stringstream;
+      // stringstream << zonedTime;
       for(int i = 0; i < receive_len; ++i) {
-        // printf(" id is %d, hex value: %x, time:%s, data is ", can_obj[i].ID, can_obj[i].ID, stringstream.str().c_str());
-        // printBits(8, can_obj[i].Data);
-        // printf("\n");
         if(can_obj[i].ID == 0) continue;
+
         Message message {
                 (uint32_t)can_obj[i].ID,
                 (uint8_t)can_obj[i].DataLen,
         };
         std::memcpy(message.raw, can_obj[i].Data, 8);
         messages.push_back(message);
-
       }
       // receive_mtx.lock();
       processReceiveData(messages);

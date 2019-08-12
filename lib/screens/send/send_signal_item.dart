@@ -7,12 +7,14 @@ import 'dart:convert';
 
 class SendSignalItemView extends StatefulWidget {
   final String name;
-  final double value;
+  double value;
   final ValueChanged<double> onChanged;
+  final Stream<double> stream;
   SendSignalItemView({
       this.name,
       this.value,
-      this.onChanged
+      this.onChanged,
+      this.stream,
   });
 
   @override
@@ -43,24 +45,38 @@ class _SendSignalItemState extends State<SendSignalItemView> {
           IconButton(
             icon: new Icon(Icons.add),
             onPressed: () {
-              double v = widget.value;
+              double v = double.parse(_controller.text);
               ++v;
+              print("add icon button clicked , ${v.toString()}");
               widget.onChanged(v);
             }
           ),
           new Flexible(
-            child: Text(widget.value.toString())
-            // child: TextField(
-            //   keyboardType: TextInputType.number,
-            //   controller: _controller,
-            //   autofocus: false,
-            // ),
+            child: StreamBuilder<double>(
+              stream: widget.stream,
+              builder: (context, AsyncSnapshot<double> snapshot) {
+                if(snapshot.hasData) {
+                  print("stream strategy,   new ${snapshot.data.toString()}");
+                  _controller.value = _controller.value.copyWith(text: snapshot.data.toString());
+                }
+                return TextField(
+                  keyboardType: TextInputType.number,
+                  controller: _controller,
+                  onChanged: (value) {
+                      print("hhhhhhhhhhhh   ${value}");
+                      widget.onChanged(double.parse(value));
+                  },
+                  autofocus: false,
+                );
+              }
+            ),
           ),
           IconButton(
             icon: new Icon(Icons.remove),
             onPressed: () {
-              double v = widget.value;
+              double v = double.parse(_controller.text);
               --v;
+              print("remove icon button clicked , ${v.toString()}");
               widget.onChanged(v);
             }
           ),

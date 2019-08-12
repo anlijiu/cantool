@@ -9,24 +9,52 @@ import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/model/can_defs.dart';
 import 'package:usb_can/usb_can.dart';
 
+class StrategyEntry {
+  final String name;
+  final String type;
+  double value;
+  final double min;
+  final double max;
+
+  StrategyEntry(this.name, this.type, this.value, this.min, this.max);
+
+  StreamController<double> _streamController = new StreamController.broadcast();
+  Stream<double> get stream => _streamController.stream;
+  void dispose() {
+      _streamController.close();
+  }
+
+  void update(double value) {
+    if(this.value != value) {
+      this.value = value;
+      notify();
+    }
+  }
+
+  void notify() {
+      _streamController.sink.add(this.value);
+  }
+}
+
 class SendBloc implements BlocBase {
   final Repository _repository = CanRepository();
 
   List<MessageMeta> _messages = <MessageMeta>[];
   List<SignalMeta> _signals = <SignalMeta>[];
-  Map<String, Strategy> _strategyMap = new Map<String, Strategy>();
   Set<int> _sendingMsgIds = new Set<int>();
+
+  Map<String, StrategyEntry> strategyMap = new Map<String, StrategyEntry>();
 
   final BehaviorSubject<List<SignalMeta>> _signalMetasController = new BehaviorSubject<List<SignalMeta>>.seeded(<SignalMeta>[]);
   final BehaviorSubject<List<MessageMeta>> _messageMetasController = new BehaviorSubject<List<MessageMeta>>.seeded(<MessageMeta>[]);
   final BehaviorSubject<List<int>> _sendingMsgIdsController = new BehaviorSubject<List<int>>.seeded(<int>[]);
-  final BehaviorSubject<Map<String, Strategy>> _strategyMapController = new BehaviorSubject<Map<String, Strategy>>();
+  // final BehaviorSubject<Map<String, StrategyEntry>> _strategyMapController = new BehaviorSubject<Map<String, StrategyEntry>>();
 
 
   Stream<List<SignalMeta>> get signalMetas => _signalMetasController.stream;
   Stream<List<MessageMeta>> get messageMetas => _messageMetasController.stream;
   Stream<List<int>> get sendingMsgIds => _sendingMsgIdsController.stream;
-  Stream<Map<String, Strategy>> get strategyMap => _strategyMapController.stream;
+  // Stream<Map<String, StrategyEntry>> get strategyMap => _strategyMapController.stream;
 
   void updateMessageMetas(List<MessageMeta> metas) {
     if(metas.isEmpty) return;
@@ -39,26 +67,21 @@ class SendBloc implements BlocBase {
     initDefaultStrategyList();
   }
 
-  void updateConstStrategy(String name, double value) {
+  void updateConstStrategy(String name, double v) {
+    double value = v > strategyMap[name].max ? strategyMap[name].max : v < strategyMap[name].min ? strategyMap[name].min : v;
+    // if(value > _strategyMap[name].max || value < _strategyMap[name].min) return;
     print("updateConstStrategy " + name + " value:" + value.toString());
-    if(value > _strategyMap[name].max || value < _strategyMap[name].min) return;
-    _strategyMap[name] = new Strategy(name, "const", value,  _strategyMap[name].min, _strategyMap[name].max);
+    strategyMap[name].update(v);
     _repository.setConstStrategy(name, value);
-    _notifyStrategyList();
   }
 
   void initDefaultStrategyList() {
-    _strategyMap.clear();
+    strategyMap.clear();
     _messages.forEach((m) {
       m.signals.forEach((s) {
-        _strategyMap[s.name] = Strategy(s.name, "const", s.minimum, s.minimum, s.maximum);
+        strategyMap[s.name] = StrategyEntry(s.name, "const", s.minimum, s.minimum, s.maximum);
       });
     });
-    _notifyStrategyList();
-  }
-
-  Strategy strategyOfSignal(SignalMeta signalMeta) {
-    return _strategyMap[signalMeta.name];
   }
 
   void setFocusMessage(MessageMeta messageMeta) {
@@ -94,15 +117,19 @@ class SendBloc implements BlocBase {
     _signalMetasController.sink.add(UnmodifiableListView(_signals));
   }
 
-  void _notifyStrategyList(){
-    _strategyMapController.sink.add(UnmodifiableMapView(_strategyMap));
-  }
+  // void _notifyStrategyList(){
+    // _strategyMapController.sink.add(UnmodifiableMapView(_strategyMap));
+  // }
 
   @override
   void dispose() {
     _messageMetasController.close();
     _signalMetasController.close();
     _sendingMsgIdsController.close();
-    _strategyMapController.close();
+
+    strategyMap.forEach((name, strategy) {
+        strategy.dispose();
+    });
+    // _strategyMapController.close();
   }
 }

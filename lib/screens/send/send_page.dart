@@ -48,19 +48,19 @@ class _SendPageState extends State<SendPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: StreamBuilder<List<MessageMeta>>(
-          stream: _appBloc.messageMetas,
-          builder: (context, AsyncSnapshot<List<MessageMeta>> snapshot) {
-            if (snapshot.hasData) {
-              return snapshot.data.isEmpty ? _buildInit() : _buildMessageList(snapshot.data);
-            } else if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
-            }
-            return Center(child: CircularProgressIndicator());
-          },
-        ),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
+      child: StreamBuilder<List<MessageMeta>>(
+        stream: _appBloc.messageMetas,
+        builder: (context, AsyncSnapshot<List<MessageMeta>> snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data.isEmpty ? _buildInit() : _buildMessageList(snapshot.data);
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          return Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
@@ -122,31 +122,23 @@ class _SendPageState extends State<SendPage> {
   }
 
   Widget _buildSignalList(List<SignalMeta> signalMetas) {
-    return StreamBuilder<Map<String, Strategy>>(
-      stream: _sendBloc.strategyMap,
-      builder: (context, AsyncSnapshot<Map<String, Strategy>> snapshot) {
-        return ListView.builder(
-          itemCount: signalMetas.length,
-          itemBuilder:(BuildContext context, int index) {
-            if (snapshot.hasData) {
-
-              return Tooltip(
-                message: signalMetas[index].comment,
-                child: SendSignalItemView(
-                  name: signalMetas[index].name,
-                  value: snapshot.data[signalMetas[index].name].value,
-                  onChanged: (v) {
-                    _sendBloc.updateConstStrategy(signalMetas[index].name, v);
-                  }
-                )
-              );
-            } else {
-              return Container();
-            }
-          }
-        );
-      }
-    );
+    return
+      ListView.builder(
+        itemCount: signalMetas.length,
+        itemBuilder:(BuildContext context, int index) {
+          return Tooltip(
+            message: signalMetas[index].comment,
+            child: SendSignalItemView(
+              name: signalMetas[index].name,
+              stream: _sendBloc.strategyMap[signalMetas[index].name].stream,
+              value: _sendBloc.strategyMap[signalMetas[index].name].value,
+              onChanged: (v) {
+                _sendBloc.updateConstStrategy(signalMetas[index].name, v);
+              }
+            )
+          );
+        }
+      );
   }
 
   Widget _buildInit() {

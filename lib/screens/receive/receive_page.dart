@@ -37,19 +37,19 @@ class _ReceivePageState extends State<ReceivePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: StreamBuilder<List<dynamic>>(
-          stream: _receiveBloc.listStream,
-          builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-            if (snapshot.hasData) {
-              return snapshot.data.isEmpty ? Text("no data") : _buildList(snapshot.data);
-            } else if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
-            }
-            return Center(child: CircularProgressIndicator());
-          },
-        ),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
+      child: StreamBuilder<List<dynamic>>(
+        stream: _receiveBloc.listStream,
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data.isEmpty ? Text("no data") : _buildList(snapshot.data);
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          return Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
@@ -70,7 +70,10 @@ class _ReceivePageState extends State<ReceivePage> {
             );
           } else if(list[index] is SignalEntry) {
             return Container(
-              height: 50,
+              margin: const EdgeInsets.only(left: 10.0),
+              padding: const EdgeInsets.only(left: 10.0),
+              color: index%2 ==1 ? Color(0x1C0CFCAC) : Color(0xFFFFFFFF),
+              height: 35,
               child: SignalItemView(list[index].name, list[index].value, list[index].signalStream) 
             );
           } else {

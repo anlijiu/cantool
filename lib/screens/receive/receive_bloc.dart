@@ -52,6 +52,8 @@ class Message {
       signals[data.name] = SignalEntry(data.name, data.value);
       return true;
     }
+
+    return false;
   }
 
   StreamController<bool> _streamController = new StreamController.broadcast();
@@ -76,7 +78,6 @@ class ReceivedCanData {
   bool addNewList(List<CanSignalData> list) {
       bool needNotify = false;
       list.forEach((data) {
-          print("ReceivedCanData addNewList ${data.name} ${data.value}  ${data.mid}");
           if(_received_messages.containsKey(data.mid)) {
             if(_received_messages[data.mid].writeSignal(data)) {
               needNotify = true;
