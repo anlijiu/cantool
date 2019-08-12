@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 import 'dart:convert' as convert;
+
 import 'package:rxdart/rxdart.dart';
 
 import 'package:cantool/repository/repository.dart';
@@ -16,10 +17,11 @@ class StrategyEntry {
   final double min;
   final double max;
 
-  StrategyEntry(this.name, this.type, this.value, this.min, this.max);
+  StrategyEntry (this.name, this.type, this.value, this.min, this.max);
 
   StreamController<double> _streamController = new StreamController.broadcast();
   Stream<double> get stream => _streamController.stream;
+
   void dispose() {
       _streamController.close();
   }
@@ -32,6 +34,7 @@ class StrategyEntry {
   }
 
   void notify() {
+      print(" StrategyEntry notify ${this.name}: ${this.value}");
       _streamController.sink.add(this.value);
   }
 }
@@ -45,7 +48,7 @@ class SendBloc implements BlocBase {
 
   Map<String, StrategyEntry> strategyMap = new Map<String, StrategyEntry>();
 
-  final BehaviorSubject<List<SignalMeta>> _signalMetasController = new BehaviorSubject<List<SignalMeta>>.seeded(<SignalMeta>[]);
+  final PublishSubject<List<SignalMeta>> _signalMetasController = new PublishSubject<List<SignalMeta>>();
   final BehaviorSubject<List<MessageMeta>> _messageMetasController = new BehaviorSubject<List<MessageMeta>>.seeded(<MessageMeta>[]);
   final BehaviorSubject<List<int>> _sendingMsgIdsController = new BehaviorSubject<List<int>>.seeded(<int>[]);
   // final BehaviorSubject<Map<String, StrategyEntry>> _strategyMapController = new BehaviorSubject<Map<String, StrategyEntry>>();
@@ -56,22 +59,27 @@ class SendBloc implements BlocBase {
   Stream<List<int>> get sendingMsgIds => _sendingMsgIdsController.stream;
   // Stream<Map<String, StrategyEntry>> get strategyMap => _strategyMapController.stream;
 
+  SendBloc() {
+      print("------------- Sendbloc init ");
+  }
+
   void updateMessageMetas(List<MessageMeta> metas) {
     if(metas.isEmpty) return;
     _messages.clear();
     _messages.addAll(metas);
+    initDefaultStrategyList();
     _notifyMessageList();
     _signals = _messages[0].signals;
     _notifySignalList();
 
-    initDefaultStrategyList();
   }
 
   void updateConstStrategy(String name, double v) {
     double value = v > strategyMap[name].max ? strategyMap[name].max : v < strategyMap[name].min ? strategyMap[name].min : v;
     // if(value > _strategyMap[name].max || value < _strategyMap[name].min) return;
     print("updateConstStrategy " + name + " value:" + value.toString());
-    strategyMap[name].update(v);
+    strategyMap[name].update(value);
+    _notifySignalList();
     _repository.setConstStrategy(name, value);
   }
 
@@ -82,10 +90,15 @@ class SendBloc implements BlocBase {
         strategyMap[s.name] = StrategyEntry(s.name, "const", s.minimum, s.minimum, s.maximum);
       });
     });
+
+    print("------initDefaultStrategyList init ${strategyMap.length}");
   }
 
   void setFocusMessage(MessageMeta messageMeta) {
     _signals = messageMeta.signals;
+    _signals.forEach((s) {
+      strategyMap[s.name].notify();
+    });
     _notifySignalList();
   }
 

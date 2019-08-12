@@ -1,7 +1,8 @@
-import 'package:cantool/screens/send/send_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:file_chooser/file_chooser.dart' as file_chooser;
 import 'package:usb_can/usb_can.dart';
+import 'package:cantool/bloc/bloc_provider.dart';
+import 'package:cantool/screens/send/send_bloc.dart';
 import 'dart:core';
 import 'dart:convert';
 
@@ -10,6 +11,7 @@ class SendSignalItemView extends StatefulWidget {
   double value;
   final ValueChanged<double> onChanged;
   final Stream<double> stream;
+
   SendSignalItemView({
       this.name,
       this.value,
@@ -23,19 +25,23 @@ class SendSignalItemView extends StatefulWidget {
 
 class _SendSignalItemState extends State<SendSignalItemView> {
   SendBloc _sendBloc;
-  TextEditingController _controller;
+  TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
-    _controller = new TextEditingController(text: widget.value.toString());;
-    _controller.addListener(() {
-      print("send_signal_item  value changed " + _controller.text);
-    });
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sendBloc = BlocProvider.of<SendBloc>(context);;
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+      controller.text = widget.value.toString();
     return Container(
       height: 50,
       child: Row(
@@ -45,7 +51,7 @@ class _SendSignalItemState extends State<SendSignalItemView> {
           IconButton(
             icon: new Icon(Icons.add),
             onPressed: () {
-              double v = double.parse(_controller.text);
+              double v = widget.value;
               ++v;
               print("add icon button clicked , ${v.toString()}");
               widget.onChanged(v);
@@ -55,13 +61,9 @@ class _SendSignalItemState extends State<SendSignalItemView> {
             child: StreamBuilder<double>(
               stream: widget.stream,
               builder: (context, AsyncSnapshot<double> snapshot) {
-                if(snapshot.hasData) {
-                  print("stream strategy,   new ${snapshot.data.toString()}");
-                  _controller.value = _controller.value.copyWith(text: snapshot.data.toString());
-                }
                 return TextField(
                   keyboardType: TextInputType.number,
-                  controller: _controller,
+                  controller: controller, 
                   onChanged: (value) {
                       print("hhhhhhhhhhhh   ${value}");
                       widget.onChanged(double.parse(value));
@@ -74,7 +76,7 @@ class _SendSignalItemState extends State<SendSignalItemView> {
           IconButton(
             icon: new Icon(Icons.remove),
             onPressed: () {
-              double v = double.parse(_controller.text);
+              double v = widget.value;
               --v;
               print("remove icon button clicked , ${v.toString()}");
               widget.onChanged(v);
@@ -83,5 +85,11 @@ class _SendSignalItemState extends State<SendSignalItemView> {
         ]
       )
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 }
