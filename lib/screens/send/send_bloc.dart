@@ -48,7 +48,7 @@ class SendBloc implements BlocBase {
 
   Map<String, StrategyEntry> strategyMap = new Map<String, StrategyEntry>();
 
-  final PublishSubject<List<SignalMeta>> _signalMetasController = new PublishSubject<List<SignalMeta>>();
+  final BehaviorSubject<List<SignalMeta>> _signalMetasController = new BehaviorSubject<List<SignalMeta>>();
   final BehaviorSubject<List<MessageMeta>> _messageMetasController = new BehaviorSubject<List<MessageMeta>>.seeded(<MessageMeta>[]);
   final BehaviorSubject<List<int>> _sendingMsgIdsController = new BehaviorSubject<List<int>>.seeded(<int>[]);
   // final BehaviorSubject<Map<String, StrategyEntry>> _strategyMapController = new BehaviorSubject<Map<String, StrategyEntry>>();

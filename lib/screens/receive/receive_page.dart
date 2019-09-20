@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 
+import 'package:cantool/generated/i18n.dart';
 import 'package:cantool/bloc/application_bloc.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/model/can_defs.dart';
@@ -37,20 +38,27 @@ class _ReceivePageState extends State<ReceivePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      margin: const EdgeInsets.all(8.0),
-      child: StreamBuilder<List<dynamic>>(
-        stream: _receiveBloc.listStream,
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data.isEmpty ? Text("no data") : _buildList(snapshot.data);
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return Center(child: CircularProgressIndicator());
-        },
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(S.of(context).receive_page),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+            child: StreamBuilder<List<dynamic>>(
+              stream: _receiveBloc.listStream,
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data.isEmpty ? Text("no data") : _buildList(snapshot.data);
+                } else if (snapshot.hasError) {
+                  return Text(snapshot.error.toString());
+                }
+                return Center(child: CircularProgressIndicator());
+              },
+            ),
+          )
+        )
+      ]
     );
   }
 

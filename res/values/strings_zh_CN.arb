@@ -4,5 +4,7 @@
   "load_dbc": "加载Dbc",
   "reload_dbc": "重新加载Dbc",
   "about": "关于",
-  "happy_coding": "Happy coding"
+  "happy_coding": "Happy coding",
+  "send_page": "发送",
+  "receive_page": "接收"
 }

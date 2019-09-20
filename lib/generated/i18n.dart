@@ -23,7 +23,9 @@ class S implements WidgetsLocalizations {
   String get cantool => "Can Tool";
   String get happy_coding => "Happy coding";
   String get load_dbc => "Load Dbc";
+  String get receive_page => "Receive";
   String get reload_dbc => "Reload Dbc";
+  String get send_page => "Send";
   String get start_send => "start sending";
 }
 
@@ -37,6 +39,10 @@ class $zh_CN extends S {
   @override
   TextDirection get textDirection => TextDirection.ltr;
 
+  @override
+  String get send_page => "发送";
+  @override
+  String get receive_page => "接收";
   @override
   String get reload_dbc => "重新加载Dbc";
   @override

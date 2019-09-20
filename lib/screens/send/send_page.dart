@@ -11,6 +11,8 @@ import 'package:cantool/model/can_defs.dart';
 import 'package:cantool/screens/send/send_bloc.dart';
 import 'package:cantool/screens/dbc/dbc_button.dart';
 import 'package:cantool/screens/send/send_signal_item.dart';
+import 'package:cantool/generated/i18n.dart';
+
 import 'package:usb_can/usb_can.dart';
 
 class SendPage extends StatefulWidget {
@@ -48,20 +50,27 @@ class _SendPageState extends State<SendPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      margin: const EdgeInsets.all(8.0),
-      child: StreamBuilder<List<MessageMeta>>(
-        stream: _appBloc.messageMetas,
-        builder: (context, AsyncSnapshot<List<MessageMeta>> snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data.isEmpty ? _buildInit() : _buildMessageList(snapshot.data);
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return Center(child: CircularProgressIndicator());
-        },
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(S.of(context).send_page),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+            child: StreamBuilder<List<MessageMeta>>(
+              stream: _appBloc.messageMetas,
+              builder: (context, AsyncSnapshot<List<MessageMeta>> snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data.isEmpty ? _buildInit() : _buildMessageList(snapshot.data);
+                } else if (snapshot.hasError) {
+                  return Text(snapshot.error.toString());
+                }
+                return Center(child: CircularProgressIndicator());
+              },
+            ),
+          )
+        )
+      ]
     );
   }
 

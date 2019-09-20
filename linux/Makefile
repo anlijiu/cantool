@@ -45,7 +45,7 @@ FLUTTER_PLUGINS_DIR=$(PLUGINS_DIR)/flutter_plugins
 OUT_DIR=$(FLUTTER_APP_BUILD_DIR)/linux
 
 # Libraries
-FLUTTER_LIB_NAME=flutter_linux
+FLUTTER_LIB_NAME=flutter_linux_glfw
 FLUTTER_LIB=$(FLUTTER_APP_CACHE_DIR)/lib$(FLUTTER_LIB_NAME).so
 CONTROLCAN_LIB_NAME=controlcan
 CONTROLCAN_LIB=libs/lib$(CONTROLCAN_LIB_NAME).so
@@ -58,6 +58,7 @@ ALL_LIBS=$(FLUTTER_LIB) $(CONTROLCAN_LIB) $(PLUGIN_LIBS)
 
 # Tools
 FLUTTER_BIN=$(FLUTTER_ROOT)/bin/flutter
+LINUX_BUILD=$(FLUTTER_ROOT)/packages/flutter_tools/bin/tool_backend.sh
 
 # Resources
 ICU_DATA_NAME=icudtl.dat
@@ -78,7 +79,7 @@ ALL_LIBS_OUT=$(foreach lib,$(ALL_LIBS),$(BUNDLE_LIB_DIR)/$(notdir $(lib)))
 
 # Add relevant code from the wrapper library, which is intended to be statically
 # built into the client.
-WRAPPER_ROOT=$(FLUTTER_APP_CACHE_DIR)/cpp_client_wrapper
+WRAPPER_ROOT=$(FLUTTER_APP_CACHE_DIR)/cpp_client_wrapper_glfw
 WRAPPER_SOURCES= \
 	$(WRAPPER_ROOT)/flutter_window_controller.cc \
 	$(WRAPPER_ROOT)/plugin_registrar.cc \
@@ -94,6 +95,10 @@ INCLUDE_DIRS=$(FLUTTER_APP_CACHE_DIR) $(PLUGIN_INCLUDE_DIRS) \
 
 # Build settings
 CXX=clang++
+ifneq ($(strip $(SYSTEM_LIBRARIES)),)
+EXTRA_CPPFLAGS+=$(patsubst -I%,-isystem%,$(shell pkg-config --cflags $(SYSTEM_LIBRARIES)))
+EXTRA_LDFLAGS+=$(shell pkg-config --libs $(SYSTEM_LIBRARIES))
+endif
 CXXFLAGS.release=-DNDEBUG
 CXXFLAGS=-std=c++14 -Wall -Werror $(CXXFLAGS.$(BUILD))
 CPPFLAGS=$(patsubst %,-I%,$(INCLUDE_DIRS)) \

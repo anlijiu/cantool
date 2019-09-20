@@ -1,5 +1,6 @@
 #include "usb_can_plugin.h"
 
+
 #include <sys/utsname.h>
 #include <memory>
 #include <sstream>
