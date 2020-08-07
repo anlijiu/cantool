@@ -346,7 +346,6 @@ CanalystiiController::onStartReceive()
   //int len = can_node.receive_can_frame(can_idx,can_obj,recv_len,0);
   unsigned int receive_len = 0;
   while(IsReceiving()) {
-
     memset(&can_obj, 0, sizeof can_obj);
     if(is_device_ready && (receive_len = can_node_.receive_can_frame(can_idx,can_obj,recv_len,20)) > 0) {
       // cout << "CanalystiiController::onStartReceive  received " << receive_len << " entries message." << std::endl;

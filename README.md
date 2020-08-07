@@ -7,6 +7,10 @@ A new Flutter project.
 flutter config
 flutter config --enable-linux-desktop
 
+sudo service udev restart
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

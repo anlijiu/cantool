@@ -18,13 +18,12 @@
 #include <memory>
 #include <vector>
 
-#include <color_panel_plugin.h>
-#include <file_chooser_plugin.h>
+// For plugin-compatible event handling (e.g., modal windows).
+#include <X11/Xlib.h>
 #include <flutter/flutter_window_controller.h>
-#include <menubar_plugin.h>
-#include <url_launcher_fde_plugin.h>
-#include <window_size_plugin.h>
-#include <usb_can_plugin.h>
+#include <gtk/gtk.h>
+
+#include "flutter/generated_plugin_registrant.h"
 
 namespace {
 
@@ -77,21 +76,19 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  // Register any native plugins.
-  ColorPanelRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("ColorPanel"));
-  FileChooserRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("FileChooser"));
-  MenubarRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("Menubar"));
-  UrlLauncherRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("UrlLauncher"));
-  WindowSizeRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("WindowSize"));
-  UsbCanRegisterWithRegistrar(
-      flutter_controller.GetRegistrarForPlugin("UsbCan"));
+  RegisterPlugins(&flutter_controller);
 
-  // Run until the window is closed.
-  flutter_controller.RunEventLoop();
+  // Set up for GTK event handling, needed by the GTK-based plugins.
+  gtk_init(0, nullptr);
+  XInitThreads();
+
+  // Run until the window is closed, processing GTK events in parallel for
+  // plugin handling.
+  while (flutter_controller.RunEventLoopWithTimeout(
+      std::chrono::milliseconds(10))) {
+    if (gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+  }
   return EXIT_SUCCESS;
 }

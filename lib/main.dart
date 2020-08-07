@@ -6,13 +6,14 @@ import 'package:cantool/screens/home/app_drawer.dart';
 import 'package:cantool/screens/home/appbar_view.dart';
 import 'generated/i18n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'dart:io';
 
 void main() {
     print("main: I'm in");
-    _setTargetPlatformForDesktop();
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
 
     runApp(
       BlocProvider<ApplicationBloc>(
@@ -20,21 +21,6 @@ void main() {
         child: MyApp(),
       )
     );
-}
-
-/// If the current platform is desktop, override the default platform to
-/// a supported platform (iOS for macOS, Android for Linux and Windows).
-/// Otherwise, do nothing.
-void _setTargetPlatformForDesktop() {
-  TargetPlatform targetPlatform;
-  if (Platform.isMacOS) {
-    targetPlatform = TargetPlatform.iOS;
-  } else if (Platform.isLinux || Platform.isWindows) {
-    targetPlatform = TargetPlatform.android;
-  }
-  if (targetPlatform != null) {
-    debugDefaultTargetPlatformOverride = targetPlatform;
-  }
 }
 
 class MyApp extends StatelessWidget {
