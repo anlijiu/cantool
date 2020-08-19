@@ -1,4 +1,9 @@
 #include "can_operator.h"
+#include "can_device.h"
+#include "cstr.h"
+#include <string.h>
+#include <pthread.h>
+#include <stdio.h>
 
 typedef enum {
     AMMO_LOOP_CYCLE,
@@ -33,7 +38,7 @@ struct signal_meta {
     unsigned int last_trigon_angle;
     unsigned long last_timestamp;
     cstr_t *signal_name;
-}
+};
 
 struct ammo_meta {
     e_ammo_loop_type loop_type;
@@ -43,7 +48,7 @@ struct ammo_meta {
     unsigned int should_send_count = 1;
 
     list_t signal_meta_list;
-}
+};
 
     // unsigned int (*build)(*PVCI_CAN_OBJ);
     // void (*destroy)(PVCI_CAN_OBJ);
@@ -53,7 +58,7 @@ struct can_operator_sender {
     list_t * ammo_meta_list;
     pthread_t thread;
     bool flag;
-}
+};
 
 struct can_operator_receiver {
     list_t * listeners;
@@ -72,37 +77,40 @@ struct can_const_signal {
 static can_operator_sender sender;
 static can_operator_receiver receiver;
 static can_device * device;
+static bool inited = false;
 
 
-void *can_send_func(void *param) {
+void* can_send_func(void *param) {
+    return 0;
 }
-void *can_receive_func(void *param) {
-    VCI_CAN_OBJ can0_cache[100];
-    VCI_CAN_OBJ can1_cache[100];
+
+void* can_receive_func(void *param) {
     unsigned int cache_len = 100;
+    VCI_CAN_OBJ can0_cache[cache_len];
+    VCI_CAN_OBJ can1_cache[cache_len];
     unsigned int receive_can0_len = 0;
     unsigned int receive_can1_len = 0;
     while(receiver.flag) {
         memset(&can0_cache, 0, sizeof can0_cache);
         memset(&can1_cache, 0, sizeof can1_cache);
         if(device->ports[USB_CAN_PORT_0].started) {
-            receive_can0_len = usb_can_receive(device, USB_CAN_PORT_0, can0_cache, 100, 20);
+            receive_can0_len = usb_can_receive(device, USB_CAN_PORT_0, can0_cache, cache_len, 20);
         }
         if(device->ports[USB_CAN_PORT_1].started) {
-            receive_can1_len = usb_can_receive(device, USB_CAN_PORT_1, can1_cache, 100, 20);
+            receive_can1_len = usb_can_receive(device, USB_CAN_PORT_1, can1_cache, cache_len, 20);
         }
-      for(int i = 0; i < receive_len; ++i) {
-        if(can_obj[i].ID == 0) continue;
+    //   for(int i = 0; i < receive_len; ++i) {
+    //     if(can_obj[i].ID == 0) continue;
 
-        Message message {
-                (uint32_t)can_obj[i].ID,
-                (uint8_t)can_obj[i].DataLen,
-        };
-        std::memcpy(message.raw, can_obj[i].Data, 8);
-        messages.push_back(message);
-      }
+    //     Message message {
+    //             (uint32_t)can_obj[i].ID,
+    //             (uint8_t)can_obj[i].DataLen,
+    //     };
+    //     std::memcpy(message.raw, can_obj[i].Data, 8);
+    //     messages.push_back(message);
+    //   }
       // receive_mtx.lock();
-      processReceiveData(messages);
+    //   processReceiveData(messages);
       // receive_mtx.unlock();
 
 //      OnReceiveMessage(can_obj);
@@ -110,13 +118,14 @@ void *can_receive_func(void *param) {
       // canalystii_node_msg::can msg = CANalystii_node::can_obj2msg(can_obj);
       // can_node.can_msg_pub_.publish(msg);
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds(50));
+    // std::this_thread::sleep_for (std::chrono::milliseconds(50));
     //ros::spinOnce();
-  }
+    return 0;
 }
 
 void can_operator_init() {
-    device = usb_can_new();
+    if(inited) return;
+    usb_can_new(&device);
     usb_can_start(device);
     sender.ammo_meta_list = list_new();
     receiver.listeners = list_new();
@@ -129,6 +138,7 @@ void can_operator_init() {
 void can_operator_destroy() {
     usb_can_free(device);
     list_destroy(receiver.listeners);
+    inited = false;
 }
 
 void can_operator_fire() {

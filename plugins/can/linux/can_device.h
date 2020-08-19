@@ -2,6 +2,7 @@
 #define CAN_DEVICE_H
 
 #include <stdbool.h>
+#include <controlcan.h>
 
 #define USB_CAN_PORT_MAX 2
 #define USB_CAN_PORT_0 0
@@ -19,7 +20,7 @@ struct can_device_port {
 struct can_device {
     bool opened;
     unsigned int device_type;
-    unsigned int device_idx = 0;//当前只支持一个设备
+    unsigned int device_idx = 0;
     unsigned int max_ports;
     struct can_device_port *ports;
     struct can_device_ops *ops;
@@ -31,16 +32,16 @@ struct can_device_ops {
 	bool (*init)(struct can_device *, unsigned int);
 	bool (*start)(struct can_device *, unsigned int);
 	bool (*send)(struct can_device *, unsigned int, PVCI_CAN_OBJ, unsigned int);
-	bool (*receive)(struct can_device *, unsigned int, PVCI_CAN_OBJ, unsigned int, int);
-}
+	int (*recv)(struct can_device *, unsigned int, PVCI_CAN_OBJ, unsigned int, int);
+};
 
 
-#ifdef __cplusplus 
-extern "C" { 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 
-void usb_can_init(struct can_device *);
+void usb_can_new(struct can_device **);
 void usb_can_free(struct can_device *);
 
 bool usb_can_start(struct can_device *);

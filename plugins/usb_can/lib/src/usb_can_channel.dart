@@ -15,9 +15,9 @@ const String _setConstStrategy = 'UsbCan.SetConstStrategy';
 
 
 /// A singleton object that handles the interaction with the platform channel.
-class UsbCanChannel {
+class CanChannel {
   /// Private constructor.
-  UsbCanChannel._() {
+  CanChannel._() {
     _eventChannel.setMessageHandler(_handleCanData);
   }
 
@@ -29,7 +29,7 @@ class UsbCanChannel {
   );
 
   /// The static instance of the menu channel.
-  static final UsbCanChannel instance = new UsbCanChannel._();
+  static final CanChannel instance = new CanChannel._();
 
   final List<ValueChanged<List<CanSignalData>>> _listeners = <ValueChanged<List<CanSignalData>>>[];
 

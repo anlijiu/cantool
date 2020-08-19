@@ -8,33 +8,33 @@ import 'models.dart';
 export 'models.dart';
 
 Future<String> syncMetaDatas(Map<String, dynamic>dbc) async {
-  return await UsbCanChannel.instance.syncMetaDatas(dbc);
+  return await CanChannel.instance.syncMetaDatas(dbc);
 }
 
 void startSending() {
-    UsbCanChannel.instance.startSending();
+    CanChannel.instance.startSending();
 }
 
 void stopSending() {
-    UsbCanChannel.instance.stopSending();
+    CanChannel.instance.stopSending();
 }
 
 void loadAmmo(int id) {
-    UsbCanChannel.instance.loadAmmo(id);
+    CanChannel.instance.loadAmmo(id);
 }
 
 void unloadAmmo(int id) {
-    UsbCanChannel.instance.unloadAmmo(id);
+    CanChannel.instance.unloadAmmo(id);
 }
 
 void setConstStrategy(String sname, double value) {
-    UsbCanChannel.instance.setConstStrategy(sname, value);
+    CanChannel.instance.setConstStrategy(sname, value);
 }
 
 void addCanDataListener(ValueChanged<List<CanSignalData>> listener) {
-    UsbCanChannel.instance.addCanDataListener(listener);
+    CanChannel.instance.addCanDataListener(listener);
 }
 
 void removeCanDataListener(ValueChanged<List<CanSignalData>> listener) {
-    UsbCanChannel.instance.removeCanDataListener(listener);
+    CanChannel.instance.removeCanDataListener(listener);
 }

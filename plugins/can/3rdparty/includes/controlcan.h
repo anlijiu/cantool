@@ -51,8 +51,8 @@
 #define UINT32 UINT
 #define LPVOID void*
 #define BOOL BYTE
-#define TRUE 1
-#define FALSE 0
+// #define TRUE 1
+// #define FALSE 0
 
 
 #if 1
@@ -111,7 +111,7 @@ typedef struct _INIT_CONFIG{
     unsigned char	Timing0;
     unsigned char	Timing1;
     unsigned char	Mode;
-}VCI_INIT_CONFIG,*PVCI_INIT_CONFIG;
+} VCI_INIT_CONFIG, *PVCI_INIT_CONFIG;
 
 //USB-CAN总线适配器板卡信息的数据类型1，该类型为VCI_FindUsbDevice函数的返回参数。
 typedef  struct  _VCI_BOARD_INFO1{

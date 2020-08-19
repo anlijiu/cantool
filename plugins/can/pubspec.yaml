@@ -1,12 +1,14 @@
-name: usb_can
-description: usb can plugin.
-version: 0.0.1
+name: can
+description: can plugin.
+version: 0.0.2
 author: anlijiu <anlijiu@gmail.com>
 homepage: https://github.com/anlijiu/cantool
 
 flutter:
   plugin:
-    pluginClass: UsbCan 
+    platforms:
+      linux:
+        pluginClass: CanPlugin
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

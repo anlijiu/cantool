@@ -13,7 +13,7 @@ import 'package:cantool/screens/dbc/dbc_button.dart';
 import 'package:cantool/screens/send/send_signal_item.dart';
 import 'package:cantool/generated/i18n.dart';
 
-import 'package:usb_can/usb_can.dart';
+import 'package:can/can.dart';
 
 class SendPage extends StatefulWidget {
   SendPage();

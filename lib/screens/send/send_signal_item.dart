@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_chooser/file_chooser.dart' as file_chooser;
-import 'package:usb_can/usb_can.dart';
+import 'package:can/can.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/screens/send/send_bloc.dart';
 import 'dart:core';

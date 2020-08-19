@@ -99,6 +99,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.7.1"
+  can:
+    dependency: "direct main"
+    description:
+      path: "plugins/can"
+      relative: true
+    source: path
+    version: "0.0.2"
   characters:
     dependency: transitive
     description:
@@ -607,13 +614,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.1.3"
-  usb_can:
-    dependency: "direct main"
-    description:
-      path: "plugins/usb_can"
-      relative: true
-    source: path
-    version: "0.0.1"
   vector_math:
     dependency: transitive
     description:

@@ -1,1 +1,1 @@
-flutter run -d linux | tee a.log
+flutter run -d linux  --verbose | tee a.log

@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:cantool/repository/repository.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/model/can_defs.dart';
-import 'package:usb_can/usb_can.dart';
+import 'package:can/can.dart';
 
 class SignalEntry {
   final String name;

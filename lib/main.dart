@@ -12,52 +12,46 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 void main() {
-    print("main: I'm in");
-    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
-
-    runApp(
-      BlocProvider<ApplicationBloc>(
-        bloc: ApplicationBloc(),
-        child: MyApp(),
-      )
-    );
+  print("main: I'm in");
+  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(BlocProvider<ApplicationBloc>(
+    bloc: ApplicationBloc(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: const Locale('zh', 'CN'), 
-      title: 'Architecture demo',
-      theme: ThemeData(
-        // Define the default brightness and colors.
-        brightness: Brightness.light,
-        primaryColor: Colors.lightBlue[800],
-        accentColor: Colors.cyan[600],
-        
-        // Define the default font family.
-        fontFamily: 'wqy',
-        
-        // Define the default TextTheme. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
-        textTheme: TextTheme(
-          headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          title: TextStyle(fontSize: 48.0, fontStyle: FontStyle.italic),
-          body1: TextStyle(fontSize: 20.0 ),
+        locale: const Locale('zh', 'CN'),
+        title: 'Architecture demo',
+        theme: ThemeData(
+          // Define the default brightness and colors.
+          brightness: Brightness.light,
+          primaryColor: Colors.lightBlue[800],
+          accentColor: Colors.cyan[600],
+
+          // Define the default font family.
+          fontFamily: 'wqy',
+
+          // Define the default TextTheme. Use this to specify the default
+          // text styling for headlines, titles, bodies of text, and more.
+          textTheme: TextTheme(
+            headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+            title: TextStyle(fontSize: 48.0, fontStyle: FontStyle.italic),
+            body1: TextStyle(fontSize: 20.0),
+          ),
         ),
-      ),
-      localizationsDelegates: const [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      home: new Scaffold(
-        appBar: AppbarView(),
-        body: HomePage(),
-        drawer: AppDrawer()
-      )
-    );
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        home: new Scaffold(
+            appBar: AppbarView(), body: HomePage(), drawer: AppDrawer()));
   }
 }
 

@@ -23,17 +23,20 @@ class ApplicationBloc implements BlocBase {
     loadDbcData();
   }
 
-  void openDbcFilePanel() {
-    file_chooser.showOpenPanel((result, paths) {
-      // Scaffold.of(context).showSnackBar(SnackBar(
-      //                 content: Text(paths[0]),
-      // ));                                                                         
+  void openDbcFilePanel() async {
+    final result = await file_chooser.showSavePanel(
+            suggestedFileName: '*.dbc',
+            allowedFileTypes: const [
+                file_chooser.FileTypeFilterGroup(
+                        fileExtensions: ['dbc'],
+                )
+            ],
+    );
 
-      if (result != file_chooser.FileChooserResult.cancel) {
-        print(paths[0]);
-        setDbc(path: paths[0]);
-      }
-    }, allowsMultipleSelection: false);
+    if (!result.canceled) {
+        print(result.paths[0]);
+        setDbc(path: result.paths[0]);
+    }
   }
 
   void loadDbcData() {

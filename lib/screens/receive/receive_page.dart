@@ -11,7 +11,7 @@ import 'package:cantool/model/can_defs.dart';
 import 'package:cantool/screens/receive/receive_bloc.dart';
 import 'package:cantool/screens/receive/message_item_view.dart';
 import 'package:cantool/screens/receive/signal_item_view.dart';
-import 'package:usb_can/usb_can.dart';
+import 'package:can/can.dart';
 
 class ReceivePage extends StatefulWidget {
   ReceivePage();

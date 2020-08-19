@@ -27,8 +27,8 @@ dependencies:
     path: plugins/color_panel
   file_chooser:
     path: plugins/file_chooser
-  usb_can:
-    path: plugins/usb_can
+  can:
+    path: plugins/can
   menubar:
     path: plugins/menubar
   window_size:

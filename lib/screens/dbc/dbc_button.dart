@@ -52,8 +52,8 @@ class _DbcButtonState extends State<DbcButton> {
   String _resultTextForFileChooserOperation(
           file_chooser.FileChooserResult result,
           [List<String> paths]) {
-      if (result == file_chooser.FileChooserResult.cancel) {
-          return 'cancelled';
+      if (result.canceled) {
+          return 'canceled';
       }
       return '${paths.join('\n')}';
   }
