@@ -83,37 +83,33 @@ void usb_can_port_init(struct can_device_port * port, unsigned int idx) {
     usb_can_vci_init(&port->conf);
 }
 
-void usb_can_new(struct can_device ** dev) {
-    *dev = (struct can_device *)malloc(sizeof(struct can_device));
+
+static VCI_BOARD_INFO1 boardInfo;
+static unsigned int deviceCount;
+unsigned int can_find() {
+    deviceCount = VCI_FindUsbDevice(&boardInfo);
+    debug_info("VCI_FindUsbDevice  result: %d, hw_Version:%d, fw_Version:%d, dr_Version:%d, in_Version:%d,irq_Num:%d, canNum is %d, Reserved:%d, str_Serial_Num:%s, str_hw_Type:%s", deviceCount,boardInfo.hw_Version, boardInfo.fw_Version, boardInfo.dr_Version, boardInfo.in_Version, boardInfo.irq_Num, boardInfo.can_Num, boardInfo.Reserved, boardInfo.str_Serial_Num, boardInfo.str_hw_Type);
+    for(int i = 0; i < deviceCount; ++i) {
+        debug_info("VCI_FindUsbDevice str_Usb_Serial[%d]: %s ", i, boardInfo.str_Usb_Serial[i]);
+    }
+    return deviceCount;
+}
+
+void usb_can_new(struct can_device ** dev, unsigned int count) {
+    *dev = (struct can_device *)malloc(sizeof(struct can_device) * count);
     struct can_device * device = *dev;
-    memset(device, 0, sizeof(*device));
-    device->max_ports = USB_CAN_PORT_MAX;
-    device->device_type = 4;
-    device->ports =  (struct can_device_port *)malloc(sizeof(struct can_device_port) * USB_CAN_PORT_MAX);
-    struct can_device_port * port = device->ports;
-    for(unsigned int i = 0; i < USB_CAN_PORT_MAX; ++i, ++port) {
-        usb_can_port_init(port, i);
-    }
-    device->ops = &usb_can_device_ops;
-
-    VCI_BOARD_INFO1  boardInfo1;
-    unsigned int findResult1 = VCI_FindUsbDevice(&boardInfo1);
-    debug_info("VCI_FindUsbDevice  result: %d, canNum is %d", findResult1, boardInfo1.can_Num);
-    for(int i = 0; i< findResult1; ++i) {
-        for(int j = 0; j < 4; ++j) {
-            debug_info("VCI_FindUsbDevice str_Usb_Serial[%d][%d]: %c ", i, j, boardInfo1.str_Usb_Serial[i][j]);
+    memset(device, 0, sizeof(*device) * count);
+    for (int i = 0; i < count; ++i, ++device)
+    {
+        device->max_ports = USB_CAN_PORT_MAX;
+        device->device_type = 4;
+        device->ports = (struct can_device_port *)malloc(sizeof(struct can_device_port) * USB_CAN_PORT_MAX);
+        struct can_device_port *port = device->ports;
+        for (unsigned int i = 0; i < USB_CAN_PORT_MAX; ++i, ++port)
+        {
+            usb_can_port_init(port, i);
         }
-    }
-
-
-
-    VCI_BOARD_INFO2  boardInfo;
-    unsigned int findResult = VCI_FindUsbDevice2(&boardInfo);
-    debug_info("VCI_FindUsbDevice2  result: %d, canNum is %d", findResult, boardInfo.can_Num);
-    for(int i = 0; i< findResult; ++i) {
-        for(int j = 0; j < 4; ++j) {
-            debug_info("VCI_FindUsbDevice2 str_Usb_Serial[%d][%d]: %c ", i, j, boardInfo.str_Usb_Serial[i][j]);
-        }
+        device->ops = &usb_can_device_ops;
     }
 }
 

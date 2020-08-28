@@ -41,7 +41,8 @@ extern "C" {
 #endif
 
 
-void usb_can_new(struct can_device **);
+unsigned int can_find();
+void usb_can_new(struct can_device **, unsigned int count);
 void usb_can_free(struct can_device *);
 
 bool usb_can_start(struct can_device *);

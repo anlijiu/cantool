@@ -371,6 +371,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.9.6+3"
+  overlay_support:
+    dependency: "direct main"
+    description:
+      name: overlay_support
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.5"
   package_config:
     dependency: transitive
     description:
@@ -558,6 +565,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.10.0-nullsafety"
+  sticky_and_expandable_list:
+    dependency: "direct main"
+    description:
+      name: sticky_and_expandable_list
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.1"
   stream_channel:
     dependency: transitive
     description:

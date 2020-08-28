@@ -18,6 +18,18 @@
     ],
     "files.associations": {
         "*.css": "postcss",
-        "thread": "cpp"
+        "thread": "cpp",
+        "functional": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp",
+        "string_view": "cpp",
+        "array": "cpp",
+        "chrono": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     }
 }

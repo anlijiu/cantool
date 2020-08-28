@@ -15,6 +15,7 @@ const String _ceaseFire = 'Can.CeaseFire';
 const String _loadAmmo = 'Can.LoadAmmo';
 const String _unloadAmmo = 'Can.UnloadAmmo';
 const String _setConstStrategy = 'Can.SetConstStrategy';
+const String _parseDbcFileMethod = "Can.ParseDbcFile";
 
 const MethodChannel _platformChannel = const MethodChannel(_canChannelName);
 
@@ -81,6 +82,16 @@ class CanChannel {
       print('openDevice Platform exception fire : ${e.message}');
     }
     return;
+  }
+
+  Future<Map<String, dynamic>> parseDbc(String path) {
+    try {
+      final response = _platformChannel.invokeMapMethod<String, dynamic>(
+          _parseDbcFileMethod, path);
+      return response;
+    } on PlatformException catch (e) {
+      print('closeDevice Platform exception fire : ${e.message}');
+    }
   }
 
   void closeDevice(String dtype, int did, int dport) {

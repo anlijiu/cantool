@@ -7,7 +7,7 @@
 
 typedef bool (*can_listener_t)(PVCI_CAN_OBJ pObj, unsigned int len);
 
-void can_operator_init();
+bool can_operator_init();
 void can_operator_destroy();
 
 void can_operator_fire();

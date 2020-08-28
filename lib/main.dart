@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'dart:io';
 
 void main() {
@@ -24,34 +25,36 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        locale: const Locale('zh', 'CN'),
-        title: 'Architecture demo',
-        theme: ThemeData(
-          // Define the default brightness and colors.
-          brightness: Brightness.light,
-          primaryColor: Colors.lightBlue[800],
-          accentColor: Colors.cyan[600],
+    return OverlaySupport(
+        child: MaterialApp(
+            locale: const Locale('zh', 'CN'),
+            title: 'Architecture demo',
+            theme: ThemeData(
+              // Define the default brightness and colors.
+              brightness: Brightness.light,
+              primaryColor: Colors.lightBlue[800],
+              accentColor: Colors.cyan[600],
 
-          // Define the default font family.
-          fontFamily: 'wqy',
+              // Define the default font family.
+              fontFamily: 'wqy',
 
-          // Define the default TextTheme. Use this to specify the default
-          // text styling for headlines, titles, bodies of text, and more.
-          textTheme: TextTheme(
-            headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-            title: TextStyle(fontSize: 48.0, fontStyle: FontStyle.italic),
-            body1: TextStyle(fontSize: 20.0),
-          ),
-        ),
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate
-        ],
-        supportedLocales: S.delegate.supportedLocales,
-        home: new Scaffold(
-            appBar: AppbarView(), body: HomePage(), drawer: AppDrawer()));
+              // Define the default TextTheme. Use this to specify the default
+              // text styling for headlines, titles, bodies of text, and more.
+              textTheme: TextTheme(
+                headline:
+                    TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+                title: TextStyle(fontSize: 48.0, fontStyle: FontStyle.italic),
+                body1: TextStyle(fontSize: 20.0),
+              ),
+            ),
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            home: new Scaffold(
+                appBar: AppbarView(), body: HomePage(), drawer: AppDrawer())));
   }
 }
 

@@ -4,6 +4,10 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 
 set(PLUGIN_NAME "${PROJECT_NAME}_plugin")
 
+ADD_DEFINITIONS(
+  -Wno-unused-function
+)
+
 add_library(${PLUGIN_NAME} SHARED
   "${PLUGIN_NAME}.cc"
   "can_device.cc"
@@ -14,6 +18,7 @@ add_library(${PLUGIN_NAME} SHARED
   "list/list.cc"
   "list/list_node.cc"
   "list/list_iterator.cc"
+  "dbc_parser.cc"
 )
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include

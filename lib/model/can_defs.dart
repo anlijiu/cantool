@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 
 part 'can_defs.g.dart';
 
@@ -19,9 +20,9 @@ class Dbc extends Object {
 }
 
 @JsonSerializable()
-class MessageMeta extends Object {
-
+class MessageMeta extends Object implements ExpandableListSection<SignalMeta> {
   MessageMeta(this.id, this.name, this.sender, this.length, this.signals);
+  bool expanded = true;
   final int id;
   final String name;
   final String sender;
@@ -30,8 +31,24 @@ class MessageMeta extends Object {
   @JsonKey(nullable: false)
   final List<SignalMeta> signals;
 
-  factory MessageMeta.fromJson(Map<String, dynamic> json) => _$MessageMetaFromJson(json);
+  factory MessageMeta.fromJson(Map<String, dynamic> json) =>
+      _$MessageMetaFromJson(json);
   Map<String, dynamic> toJson() => _$MessageMetaToJson(this);
+
+  @override
+  List<SignalMeta> getItems() {
+    return signals;
+  }
+
+  @override
+  bool isSectionExpanded() {
+    return expanded;
+  }
+
+  @override
+  void setSectionExpanded(bool expanded) {
+    this.expanded = expanded;
+  }
 }
 
 @JsonSerializable()
@@ -50,8 +67,22 @@ class SignalMeta extends Object {
   final String comment;
   final Map<int, String> options;
 
-  SignalMeta(this.name, this.start_bit, this.length, this.little_endian, this.is_signed, this.value_type, this.scaling, this.offset, this.minimum, this.maximum, this.unit, this.comment, this.options);
-  factory SignalMeta.fromJson(Map<String, dynamic> json) => _$SignalMetaFromJson(json);
+  SignalMeta(
+      this.name,
+      this.start_bit,
+      this.length,
+      this.little_endian,
+      this.is_signed,
+      this.value_type,
+      this.scaling,
+      this.offset,
+      this.minimum,
+      this.maximum,
+      this.unit,
+      this.comment,
+      this.options);
+  factory SignalMeta.fromJson(Map<String, dynamic> json) =>
+      _$SignalMetaFromJson(json);
   Map<String, dynamic> toJson() => _$SignalMetaToJson(this);
 }
 

@@ -18,7 +18,9 @@ environment:
 
 dependencies:
   animated_text_kit: ^2.2.0
+  sticky_and_expandable_list: ^0.2.1
   draggable_scrollbar: ^0.0.4
+  overlay_support: ^1.0.5
   localstorage: ^3.0.0
   json_annotation: ^3.0.1
   rxdart: ^0.24.1

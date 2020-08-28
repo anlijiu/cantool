@@ -27,16 +27,16 @@ class CanRepository implements Repository {
   }
   CanRepository._internal() {
     can.openDevice();
-    // var storage = LocalStorage('dbc');
-    // storage.ready.then((s) {
-    //   Map<String, dynamic> dbcInJson = storage.getItem('dbc');
-    //   can.syncMetaDatas(dbcInJson);
-    // });
+    var storage = LocalStorage('dbc');
+    storage.ready.then((s) {
+      Map<String, dynamic> dbcInJson = storage.getItem('dbc');
+      can.syncMetaDatas(dbcInJson);
+    });
   }
 
   @override
-  Future<Map<String, dynamic>> setDbc(String strDbc) async {
-    Map<String, dynamic> dbcInJson = convert.jsonDecode(strDbc);
+  Future<Map<String, dynamic>> setDbc(String path) async {
+    Map<String, dynamic> dbcInJson = await can.parseDbc(path);
     _saveDbcToDataBase(dbcInJson);
     syncMetaDatas(dbcInJson);
     return dbcInJson;

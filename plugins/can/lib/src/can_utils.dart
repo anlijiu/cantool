@@ -11,6 +11,10 @@ Future<String> syncMetaDatas(Map<String, dynamic> dbc) async {
   return await CanChannel.instance.syncMetaDatas(dbc);
 }
 
+Future<Map<String, dynamic>> parseDbc(String path) {
+  return CanChannel.instance.parseDbc(path);
+}
+
 void openDevice([String dtype = "usb", int did = 0, int dport = 0]) {
   CanChannel.instance.openDevice(dtype, did, dport);
 }
