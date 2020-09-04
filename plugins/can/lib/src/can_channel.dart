@@ -12,10 +12,11 @@ const String _closeDeviceMethod = "Can.CloseDevice";
 const String _syncMetaDatas = 'Can.SyncMetaDatas';
 const String _fire = 'Can.Fire';
 const String _ceaseFire = 'Can.CeaseFire';
-const String _loadAmmo = 'Can.LoadAmmo';
-const String _unloadAmmo = 'Can.UnloadAmmo';
+const String _loadAmmo = 'Can.AddAmmo';
+const String _unloadAmmo = 'Can.RemomveAmmo';
 const String _setConstStrategy = 'Can.SetConstStrategy';
 const String _parseDbcFileMethod = "Can.ParseDbcFile";
+const String _canReceiveCallbackMethod = "Can.ReceiveCallback";
 
 const MethodChannel _platformChannel = const MethodChannel(_canChannelName);
 
@@ -47,17 +48,17 @@ class CanChannel {
     _listeners.remove(listener);
   }
 
-  Future<Null> _handleCanData(dynamic message) async {
-    var m = new Map<String, dynamic>.from(message);
-    List<CanSignalData> event = <CanSignalData>[];
-    m["signals"].forEach((s) {
-      event.add(CanSignalData(s["name"], s["value"], s["mid"]));
-    });
-
-    for (ValueChanged<List<CanSignalData>> listener
-        in List<ValueChanged<List<CanSignalData>>>.from(_listeners)) {
-      if (_listeners.contains(listener)) {
-        listener(event);
+  Future<Null> _handleCanData(MethodCall methodCall) async {
+    if (methodCall.method == _canReceiveCallbackMethod) {
+      final List<CanSignalData> arg = (methodCall.arguments as List)
+          .map((e) => CanSignalData(e["name"], e["value"], e["mid"]))
+          .toList();
+      print(arg);
+      for (ValueChanged<List<CanSignalData>> listener
+          in List<ValueChanged<List<CanSignalData>>>.from(_listeners)) {
+        if (_listeners.contains(listener)) {
+          listener(arg);
+        }
       }
     }
     return;
@@ -66,8 +67,7 @@ class CanChannel {
   /// Returns a list of screens.
   Future<String> syncMetaDatas(Map<String, dynamic> dbc) async {
     try {
-      final response =
-          await _platformChannel.invokeMethod(_syncMetaDatas, [dbc]);
+      final response = await _platformChannel.invokeMethod(_syncMetaDatas, dbc);
       return response;
     } on PlatformException catch (e) {
       print('Platform exception syncMetaDatas: ${e.message}');
@@ -141,8 +141,8 @@ class CanChannel {
 
   void setConstStrategy(String sname, double value) {
     try {
-      final response =
-          _platformChannel.invokeMethod(_setConstStrategy, [sname, value]);
+      final response = _platformChannel
+          .invokeMethod(_setConstStrategy, {"name": sname, "value": value});
     } on PlatformException catch (e) {
       print('Platform exception set const strategy : ${e.message}');
     }

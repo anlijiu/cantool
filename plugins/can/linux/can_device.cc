@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "log.h"
 
 bool usb_can_ops_open(struct can_device * device)
 {
@@ -40,8 +41,10 @@ bool usb_can_ops_start(struct can_device * device, unsigned int port_idx) {
 
 bool usb_can_ops_send(struct can_device * device, unsigned int port_idx, PVCI_CAN_OBJ pObj, unsigned int len) {
     if(USB_CAN_PORT_0 == port_idx || USB_CAN_PORT_1 == port_idx) {
-        bool result = (VCI_Transmit(device->device_type, device->device_idx, device->ports[port_idx].idx, pObj, len)==1);
-        return result;
+        int send_len = VCI_Transmit(device->device_type, device->device_idx, device->ports[port_idx].idx, pObj, len);
+        debug_info("usb_can_ops_send  deviceType:%d, deviceIdx: %d, port:%d, len: %d, send_len:%d",
+                   device->device_type, device->device_idx, device->ports[port_idx].idx, len, send_len);
+        return send_len == len;
     }
 
     return false;
@@ -105,9 +108,9 @@ void usb_can_new(struct can_device ** dev, unsigned int count) {
         device->device_type = 4;
         device->ports = (struct can_device_port *)malloc(sizeof(struct can_device_port) * USB_CAN_PORT_MAX);
         struct can_device_port *port = device->ports;
-        for (unsigned int i = 0; i < USB_CAN_PORT_MAX; ++i, ++port)
+        for (unsigned int j = 0; j < USB_CAN_PORT_MAX; ++j, ++port)
         {
-            usb_can_port_init(port, i);
+            usb_can_port_init(port, j);
         }
         device->ops = &usb_can_device_ops;
     }
@@ -123,14 +126,19 @@ void usb_can_free(struct can_device * device) {
 
 bool usb_can_start(struct can_device * device) {
     bool status = device->ops->open(device);
-    if(status) {
+    debug_info("usb_can_start , open result: %d", status);
+    // if(status) {
         status = device->ops->init(device, USB_CAN_PORT_0);
+        debug_info("usb_can_start , init port0 result: %d", status);
         status = device->ops->init(device, USB_CAN_PORT_1);
-    }
-    if(status) {
+        debug_info("usb_can_start , init port1 result: %d", status);
+    // }
+    // if(status) {
         status = device->ops->start(device, USB_CAN_PORT_0);
+        debug_info("usb_can_start , start port0 result: %d", status);
         status = device->ops->start(device, USB_CAN_PORT_1);
-    }
+        debug_info("usb_can_start , start port1 result: %d", status);
+    // }
     return status;
 }
 

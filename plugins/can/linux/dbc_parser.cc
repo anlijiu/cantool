@@ -6,6 +6,8 @@
 
 #include <candbc-model.h>
 #include <candbc-reader.h>
+#include "hashmap.h"
+#include "can_defs.h"
 #include "log.h"
 
 typedef struct
@@ -17,6 +19,12 @@ typedef struct
     int signals;
     int signals_bit_length;
 } stats_t;
+
+static bool dbc_synced = false;
+
+bool has_dbc_synced() {
+    return dbc_synced;
+}
 
 static void put_string(FlValue* result, const char* key, const char* value) {
     if(key != nullptr && value != nullptr) {
@@ -237,4 +245,114 @@ int parse_dbc(const char *path, FlValue* result)
 
     dbc_free(dbc);
     return 0;
+}
+
+typedef HASHMAP(uint32_t, struct message_meta) message_meta_repo;
+typedef HASHMAP(char, struct signal_meta) signal_meta_repo;
+
+static message_meta_repo m_repo;
+static signal_meta_repo s_repo;
+
+
+void clearup_message_meta_repo(message_meta_repo * repo) {
+    struct message_meta * m;
+    hashmap_foreach_data(m, repo) {
+        list_destroy(m->signal_ids);
+        free(m);
+    }
+    hashmap_cleanup(repo);
+}
+
+void clearup_signal_meta_repo(signal_meta_repo * repo) {
+    struct signal_meta * m;
+    hashmap_foreach_data(m, repo) {
+        free(m);
+    }
+    hashmap_cleanup(repo);
+}
+
+size_t message_meta_size() {
+    return hashmap_size(&m_repo);
+}
+
+struct message_meta * get_message_meta_by_id(uint32_t id) {
+    return hashmap_get(&m_repo, &id);
+}
+
+struct signal_meta * get_signal_meta_by_id(const char * name) {
+    return hashmap_get(&s_repo, name);
+}
+
+bool
+dbc_parser_sync_meta_data(FlValue *args)
+{
+    debug_info("dbc_parser_sync_meta_data in ");
+    if(hashmap_size(&m_repo) > 0) {
+        debug_info("haha sssssssssssssssssssssssssssssssss   %ld, %ld", hashmap_size(&m_repo), hashmap_size(&s_repo));
+        clearup_message_meta_repo(&m_repo);
+        clearup_signal_meta_repo(&s_repo);
+    }
+
+    hashmap_init(&m_repo, hashmap_hash_integer, hash_integer_compare);
+    hashmap_init(&s_repo, hashmap_hash_string, strcmp);
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP)
+    {
+        FlValue *messages = fl_value_lookup_string(args, "messages");
+        size_t message_length = fl_value_get_length(messages);
+        debug_info("dbc_parser_sync_meta_data message_length is %ld", message_length);
+
+        for (size_t i = 0; i < message_length; ++i)
+        {
+            struct message_meta * m_meta = (struct message_meta *)malloc(sizeof(struct message_meta));
+            FlValue* m = fl_value_get_list_value(messages, i);
+            FlValue *vid = fl_value_lookup_string(m, "id");
+            FlValue *vname = fl_value_lookup_string(m, "name");
+            FlValue *vlength = fl_value_lookup_string(m, "length");
+            FlValue *vsignals = fl_value_lookup_string(m, "signals");
+            strcpy(m_meta->name, fl_value_get_string(vname));
+            m_meta->id = fl_value_get_int(vid);
+            m_meta->length = fl_value_get_int(vlength);
+            m_meta->signal_ids = list_new();
+            size_t signal_length = fl_value_get_length(vsignals);
+
+            for(size_t j = 0; j < signal_length; ++j) {
+                struct signal_meta * s_meta = (struct signal_meta *)malloc(sizeof(struct signal_meta));
+                FlValue* s = fl_value_get_list_value(vsignals, j);
+                s_meta->mid = m_meta->id;
+                strcpy(s_meta->name, fl_value_get_string(fl_value_lookup_string(s, "name")));
+                s_meta->start_bit = fl_value_get_int(fl_value_lookup_string(s, "start_bit"));
+                s_meta->length = fl_value_get_int(fl_value_lookup_string(s, "length"));
+                s_meta->scaling = fl_value_get_float(fl_value_lookup_string(s, "scaling"));
+                s_meta->offset = fl_value_get_float(fl_value_lookup_string(s, "offset"));
+                s_meta->minimum = fl_value_get_float(fl_value_lookup_string(s, "minimum"));
+                s_meta->maximum = fl_value_get_float(fl_value_lookup_string(s, "maximum"));
+                list_node_t *snode = list_node_new((void*)s_meta->name);
+                list_rpush(m_meta->signal_ids, snode);
+
+                hashmap_put(&s_repo, s_meta->name, s_meta);
+            }
+            hashmap_put(&m_repo, &m_meta->id, m_meta);
+        }
+
+        size_t size1 = hashmap_size(&m_repo);
+        size_t size2 = hashmap_size(&s_repo);
+        debug_info("sssssssssssssssssssssssssssssssss   %ld, %ld", size1, size2);
+
+        dbc_synced = true;
+        return true;
+    }
+    return false;
+// name: IBS_SOC, start_bit: 7, length: 8, little_endian: 0, is_signed: 0,
+// value_type: integer, scaling: 1.0, offset: 0.0, minimum: 0.0, maximum: 100.0,
+// unit: %, comment: State of Charge, attributes: {GenSigStartValue: 255}, options: {255: invalid}},
+    //      FlValue* messages = fl_value_lookup_string(args, "messages");
+    //   }
+    //     use_alpha_value = fl_value_lookup_string(args, kColorPanelShowAlpha);
+//   gboolean use_alpha =
+//       use_alpha_value != nullptr ? fl_value_get_bool(use_alpha_value) : FALSE;
+//
+//   FlView* view = fl_plugin_registrar_get_view(self->registrar);
+//   if (view == nullptr) {
+//     return FL_METHOD_RESPONSE(
+        // fl_method_error_response_new(kNoScreenError, nullptr, nullptr));
 }

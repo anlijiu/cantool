@@ -652,3 +652,13 @@ size_t hashmap_hash_string_i(const char *key)
     hash += (hash << 15);
     return hash;
 }
+
+size_t hashmap_hash_integer(const uint32_t * key) {
+    return *key;
+}
+
+int hash_integer_compare(const uint32_t * key1, const uint32_t * key2) {
+    if(*key1 == *key2) return 0;
+    else if(*key1 > *key2) return 1;
+    else return -1;
+}

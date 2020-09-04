@@ -140,6 +140,7 @@ class ReceiveBloc implements BlocBase {
 
   ReceiveBloc() {
       _repository.addCanDataListener((d) {
+          // print(d);
           _received_can_data.addNewList(d);
       });
   }

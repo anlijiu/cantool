@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct hashmap_entry;
 
 struct hashmap_base {
@@ -54,3 +58,9 @@ size_t hashmap_hash_default(const void *data, size_t len);
 size_t hashmap_hash_string(const char *key);
 size_t hashmap_hash_string_i(const char *key);
 
+size_t hashmap_hash_integer(const uint32_t * key);
+int hash_integer_compare(const uint32_t * key1, const uint32_t * key2);
+
+#ifdef __cplusplus
+}
+#endif

@@ -30,6 +30,10 @@
         "ratio": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "unordered_map": "cpp",
+        "map": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp"
     }
 }

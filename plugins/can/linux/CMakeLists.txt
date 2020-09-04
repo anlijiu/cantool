@@ -14,6 +14,7 @@ add_library(${PLUGIN_NAME} SHARED
   "can_operator.cc"
   "cstr.cc"
   "hashmap.cc"
+  "libwecan.cc"
   "pipe.c"
   "list/list.cc"
   "list/list_node.cc"
