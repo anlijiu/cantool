@@ -3,20 +3,23 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "libusb.h"
 #include "log.h"
 
 bool usb_can_ops_open(struct can_device * device)
 {
-    bool result = (VCI_OpenDevice(device->device_type, device->device_idx, 0)==1);
-    device->opened = result;
-    return result;
+    int result = VCI_OpenDevice(device->device_type, device->device_idx, 0);
+    debug_info("usb_can_ops_open   result is %d\n", result);
+    device->opened = result == 1;
+    return device->opened;
 }
 
 bool usb_can_ops_close(struct can_device * device)
 {
-    bool result = (VCI_CloseDevice(device->device_type, device->device_idx)==1);
-    device->opened = !result;
-    return result;
+    int result = VCI_CloseDevice(device->device_type, device->device_idx);
+    debug_info("usb_can_ops_close   result is %d\n", result);
+    device->opened = result == 1;
+    return device->opened;
 }
 
 bool usb_can_ops_init(struct can_device * device, unsigned int port_idx) {
@@ -125,7 +128,8 @@ void usb_can_free(struct can_device * device) {
 }
 
 bool usb_can_start(struct can_device * device) {
-    bool status = device->ops->open(device);
+    bool status = false;
+    status = device->ops->open(device);
     debug_info("usb_can_start , open result: %d", status);
     // if(status) {
         status = device->ops->init(device, USB_CAN_PORT_0);
@@ -153,4 +157,61 @@ bool usb_can_send(struct can_device * device, unsigned int port_idx, PVCI_CAN_OB
 
 unsigned int usb_can_receive(struct can_device * device, unsigned int port_idx, PVCI_CAN_OBJ pObj, unsigned int len, int wait_time) {
     return device->ops->recv(device, port_idx, pObj, len, wait_time);
+}
+
+
+static int print_devs(libusb_device **devs)
+{
+	libusb_device *dev;
+	int i = 0, j = 0;
+	uint8_t path[8];
+    int device_count = 0;
+
+	while ((dev = devs[i++]) != NULL) {
+		struct libusb_device_descriptor desc;
+		int r = libusb_get_device_descriptor(dev, &desc);
+		if (r < 0) {
+			debug_info("failed to get device descriptor");
+			return 0;
+		}
+
+		debug_info("%04x:%04x (bus %d, device %d)",
+			desc.idVendor, desc.idProduct,
+			libusb_get_bus_number(dev), libusb_get_device_address(dev));
+
+        if(desc.idVendor == 0x04d8 && desc.idProduct == 0x0053) device_count++;
+		r = libusb_get_port_numbers(dev, path, sizeof(path));
+		if (r > 0) {
+			debug_info(" path: %d", path[0]);
+			for (j = 1; j < r; j++)
+				debug_info(".%d", path[j]);
+		}
+		debug_info("\n");
+	}
+    return device_count;
+}
+
+int usb_can_device_init() {
+	return libusb_init(NULL);
+}
+
+void usb_can_device_exit() {
+	libusb_exit(NULL);
+}
+
+int usb_can_device_count() {
+	libusb_device **devs;
+	ssize_t cnt;
+    int device_count = 0;
+
+	cnt = libusb_get_device_list(NULL, &devs);
+	if (cnt < 0){
+		libusb_exit(NULL);
+		return (int) cnt;
+	}
+
+	device_count = print_devs(devs);
+	libusb_free_device_list(devs, 1);
+
+    return device_count;
 }

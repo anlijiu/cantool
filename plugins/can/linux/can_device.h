@@ -51,7 +51,9 @@ bool usb_can_stop(struct can_device *);
 bool usb_can_send(struct can_device *, unsigned int port, PVCI_CAN_OBJ pObj, unsigned int len);
 unsigned int usb_can_receive(struct can_device *, unsigned int port, PVCI_CAN_OBJ pObj, unsigned int len, int wait_time);
 
-
+int usb_can_device_init();
+void usb_can_device_exit();
+int usb_can_device_count();
 
 #ifdef __cplusplus
 }

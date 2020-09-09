@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include "log.h"
+#include "can_device.h"
 #include "can_operator.h"
 #include "controlcan.h"
 #include "dbc_parser.h"
@@ -207,6 +208,7 @@ static void fl_can_plugin_class_init(FLCanPluginClass *klass)
 }
 
 static void can_destroy() {
+  usb_can_device_exit();
   g_message("\n\ncan_destroy in\n\n");
 }
 
@@ -229,6 +231,8 @@ FLCanPlugin *fl_can_plugin_new(FlPluginRegistrar *registrar)
     g_signal_connect(G_OBJECT(window),
         "destroy", can_destroy, NULL);
 
+  usb_can_device_init();
+  debug_info("usb device count: %d", usb_can_device_count());
   g_message("\nfl_can_plugin_new end\n");
   return self;
 }
