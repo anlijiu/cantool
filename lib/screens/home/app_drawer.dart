@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
+
+import 'app_drawer.i18n.dart';
+
 import 'package:cantool/screens/about/about_page.dart';
 import 'package:cantool/screens/dbc/dbc_button.dart';
 import 'package:cantool/bloc/application_bloc.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
-import 'package:cantool/generated/i18n.dart';
 
 class AppDrawer extends StatelessWidget {
   ApplicationBloc _appBloc;
@@ -20,20 +23,20 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text( S.of(context).happy_coding ),
+            child: Text("Happy coding".i18n),
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
           ),
 
           ListTile(
-            title: Text( S.of(context).load_dbc ),
+            title: Text("Load Dbc".i18n),
             onTap: () {
               _appBloc.openDbcFilePanel();
             }
           ),
           ListTile(
-            title: Text( S.of(context).about ),
+            title: Text("About".i18n),
             onTap: () {
               Navigator.push<String>(context, 
                       new MaterialPageRoute(builder: (BuildContext context) {

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:file_chooser/file_chooser.dart' as file_chooser;
 
-import 'package:cantool/generated/i18n.dart';
 import 'package:cantool/bloc/application_bloc.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
+
+import 'dbc_button.i18n.dart';
 
 class DbcButton extends StatefulWidget {
   DbcButton({
@@ -30,7 +31,7 @@ class _DbcButtonState extends State<DbcButton> {
     Widget build(BuildContext context) {
       return GestureDetector(
         child: new Container(
-          child: new Text( widget.text ?? S.of(context).load_dbc),
+          child: new Text( widget.text ?? "Load DBC".i18n),
         ),
         onTap: () {
           _appBloc.openDbcFilePanel();

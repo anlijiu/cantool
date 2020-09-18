@@ -11,9 +11,11 @@ import 'package:cantool/model/can_defs.dart';
 import 'package:cantool/screens/send/send_bloc.dart';
 import 'package:cantool/screens/dbc/dbc_button.dart';
 import 'package:cantool/screens/send/send_signal_item.dart';
-import 'package:cantool/generated/i18n.dart';
 
 import 'package:can/can.dart';
+
+import 'send_page.i18n.dart';
+
 
 class SendPage extends StatefulWidget {
   SendPage();
@@ -53,7 +55,7 @@ class _SendPageState extends State<SendPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Text(S.of(context).send_page),
+        Text("Send".i18n),
         Expanded(
           child: Container(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),

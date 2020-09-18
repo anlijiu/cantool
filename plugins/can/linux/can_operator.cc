@@ -49,11 +49,11 @@ static bool inited = false;
 static void notifyListeners(PVCI_CAN_OBJ pObj, unsigned int len) {
     if(!has_dbc_synced()) return;
     PVCI_CAN_OBJ p = pObj;
-    debug_info("notifyListeners  start %d", len);
+    // debug_info("notifyListeners  start %d", len);
     g_autoptr(FlValue) result = fl_value_new_list();
 
     for(int i = 0; i < len; ++i, ++p) {
-        debug_info("notifyListeners  p->ID: %d ", p->ID);
+        // debug_info("notifyListeners  p->ID: %d ", p->ID);
         struct message_meta * m_meta = get_message_meta_by_id(p->ID);
         if(m_meta == NULL) continue;
         list_iterator_t *it = list_iterator_new(m_meta->signal_ids, LIST_HEAD);
@@ -158,7 +158,7 @@ void *can_receive_func(void *param)
     pthread_mutex_lock(&receiver.mutex);
     while (receiver.flag)
     {
-        debug_info("can_receive_func  in while\n");
+        // debug_info("can_receive_func  in while\n");
         memset(&can0_cache, 0, sizeof can0_cache);
         memset(&can1_cache, 0, sizeof can1_cache);
         if (device->ports[USB_CAN_PORT_0].started

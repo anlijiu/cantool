@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 
-import 'package:cantool/generated/i18n.dart';
 import 'package:cantool/bloc/application_bloc.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/model/can_defs.dart';
@@ -12,6 +11,8 @@ import 'package:cantool/screens/receive/receive_bloc.dart';
 import 'package:cantool/screens/receive/message_item_view.dart';
 import 'package:cantool/screens/receive/signal_item_view.dart';
 import 'package:can/can.dart';
+
+import 'receive_page.i18n.dart';
 
 class ReceivePage extends StatefulWidget {
   ReceivePage();
@@ -41,7 +42,7 @@ class _ReceivePageState extends State<ReceivePage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Text(S.of(context).receive_page),
+        Text("Receive".i18n),
         Expanded(
           child: Container(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),

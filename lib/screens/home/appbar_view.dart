@@ -1,9 +1,9 @@
-import 'package:cantool/generated/i18n.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
+
+import 'appbar_view.i18n.dart';
 import 'package:cantool/screens/home/appbar_bloc.dart';
 import 'package:cantool/screens/dbc/dbc_button.dart';
-
-import 'package:flutter/material.dart';
-
 
 
 class AppbarView extends StatefulWidget implements PreferredSizeWidget {
@@ -64,7 +64,7 @@ class _AppbarBlocState extends State<AppbarView> {
               val ? _appbarBloc.startSending() : _appbarBloc.stopSending();
             },
           ),
-          Text(S.of(context).start_send),
+          Text("start sending".i18n),
         ]
       )
     );

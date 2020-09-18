@@ -10,6 +10,7 @@ import 'package:cantool/repository/repository.dart';
 import 'package:cantool/model/can_defs.dart';
 import 'package:cantool/bloc/bloc_provider.dart';
 
+
 class ApplicationBloc implements BlocBase {
   final Repository _repository = CanRepository();
 

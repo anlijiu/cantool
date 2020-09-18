@@ -53,7 +53,7 @@ class CanChannel {
       final List<CanSignalData> arg = (methodCall.arguments as List)
           .map((e) => CanSignalData(e["name"], e["value"], e["mid"]))
           .toList();
-      print(arg);
+      // print(arg);
       for (ValueChanged<List<CanSignalData>> listener
           in List<ValueChanged<List<CanSignalData>>>.from(_listeners)) {
         if (_listeners.contains(listener)) {
