@@ -4,27 +4,27 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 
-import 'package:cantool/repository/repository.dart';
-import 'package:cantool/bloc/application_bloc.dart';
-import 'package:cantool/bloc/bloc_provider.dart';
+// import 'package:cantool/repository/repository.dart';
+// import 'package:cantool/bloc/application_bloc.dart';
+// import 'package:cantool/bloc/bloc_provider.dart';
 import 'package:cantool/screens/home/home_page.dart';
 import 'package:cantool/screens/home/app_drawer.dart';
 import 'package:cantool/screens/home/appbar_view.dart';
+
 
 void main() {
   print("main: I'm in");
   debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(BlocProvider<ApplicationBloc>(
-    bloc: ApplicationBloc(),
-    child: MyApp(),
-  ));
+  runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return OverlaySupport(

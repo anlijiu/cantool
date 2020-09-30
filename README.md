@@ -7,6 +7,9 @@ A new Flutter project.
 flutter config
 flutter config --enable-linux-desktop
 
+flutter pub get
+flutter pub run build_runner build
+
 sudo service udev restart
 sudo udevadm control --reload-rules
 sudo udevadm trigger

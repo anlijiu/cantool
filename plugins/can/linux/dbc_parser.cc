@@ -117,13 +117,13 @@ static int extract_message_attributes(FlValue *result, attribute_list_t *attribu
     return 0;
 }
 
-static void extract_message_signals(FlValue *result, signal_list_t *signal_list,
+static void extract_message_signals(FlValue *result, FlValue *signals, signal_list_t *signal_list,
                                     GHashTable *multiplexing_table, stats_t *stats) {
     if (signal_list == NULL)
         return;
 
-    g_autoptr(FlValue) fv_signal_list = fl_value_new_list();
-    fl_value_set_string(result, "signals", fv_signal_list);
+    g_autoptr(FlValue) fv_signal_ids = fl_value_new_list();
+    fl_value_set_string(result, "signal_ids", fv_signal_ids);
 
     while (signal_list != NULL) {
         g_autoptr(FlValue) fv_signal = fl_value_new_map();
@@ -131,6 +131,7 @@ static void extract_message_signals(FlValue *result, signal_list_t *signal_list,
         signal_t *signal = signal_list->signal;
 
         put_string(fv_signal, "name", signal->name);
+        fl_value_set_string_take(fv_signal, "mid", fl_value_new_int(fl_value_lookup_string(result, "id")));
         fl_value_set_string_take(fv_signal, "start_bit", fl_value_new_int(signal->bit_start));
         fl_value_set_string_take(fv_signal, "length", fl_value_new_int(signal->bit_len));
         stats->signals_bit_length += signal->bit_len;
@@ -186,7 +187,8 @@ static void extract_message_signals(FlValue *result, signal_list_t *signal_list,
             /* m_signal */
             break;
         }
-        fl_value_append(fv_signal_list, fv_signal);
+        fl_value_append(signals, fv_signal);
+        fl_value_append(fv_signal_ids, fl_value_lookup_string(fv_signal, "name"));
         stats->signals++;
         signal_list = signal_list->next;
     }
@@ -195,7 +197,9 @@ static void extract_message_signals(FlValue *result, signal_list_t *signal_list,
 static void extract_messages(FlValue *result, message_list_t *message_list, stats_t *stats) {
         debug_info("start of extract_messages");
     g_autoptr(FlValue) fv_message_list = fl_value_new_list();
+    g_autoptr(FlValue) fv_signals_list = fl_value_new_list();
     fl_value_set_string(result, "messages", fv_message_list);
+    fl_value_set_string(result, "signals", fv_signals_list);
     while (message_list != NULL) {
         g_autoptr(FlValue) fv_message = fl_value_new_map();
         fl_value_append(fv_message_list, fv_message);
@@ -208,7 +212,7 @@ static void extract_messages(FlValue *result, message_list_t *message_list, stat
         put_string(fv_message, "sender", message->sender);
         fl_value_set_string_take(fv_message, "length", fl_value_new_int(message->len));
         extract_message_attributes(fv_message, message->attribute_list);
-        extract_message_signals(fv_message, message->signal_list, multiplexing_table, stats);
+        extract_message_signals(fv_message, fv_signals_list, message->signal_list, multiplexing_table, stats);
         multiplexing_count = g_hash_table_size(multiplexing_table);
         if (multiplexing_count) {
             fl_value_set_string_take(fv_message, "has_multiplexor", fl_value_new_bool(true));

@@ -25,6 +25,9 @@ dependencies:
   localstorage: ^3.0.0
   json_annotation: ^3.0.1
   rxdart: ^0.24.1
+  flutter_hooks: ^0.14.0
+  hooks_riverpod: ^0.11.0
+  state_notifier: ^0.6.0
   path_provider: ^1.6.11
   color_panel:
     path: plugins/color_panel

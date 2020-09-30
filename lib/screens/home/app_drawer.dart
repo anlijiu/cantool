@@ -5,8 +5,6 @@ import 'app_drawer.i18n.dart';
 
 import 'package:cantool/screens/about/about_page.dart';
 import 'package:cantool/screens/dbc/dbc_button.dart';
-import 'package:cantool/bloc/application_bloc.dart';
-import 'package:cantool/bloc/bloc_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   ApplicationBloc _appBloc;
