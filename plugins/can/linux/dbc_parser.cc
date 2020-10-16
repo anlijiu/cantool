@@ -1,5 +1,6 @@
 #include "dbc_parser.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <glib.h>
@@ -131,7 +132,7 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
         signal_t *signal = signal_list->signal;
 
         put_string(fv_signal, "name", signal->name);
-        fl_value_set_string_take(fv_signal, "mid", fl_value_new_int(fl_value_lookup_string(result, "id")));
+        fl_value_set_string_take(fv_signal, "mid", fl_value_new_int(fl_value_get_int(fl_value_lookup_string(result, "id"))));
         fl_value_set_string_take(fv_signal, "start_bit", fl_value_new_int(signal->bit_start));
         fl_value_set_string_take(fv_signal, "length", fl_value_new_int(signal->bit_len));
         stats->signals_bit_length += signal->bit_len;
@@ -187,7 +188,10 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
             /* m_signal */
             break;
         }
-        fl_value_append(signals, fv_signal);
+
+        fl_value_set_string_take(signals, signal->name, fv_signal);
+
+        // fl_value_append(signals, fv_signal);
         fl_value_append(fv_signal_ids, fl_value_lookup_string(fv_signal, "name"));
         stats->signals++;
         signal_list = signal_list->next;
@@ -196,13 +200,15 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
 
 static void extract_messages(FlValue *result, message_list_t *message_list, stats_t *stats) {
         debug_info("start of extract_messages");
-    g_autoptr(FlValue) fv_message_list = fl_value_new_list();
-    g_autoptr(FlValue) fv_signals_list = fl_value_new_list();
+    // g_autoptr(FlValue) fv_message_list = fl_value_new_list();
+    // g_autoptr(FlValue) fv_signals_list = fl_value_new_list();
+    g_autoptr(FlValue) fv_message_list = fl_value_new_map();
+    g_autoptr(FlValue) fv_signals_list = fl_value_new_map();
     fl_value_set_string(result, "messages", fv_message_list);
     fl_value_set_string(result, "signals", fv_signals_list);
     while (message_list != NULL) {
         g_autoptr(FlValue) fv_message = fl_value_new_map();
-        fl_value_append(fv_message_list, fv_message);
+        // fl_value_append(fv_message_list, fv_message);
 
         int multiplexing_count;
         message_t *message = message_list->message;
@@ -224,6 +230,12 @@ static void extract_messages(FlValue *result, message_list_t *message_list, stat
             stats->normal_messages++;
         }
         // g_hash_table_destroy(multiplexing_table);
+
+        char keystr[25];
+        sprintf(keystr, "%lu", message->id);
+        debug_info("kkkkkkkkkkkkey is %s", keystr);
+
+        fl_value_set_string(fv_message_list, keystr, fv_message);
 
         stats->messages++;
         message_list = message_list->next;
