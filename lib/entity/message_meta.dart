@@ -6,6 +6,7 @@ part 'message_meta.g.dart';
 
 @freezed
 abstract class MessageMeta with _$MessageMeta {
+  @JsonSerializable(fieldRename: FieldRename.snake)
   factory MessageMeta(
       {@required int id,
       @required String name,

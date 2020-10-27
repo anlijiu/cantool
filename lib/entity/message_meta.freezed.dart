@@ -130,7 +130,7 @@ class __$MessageMetaCopyWithImpl<$Res> extends _$MessageMetaCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 
 /// @nodoc
 class _$_MessageMeta implements _MessageMeta {

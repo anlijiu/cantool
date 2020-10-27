@@ -16,12 +16,12 @@ abstract class SignalMeta with _$SignalMeta {
     @required double offset,
     @required double minimum,
     @required double maximum,
-    @required String unit,
+    @nullable @required String unit,
     @required String comment,
     @required int mid,
     Map<int, String> options,
   }) = _SignalMeta;
-	
+
   factory SignalMeta.fromJson(Map<String, dynamic> json) =>
-			_$SignalMetaFromJson(json);
+      _$SignalMetaFromJson(json);
 }

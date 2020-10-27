@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:cantool/can_controller.dart';
+import 'package:cantool/repository/can_repository.dart';
 import 'i18n.dart';
 
 final startSending = StateProvider((_) => false);
@@ -24,7 +24,7 @@ class AppbarView extends HookWidget implements PreferredSizeWidget {
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
     final sending = useProvider(startSending);
-    final controller = useProvider(canController);
+    final controller = useProvider(canRepository);
     return Container(
         height: 50,
         decoration: new BoxDecoration(

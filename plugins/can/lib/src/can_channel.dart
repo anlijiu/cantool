@@ -49,7 +49,9 @@ class CanChannel {
   }
 
   Future<Null> _handleCanData(MethodCall methodCall) async {
+    print("receive_page.dart  _handleCanData in");
     if (methodCall.method == _canReceiveCallbackMethod) {
+      print("receive_page.dart  receive can data");
       final List<CanSignalData> arg = (methodCall.arguments as List)
           .map((e) => CanSignalData(e["name"], e["value"], e["mid"]))
           .toList();

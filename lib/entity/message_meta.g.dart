@@ -12,7 +12,7 @@ _$_MessageMeta _$_$_MessageMetaFromJson(Map<String, dynamic> json) {
     name: json['name'] as String,
     sender: json['sender'] as String,
     length: json['length'] as int,
-    signalIds: (json['signalIds'] as List)?.map((e) => e as String)?.toList(),
+    signalIds: (json['signal_ids'] as List)?.map((e) => e as String)?.toList(),
   );
 }
 
@@ -22,5 +22,5 @@ Map<String, dynamic> _$_$_MessageMetaToJson(_$_MessageMeta instance) =>
       'name': instance.name,
       'sender': instance.sender,
       'length': instance.length,
-      'signalIds': instance.signalIds,
+      'signal_ids': instance.signalIds,
     };

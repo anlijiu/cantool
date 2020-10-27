@@ -1,11 +1,13 @@
-class CanSignalData {
-  CanSignalData(this.name, this.value, this.mid);
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final String name;
-  final double value;
-  final int mid;
+part 'models.freezed.dart';
+part 'models.g.dart';
 
-  @override
-  String toString() =>
-      "CanSignalData - name:${name.toString()}, value: ${value.toString()}, mid: ${mid.toString()}";
+@freezed
+abstract class CanSignalData with _$CanSignalData {
+
+  const factory CanSignalData(String name, double value, int mid) = _CanSignalData;
+
+  factory CanSignalData.fromJson(Map<String, dynamic> json) =>
+      _$CanSignalDataFromJson(json);
 }

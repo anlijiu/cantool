@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:cantool/pages/send/send_page.dart';
+import 'package:cantool/pages/receive/receive_page.dart';
 import 'i18n.dart';
 
 class HomePage extends HookWidget {
@@ -25,7 +26,12 @@ class HomePage extends HookWidget {
       body: SafeArea(
         child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.00),
-            child: SendPage()),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  new Flexible(child: SendPage()),
+                  new Flexible(child: ReceivePage()),
+                ])),
       ),
     );
   }

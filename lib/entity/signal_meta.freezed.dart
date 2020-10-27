@@ -28,7 +28,7 @@ class _$SignalMetaTearOff {
       @required double offset,
       @required double minimum,
       @required double maximum,
-      @required String unit,
+      @required @nullable String unit,
       @required String comment,
       @required int mid,
       Map<int, String> options}) {
@@ -72,6 +72,7 @@ mixin _$SignalMeta {
   double get offset;
   double get minimum;
   double get maximum;
+  @nullable
   String get unit;
   String get comment;
   int get mid;
@@ -97,7 +98,7 @@ abstract class $SignalMetaCopyWith<$Res> {
       double offset,
       double minimum,
       double maximum,
-      String unit,
+      @nullable String unit,
       String comment,
       int mid,
       Map<int, String> options});
@@ -168,7 +169,7 @@ abstract class _$SignalMetaCopyWith<$Res> implements $SignalMetaCopyWith<$Res> {
       double offset,
       double minimum,
       double maximum,
-      String unit,
+      @nullable String unit,
       String comment,
       int mid,
       Map<int, String> options});
@@ -239,7 +240,7 @@ class _$_SignalMeta implements _SignalMeta {
       @required this.offset,
       @required this.minimum,
       @required this.maximum,
-      @required this.unit,
+      @required @nullable this.unit,
       @required this.comment,
       @required this.mid,
       this.options})
@@ -253,7 +254,6 @@ class _$_SignalMeta implements _SignalMeta {
         assert(offset != null),
         assert(minimum != null),
         assert(maximum != null),
-        assert(unit != null),
         assert(comment != null),
         assert(mid != null);
 
@@ -281,6 +281,7 @@ class _$_SignalMeta implements _SignalMeta {
   @override
   final double maximum;
   @override
+  @nullable
   final String unit;
   @override
   final String comment;
@@ -376,7 +377,7 @@ abstract class _SignalMeta implements SignalMeta {
       @required double offset,
       @required double minimum,
       @required double maximum,
-      @required String unit,
+      @required @nullable String unit,
       @required String comment,
       @required int mid,
       Map<int, String> options}) = _$_SignalMeta;
@@ -405,6 +406,7 @@ abstract class _SignalMeta implements SignalMeta {
   @override
   double get maximum;
   @override
+  @nullable
   String get unit;
   @override
   String get comment;

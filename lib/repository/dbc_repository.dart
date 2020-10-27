@@ -23,11 +23,17 @@ abstract class DbcRepository {
 
 class DbcRepositoryImpl implements DbcRepository {
   final Reader read;
-  DbcRepositoryImpl(this.read);
+  DbcRepositoryImpl(this.read) {
+    loadFromDb();
+  }
 
   final _dbcKey = 'dbc';
   final _dbName = 'dbc_database';
   // final _todoKey = 'todos';
+
+  void loadFromDb() async {
+    await read(localStorageProvider(_dbName).future);
+  }
 
   Future<DbcMeta> getDbcMeta() async {
     final storage = await read(localStorageProvider(_dbName).future);

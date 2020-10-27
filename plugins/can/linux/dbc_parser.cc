@@ -189,7 +189,7 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
             break;
         }
 
-        fl_value_set_string_take(signals, signal->name, fv_signal);
+        fl_value_set_string(signals, signal->name, fv_signal);
 
         // fl_value_append(signals, fv_signal);
         fl_value_append(fv_signal_ids, fl_value_lookup_string(fv_signal, "name"));
@@ -314,40 +314,50 @@ dbc_parser_sync_meta_data(FlValue *args)
     if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP)
     {
         FlValue *messages = fl_value_lookup_string(args, "messages");
-        size_t message_length = fl_value_get_length(messages);
-        debug_info("dbc_parser_sync_meta_data message_length is %ld", message_length);
+        size_t message_metas_length = fl_value_get_length(messages);
+        debug_info("dbc_parser_sync_meta_data message_metas_length : %ld", message_metas_length);
 
-        for (size_t i = 0; i < message_length; ++i)
+        for (size_t i = 0; i < message_metas_length; ++i)
         {
             struct message_meta * m_meta = (struct message_meta *)malloc(sizeof(struct message_meta));
-            FlValue* m = fl_value_get_list_value(messages, i);
+            FlValue* m = fl_value_get_map_value(messages, i);
             FlValue *vid = fl_value_lookup_string(m, "id");
             FlValue *vname = fl_value_lookup_string(m, "name");
             FlValue *vlength = fl_value_lookup_string(m, "length");
-            FlValue *vsignals = fl_value_lookup_string(m, "signals");
+            FlValue *signal_ids = fl_value_lookup_string(m, "signal_ids");
             strcpy(m_meta->name, fl_value_get_string(vname));
             m_meta->id = fl_value_get_int(vid);
             m_meta->length = fl_value_get_int(vlength);
             m_meta->signal_ids = list_new();
-            size_t signal_length = fl_value_get_length(vsignals);
 
-            for(size_t j = 0; j < signal_length; ++j) {
-                struct signal_meta * s_meta = (struct signal_meta *)malloc(sizeof(struct signal_meta));
-                FlValue* s = fl_value_get_list_value(vsignals, j);
-                s_meta->mid = m_meta->id;
-                strcpy(s_meta->name, fl_value_get_string(fl_value_lookup_string(s, "name")));
-                s_meta->start_bit = fl_value_get_int(fl_value_lookup_string(s, "start_bit"));
-                s_meta->length = fl_value_get_int(fl_value_lookup_string(s, "length"));
-                s_meta->scaling = fl_value_get_float(fl_value_lookup_string(s, "scaling"));
-                s_meta->offset = fl_value_get_float(fl_value_lookup_string(s, "offset"));
-                s_meta->minimum = fl_value_get_float(fl_value_lookup_string(s, "minimum"));
-                s_meta->maximum = fl_value_get_float(fl_value_lookup_string(s, "maximum"));
-                list_node_t *snode = list_node_new((void*)s_meta->name);
-                list_rpush(m_meta->signal_ids, snode);
+            size_t signal_ids_length = fl_value_get_length(signal_ids);
 
-                hashmap_put(&s_repo, s_meta->name, s_meta);
+            for(size_t j = 0; j < signal_ids_length; ++j) {
+
+                FlValue* sid = fl_value_get_list_value(signal_ids, j);
+                char *ptr = (char*)malloc(256 * sizeof(*ptr));
+                strcpy(ptr, fl_value_get_string(sid));
+                list_node_t *sidNode = list_node_new((void*)ptr);
+                list_rpush(m_meta->signal_ids, sidNode);
             }
             hashmap_put(&m_repo, &m_meta->id, m_meta);
+        }
+
+        FlValue *signals = fl_value_lookup_string(args, "signals");
+        size_t signal_metas_length = fl_value_get_length(signals);
+
+        for(size_t i = 0; i < signal_metas_length; ++i) {
+            struct signal_meta * s_meta = (struct signal_meta *)malloc(sizeof(struct signal_meta));
+            FlValue* s = fl_value_get_map_value(signals, i);
+            s_meta->mid = fl_value_get_int(fl_value_lookup_string(s, "mid"));
+            strcpy(s_meta->name, fl_value_get_string(fl_value_lookup_string(s, "name")));
+            s_meta->start_bit = fl_value_get_int(fl_value_lookup_string(s, "start_bit"));
+            s_meta->length = fl_value_get_int(fl_value_lookup_string(s, "length"));
+            s_meta->scaling = fl_value_get_float(fl_value_lookup_string(s, "scaling"));
+            s_meta->offset = fl_value_get_float(fl_value_lookup_string(s, "offset"));
+            s_meta->minimum = fl_value_get_float(fl_value_lookup_string(s, "minimum"));
+            s_meta->maximum = fl_value_get_float(fl_value_lookup_string(s, "maximum"));
+            hashmap_put(&s_repo, s_meta->name, s_meta);
         }
 
         size_t size1 = hashmap_size(&m_repo);
