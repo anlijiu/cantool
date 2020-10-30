@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/repository/can_repository.dart';
-import 'i18n.dart';
 
-final startSending = StateProvider((_) => false);
-
-class AppbarView extends HookWidget implements PreferredSizeWidget {
+class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   final double height;
-  AppbarView({
+  ReplayAppbarView({
     Key key,
     this.height: 46.0,
   }) : super(key: key);
@@ -23,8 +20,6 @@ class AppbarView extends HookWidget implements PreferredSizeWidget {
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
-    final sending = useProvider(startSending);
-    final controller = useProvider(canRepository);
     return Container(
         height: 50,
         decoration: new BoxDecoration(
@@ -43,16 +38,6 @@ class AppbarView extends HookWidget implements PreferredSizeWidget {
                     Scaffold.of(context).openDrawer();
                   },
                 ),
-          Checkbox(
-            value: sending.state,
-            activeColor: Colors.blue,
-            onChanged: (bool val) {
-              final state = !sending.state;
-              context.read(startSending).state = state;
-              state ? controller.startSending() : controller.stopSending();
-            },
-          ),
-          Text("Start Sending".i18n),
         ]));
   } //这里设置控件（appBar）的高度
 }
