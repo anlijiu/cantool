@@ -2,6 +2,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/entity/dbc_meta.dart';
 import 'package:cantool/entity/strategy.dart';
+import 'package:cantool/providers.dart';
 import './message_item.dart';
 import './strategy_item.dart';
 

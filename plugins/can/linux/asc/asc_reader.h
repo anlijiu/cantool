@@ -21,10 +21,12 @@
 #include <stdio.h>
 #include <candbc-types.h>
 #include <time.h>
+#include <flutter_linux/flutter_linux.h>
+#include <stdbool.h>
 
 /* ascRead function */
 
-int parse_asc(const char *path, FlValue* result);
+bool parse_asc(const char *path, FlValue* filter, FlValue* result);
 // void ascReader_processFile(FILE *fp, msgRxCb_t msgRxCb, void *cbData);
 
 #endif

@@ -9,6 +9,7 @@
 #include "log.h"
 #include "can_device.h"
 #include "can_operator.h"
+#include "replay_operator.h"
 #include "controlcan.h"
 #include "dbc_parser.h"
 
@@ -30,6 +31,8 @@ const char kSyncMetaDatas[] = "Can.SyncMetaDatas";
 const char kSetConstStrategy[] = "Can.SetConstStrategy";
 const char kCanReceiveCallbackMethod[] = "Can.ReceiveCallback";
 
+const char kReplaySetFile[] = "Can.ReplaySetFile";
+const char kReplayGetFiltedSignals[] = "Can.ReplayGetFiltedSignals";
 
 static FlMethodChannel *channel;
 
@@ -161,6 +164,22 @@ static FlMethodResponse *set_const_strategy(FLCanPlugin *self, FlValue *args) {
   }
 }
 
+static FlMethodResponse *replay_set_file(FLCanPlugin *self, FlValue *args) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_STRING) {
+        const char* path = fl_value_get_string(args);
+        replay_operator_set_file_path(path);
+    }
+    return FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
+}
+static FlMethodResponse *replay_get_filted_signals(FLCanPlugin *self, FlValue *args) {
+    g_autoptr(FlValue) result = fl_value_new_map();
+
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_LIST) {
+        replay_operator_get_filted_signals(args, result);
+    }
+    return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+}
+
 
 // Called when a method call is received from Flutter.
 static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
@@ -190,6 +209,10 @@ static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
     response = remove_ammo(self, args);
   } else if (strcmp(method, kSetConstStrategy) == 0) {
     response = set_const_strategy(self, args);
+  } else if (strcmp(method, kReplaySetFile) == 0) {
+    response = replay_set_file(self, args);
+  } else if (strcmp(method, kReplayGetFiltedSignals) == 0) {
+    response = replay_get_filted_signals(self, args);
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }

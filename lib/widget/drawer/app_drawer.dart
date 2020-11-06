@@ -1,5 +1,5 @@
 import 'package:cantool/providers.dart';
-import 'package:cantool/repository/dbc_repository.dart';
+import 'package:cantool/entity/dbc_meta.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,7 +11,7 @@ final drawerKeyProvider = Provider((ref) => GlobalKey<NavigatorState>());
 class AppDrawer extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = useProvider(dbcRepository);
+    final controller = useProvider(dbcMetaProvider);
     final router = useProvider(routerProvider);
     final drawerKey = useProvider(drawerKeyProvider);
     final currentTab = useProvider(currentTabInDrawerProvider);

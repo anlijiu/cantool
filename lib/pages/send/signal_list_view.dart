@@ -1,5 +1,6 @@
 import 'package:cantool/entity/dbc_meta.dart';
 import 'package:cantool/entity/strategy.dart';
+import 'package:cantool/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

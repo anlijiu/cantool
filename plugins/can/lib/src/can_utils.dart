@@ -50,3 +50,11 @@ void addCanDataListener(ValueChanged<List<CanSignalData>> listener) {
 void removeCanDataListener(ValueChanged<List<CanSignalData>> listener) {
   CanChannel.instance.removeCanDataListener(listener);
 }
+
+Future<Map<String, dynamic>> setReplayFile(String path) {
+  return CanChannel.instance.setReplayFile(path);
+}
+
+Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
+  return CanChannel.instance.replayFiltedSignals(filter);
+}

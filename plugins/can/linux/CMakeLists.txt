@@ -12,6 +12,7 @@ add_library(${PLUGIN_NAME} SHARED
   "${PLUGIN_NAME}.cc"
   "can_device.cc"
   "can_operator.cc"
+  "replay_operator.cc"
   "cstr.cc"
   "hashmap.cc"
   "libwecan.cc"
@@ -19,11 +20,14 @@ add_library(${PLUGIN_NAME} SHARED
   "list/list.cc"
   "list/list_node.cc"
   "list/list_iterator.cc"
+  "asc/asc_reader.cc"
   "dbc_parser.cc"
 )
 include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/list
+  ${CMAKE_CURRENT_SOURCE_DIR}/asc
   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/includes
 )
 message("hello")

@@ -18,6 +18,9 @@ const String _setConstStrategy = 'Can.SetConstStrategy';
 const String _parseDbcFileMethod = "Can.ParseDbcFile";
 const String _canReceiveCallbackMethod = "Can.ReceiveCallback";
 
+const String _replaySetFile = "Can.ReplaySetFile";
+const String _replayGetFiltedSignals = "Can.ReplayGetFiltedSignals";
+
 const MethodChannel _platformChannel = const MethodChannel(_canChannelName);
 
 /// A singleton object that handles the interaction with the platform channel.
@@ -149,5 +152,25 @@ class CanChannel {
       print('Platform exception set const strategy : ${e.message}');
     }
     return;
+  }
+
+  Future<Map<String, dynamic>> setReplayFile(String path) {
+    try {
+      final response = _platformChannel.invokeMapMethod<String, dynamic>(
+          _replaySetFile, path);
+      return response;
+    } on PlatformException catch (e) {
+      print('closeDevice Platform exception fire : ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
+    try {
+      final response = _platformChannel.invokeMapMethod<String, dynamic>(
+          _replayGetFiltedSignals, filter);
+      return response;
+    } on PlatformException catch (e) {
+      print('replayFiltedSignals Platform exception fire : ${e.message}');
+    }
   }
 }

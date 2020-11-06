@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:convert' as convert;
+import 'package:cantool/providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
