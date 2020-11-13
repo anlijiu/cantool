@@ -25,12 +25,14 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 #include "asc_reader.h"
 #include "list.h"
 #include "hashmap.h"
 #include "dbc_parser.h"
 #include "can_defs.h"
 #include "libwecan.h"
+#include "log.h"
 
 #define buffer_size 3072L //3*1024
 
@@ -75,6 +77,16 @@ static char *split(char *str, const char *delim)
     return p + strlen(delim);       // return tail substring
 }
 
+char* printtm(struct tm tm)
+{
+  static char buf[100];
+  sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d (gmtoff=%ld, isdst=%d)",
+    tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+    tm.tm_hour, tm.tm_min, tm.tm_sec,
+    tm.tm_gmtoff, tm.tm_isdst);
+  return buf;
+}
+
 static void processheaderline(char *str, FlValue *result) {
     char *tail = split(str, " ");   /* get first token */
     char *cp;
@@ -83,8 +95,25 @@ static void processheaderline(char *str, FlValue *result) {
     if(!tail) return;
 
     if(!strcmp(str, "date")) {
-        // printf("processheader: date: %s \n", tail);
+        struct tm *timeinfo = (struct tm *)malloc(sizeof(struct tm));
+        debug_info("processheader: date:%s|\n", tail);
+        time_t rawtime = 0;
+        memset(timeinfo, 0, sizeof(struct tm));
+        debug_info("timeinfo after memset 0 : %s",  printtm(*timeinfo));
+        // strptime(tail, "%a %b %d %I:%M:%S %p %y",  timeinfo);
+        strptime("Mon Sep 21 10:56:01 pm 2020", "%a %b %d %I:%M:%S %p %y",  timeinfo);
+
+        debug_info("processheader: date:%s|timeinfo:%s|\n", tail, printtm(*timeinfo));
+        rawtime = mktime(timeinfo);
+        debug_info("rawtime: %ld, %s", rawtime, printtm(*timeinfo));
+
+
+        // struct tm *ti = getdate("Mon Sep 21 10:56:01 pm 2020");
+        // printf(" ti: %s              year:%d, hour:%d\n", printtm(*ti), ti->tm_year, ti->tm_hour);
+
+
         fl_value_set_string_take(result, "date", fl_value_new_string(tail));
+        fl_value_set_string_take(result, "timestamp", fl_value_new_int(rawtime));
     } else if(!strcmp(str,"base")) {              /* parse numeric base */
         cp = strtok(tail, " ");    /* dec/hex */
         if(!cp) return;
@@ -206,6 +235,11 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
     filter_repo_map filter_repo;
     hashmap_init(&filter_repo, hashmap_hash_integer, hash_integer_compare);
 
+    FlValue* summary = fl_value_new_map();
+    fl_value_set_string_take(result, "summary", summary);
+    FlValue* data = fl_value_new_map();
+    fl_value_set_string_take(result, "data", data);
+
     size_t m_length = fl_value_get_length(filter);
     for (size_t i = 0; i < m_length; ++i) {
         FlValue* mv = fl_value_get_list_value(filter, i);
@@ -236,8 +270,8 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
     long chunks = size / (buffer_size);
     printf ( "size = %ld, chunks is %ld\n" , size, chunks);
 
-    fl_value_set_string_take(result, "size", fl_value_new_int(size));
-    fl_value_set_string_take(result, "chunks", fl_value_new_int(chunks));
+    fl_value_set_string_take(summary, "size", fl_value_new_int(size));
+    fl_value_set_string_take(summary, "chunks", fl_value_new_int(chunks));
 
     char* buffer = (char*)malloc((buffer_size+1) * sizeof(char));
     
@@ -257,9 +291,9 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                 half_enter = true;
                 *p++ = '\0';
                 if(in_asc_header) {
-                    processheaderline(currline, result);
+                    processheaderline(currline, summary);
                 } else {
-                    processline(currline, &filter_repo, result);
+                    processline(currline, &filter_repo, data);
                 }
                 memset( currline, 0, sizeof(currline) );
                 p = currline;
@@ -269,9 +303,9 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                 } else {
                     *p++ = '\0';
                     if(in_asc_header) {
-                        processheaderline(currline, result);
+                        processheaderline(currline, summary);
                     } else {
-                        processline(currline, &filter_repo, result);
+                        processline(currline, &filter_repo, data);
                     }
                     memset( currline, 0, sizeof(char)*64 );
                     p = currline;

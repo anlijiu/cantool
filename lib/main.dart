@@ -28,7 +28,7 @@ class Logger extends ProviderObserver {
 
 void main() {
   print("main: I'm in");
-  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  debugDefaultTargetPlatformOverride = TargetPlatform.linux;
   WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(child: MyApp(), observers: [Logger()]));
 }

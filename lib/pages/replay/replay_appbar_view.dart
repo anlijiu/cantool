@@ -1,4 +1,5 @@
 import 'package:cantool/entity/signal_meta.dart';
+import 'package:cantool/pages/replay/replay_filter_dialog.dart';
 import 'package:cantool/providers.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
@@ -7,49 +8,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/repository/can_repository.dart';
 import 'package:can/can.dart' as can;
 import 'dart:convert';
+import 'models.dart';
 import 'providers.dart';
-
-final _currentSignalMeta = ScopedProvider<SignalMeta>(null);
-
-class SignalTile extends HookWidget {
-  const SignalTile();
-
-  @override
-  Widget build(BuildContext context) {
-    final signal = useProvider(_currentSignalMeta);
-    final filteredMsgState = useProvider(filterMsgSignalProvider);
-    final filteredMsg = filteredMsgState.state;
-    final viewController = useProvider(viewControllerProvider);
-    final checked =
-        filteredMsg[signal.mid]?.signals?.keys?.contains(signal.name) == true;
-
-    return Material(
-      child: ListTile(
-          title: Text('${signal.name}'),
-          leading: IconButton(
-            icon: checked
-                ? const Icon(Icons.check_box, color: Colors.green)
-                : const Icon(Icons.check_box_outline_blank),
-            onPressed: () {
-              print(" SignalTile  onPressed  " + signal.toString());
-              checked
-                  ? viewController.removeSignalByMeta(signal)
-                  : viewController.addSignalByMeta(signal);
-
-              // context.read(viewController).toggleStatus(message);
-            },
-          ),
-          trailing: Text('0x${signal.mid.toRadixString(16).toUpperCase()}'),
-          onTap: () {
-            // context.read(viewController).focusMessage(message);
-          }),
-    );
-  }
-}
 
 class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   final double height;
-  ScrollController _signalListController = ScrollController();
 
   ReplayAppbarView({
     Key key,
@@ -63,7 +26,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final filterMsgSignal = useProvider(filterMsgSignalProvider);
-    final signalMetas = useProvider(signalMetasProvider).state.values.toList();
+    final result = useProvider(replayResultProvider);
 
     final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
@@ -90,7 +53,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                   },
                 ),
           FlatButton.icon(
-              onPressed: () => showAddSignalDialog(context, signalMetas),
+              onPressed: () => showAddSignalDialog(context),
               icon: Icon(Icons.add),
               label: Text('Add')),
           ProviderListener(
@@ -110,7 +73,9 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                           ///filterMsgSignal.state.values.toList();
 
                           var sss = await can.replayFiltedSignals(filter);
-                          print('sss is ' + sss.toString());
+                          result.state = ReplayResult.fromJson(sss);
+                          print('sss summary is ' +
+                              ReplayResult.fromJson(sss).summary.toString());
                         }
                       : null,
                   color: needRefresh.value ? Colors.blue : Colors.white,
@@ -119,7 +84,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
         ]));
   } //这里设置控件（appBar）的高度
 
-  void showAddSignalDialog(context, List<SignalMeta> signalMetas) {
+  void showAddSignalDialog(context) {
     showGeneralDialog(
         context: context,
         barrierDismissible: true,
@@ -129,44 +94,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
-          return Center(
-            child: Container(
-              width: MediaQuery.of(context).size.width - 210,
-              height: MediaQuery.of(context).size.height - 180,
-              padding: EdgeInsets.all(20),
-              color: Colors.white,
-              child: Column(
-                children: [
-                  RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    color: const Color(0xFF1BC0C5),
-                  ),
-                  Flexible(
-                      child: DraggableScrollbar.semicircle(
-                          controller: _signalListController,
-                          child: ListView.builder(
-                            itemExtent: 50,
-                            scrollDirection: Axis.vertical,
-                            controller: _signalListController,
-                            itemCount: signalMetas.length,
-                            itemBuilder: (ctx, int idx) => ProviderScope(
-                              overrides: [
-                                _currentSignalMeta
-                                    .overrideWithValue(signalMetas[idx]),
-                              ],
-                              child: const SignalTile(),
-                            ),
-                          )))
-                ],
-              ),
-            ),
-          );
+          return ReplayFilterDialog();
         });
   }
 }
