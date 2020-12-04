@@ -19,7 +19,7 @@ class _$DbcMetaTearOff {
 // ignore: unused_element
   _DbcMeta call(
       {@required String filename,
-      String version = '',
+      String version = "",
       @required Map<int, MessageMeta> messages,
       @required Map<String, SignalMeta> signals}) {
     return _DbcMeta(
@@ -137,7 +137,7 @@ class __$DbcMetaCopyWithImpl<$Res> extends _$DbcMetaCopyWithImpl<$Res>
 class _$_DbcMeta implements _DbcMeta {
   _$_DbcMeta(
       {@required this.filename,
-      this.version = '',
+      this.version = "",
       @required this.messages,
       @required this.signals})
       : assert(filename != null),
@@ -150,7 +150,7 @@ class _$_DbcMeta implements _DbcMeta {
 
   @override
   final String filename;
-  @JsonKey(defaultValue: '')
+  @JsonKey(defaultValue: "")
   @override
   final String version;
   @override

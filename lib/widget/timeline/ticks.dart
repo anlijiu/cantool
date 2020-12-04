@@ -24,8 +24,14 @@ class Ticks {
   /// Other than providing the [PaintingContext] to allow the ticks to paint themselves,
   /// other relevant sizing information is passed to this `paint()` method, as well as
   /// a reference to the [Timeline].
+  ///
+  /// [offset] 图表canvas起点
+  /// [scale] 缩放 像素宽度/(开始-结束时间段)
+  /// [size] 图表canvas 宽高
   void paint(PaintingContext context, Offset offset, double translation,
       double scale, Size size, Timeline timeline) {
+    print(
+        "ticks print    offset:$offset, translation:$translation, scale:$scale, size:$size");
     final Canvas canvas = context.canvas;
 
     double width = size.width;
@@ -41,6 +47,7 @@ class Ticks {
 
     /// 缩放之后的刻度间距
     double scaledTickDistance = tickDistance * scale;
+    // print("ticks  scaledTickDistance is $scaledTickDistance");
     if (scaledTickDistance > 2 * TickDistance) {
       while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
         scaledTickDistance /= 2.0;
@@ -57,6 +64,7 @@ class Ticks {
 
     /// The number of ticks to draw.
     int numTicks = (width / scaledTickDistance).ceil() + 2;
+    // print("ticks  numTicks is $numTicks");
     if (scaledTickDistance > TextTickDistance) {
       textTickDistance = tickDistance;
     }
@@ -72,53 +80,7 @@ class Ticks {
     tickOffset -= scaledTickDistance;
     startingTickMarkValue -= tickDistance;
 
-    /// Ticks can change color because the timeline background will also change color
-    /// depending on the current era. The [TickColors] object, in `timeline_utils.dart`,
-    /// wraps this information.
-    List<TickColors> tickColors = timeline.tickColors;
-    if (tickColors != null && tickColors.length > 0) {
-      /// Build up the color stops for the linear gradient.
-      double rangeStart = tickColors.first.start;
-      double range = tickColors.last.start - tickColors.first.start;
-      List<ui.Color> colors = <ui.Color>[];
-      List<double> stops = <double>[];
-      for (TickColors bg in tickColors) {
-        colors.add(bg.background);
-        stops.add((bg.start - rangeStart) / range);
-      }
-      double s =
-          timeline.computeScale(timeline.renderStart, timeline.renderEnd);
-
-      /// y-coordinate for the starting and ending element.
-      double x1 = (tickColors.first.start - timeline.renderStart) * s;
-      double x2 = (tickColors.last.start - timeline.renderStart) * s;
-
-      /// Fill Background.
-      ui.Paint paint = ui.Paint()
-        ..shader = ui.Gradient.linear(
-            ui.Offset(x1, 0.0), ui.Offset(x2, 0.0), colors, stops)
-        ..style = ui.PaintingStyle.fill;
-
-      /// Fill in top/bottom if necessary.
-      if (x1 > offset.dx) {
-        canvas.drawRect(
-            Rect.fromLTWH(offset.dy, 0, x1 - offset.dx + 1.0, gutterWidth),
-            ui.Paint()..color = tickColors.first.background);
-      }
-      if (x2 < offset.dx + width) {
-        canvas.drawRect(
-            Rect.fromLTWH(
-                x2 - 1, offset.dy, (offset.dx + width) - x2, gutterWidth),
-            ui.Paint()..color = tickColors.last.background);
-      }
-
-      /// Draw the gutter.
-      canvas.drawRect(Rect.fromLTWH(x1, 0, x2 - x1, gutterWidth), paint);
-    } else {
-      canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy, width, gutterWidth),
-          Paint()..color = Color.fromRGBO(246, 246, 246, 0.95));
-    }
-
+    print("ssssssstartingTickMarkValue $startingTickMarkValue");
     Set<String> usedValues = Set<String>();
 
     TickColors colors = TickColors()
@@ -129,10 +91,9 @@ class Ticks {
       ..start = 0.1
       ..screenY = 0.0;
 
-    print(" offset is dx:${offset.dx}, dy:${offset.dy}");
-    print(" size is width:${size.width}, height:${size.height}");
-    canvas.drawRect(
-        Rect.fromLTWH(0, 0, 500, 700.0), Paint()..color = Colors.blue);
+    // print("ticks  offset is dx:${offset.dx}, dy:${offset.dy}");
+    // print("ticks  size is width:${size.width}, height:${size.height}");
+    // print("ticks  numTicks is $numTicks, scale: $scale");
 
     /// Draw all the ticks.
     for (int i = 0; i < numTicks; i++) {
@@ -155,21 +116,12 @@ class Ticks {
             textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
           ..pushStyle(ui.TextStyle(color: colors.text));
 
-        int value = tt.round().abs();
+        int value = tt;
 
         /// Format the label nicely depending on how long ago the tick is placed at.
-        String label;
-        if (value < 9000) {
-          label = value.toStringAsFixed(0);
-        } else {
-          NumberFormat formatter = NumberFormat.compact();
-          label = formatter.format(value);
-          int digits = formatter.significantDigits;
-          while (usedValues.contains(label) && digits < 10) {
-            formatter.significantDigits = ++digits;
-            label = formatter.format(value);
-          }
-        }
+        String label = DateFormat('yyyy-MM-dd – kk:mm:ss').format(
+            timeline.timelineData.baseTime.add(Duration(milliseconds: value)));
+
         usedValues.add(label);
         builder.addText(label);
         ui.Paragraph tickParagraph = builder.build();
@@ -178,7 +130,7 @@ class Ticks {
         //刻度文字
         canvas.drawParagraph(
             tickParagraph,
-            Offset(offset.dy + width - o - tickParagraph.width,
+            Offset(offset.dx + width - o - tickParagraph.width,
                 height + TickSize));
       } else {
         /// 刻度文字之间的小刻度

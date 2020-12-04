@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cantool/pages/app.dart';
 import 'package:cantool/providers.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
@@ -13,7 +12,6 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 
 import 'package:cantool/pages/home/home_page.dart';
-import 'package:cantool/route/routes.dart';
 
 class Logger extends ProviderObserver {
   @override
@@ -36,8 +34,6 @@ void main() {
 class MyApp extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final router = useProvider(routerProvider);
-    Routes.configureRoutes(router);
 
     return OverlaySupport(
         child: MaterialApp(
@@ -69,7 +65,6 @@ class MyApp extends HookWidget {
               const Locale('en', "US"),
               const Locale('zh', "CN"),
             ],
-            onGenerateRoute: router.generator,
             home: I18n(child: AppPage())));
   }
 }

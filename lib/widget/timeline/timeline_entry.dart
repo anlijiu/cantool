@@ -22,6 +22,8 @@ class TimelineEntry {
 
   Color accent;
 
+  Map<String, int> yAxisLabels;
+
   /// Each entry constitues an element of a tree:
   /// eras are grouped into spanning eras and events are placed into the eras they belong to.
   TimelineEntry parent;
@@ -37,6 +39,7 @@ class TimelineEntry {
   double start;
   double end;
   double x = 0.0;
+  double y = 0.0;
   double endX = 0.0;
   double length = 0.0;
   double opacity = 0.0;
@@ -83,7 +86,7 @@ class TimelineEntry {
   /// Debug information.
   @override
   String toString() {
-    return "TIMELINE ENTRY: $label -($start,$end)";
+    return "TIMELINE ENTRY: $label -(start:$start,end:$end) opacity:$opacity x:$x y:$y  value:$value";
   }
 
   /// Helper method.

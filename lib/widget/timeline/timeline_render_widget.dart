@@ -2,12 +2,15 @@ import 'dart:math';
 import 'dart:ui';
 import 'dart:ui' as ui;
 
+import 'package:cantool/widget/timeline/x_axis.dart';
+import 'package:cantool/widget/timeline/y_axis.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 import 'ticks.dart';
 import 'timeline.dart';
+import 'timeline_data.dart';
 import 'timeline_entry.dart';
 import 'timeline_utils.dart';
 
@@ -44,7 +47,6 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    print("TimelineRenderWidget createRenderObject in");
     return TimelineRenderObject()
       ..timeline = timeline
       ..touchBubble = touchBubble
@@ -86,6 +88,8 @@ class TimelineRenderObject extends RenderBox {
 
   double _topOverlap = 0.0;
   Ticks _ticks = Ticks();
+  XAxis _xAxis = XAxis();
+  YAxis _yAxis = YAxis();
   Timeline _timeline;
   List<TapTarget> _tapTargets = List<TapTarget>();
   List<TimelineEntry> _favorites;
@@ -113,7 +117,7 @@ class TimelineRenderObject extends RenderBox {
       return;
     }
     _timeline = value;
-    //_timeline.onNeedPaint = markNeedsPaint;
+    _timeline.onNeedPaint = markNeedsPaint;
     markNeedsPaint();
     markNeedsLayout();
   }
@@ -153,17 +157,18 @@ class TimelineRenderObject extends RenderBox {
   @override
   void performLayout() {
     if (_timeline != null) {
-      _timeline.setViewport(height: size.height, animate: true);
+      _timeline.setViewport(
+          width: size.width, height: size.height, animate: true);
     }
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    print("TimelineRenderWidget paint in");
     final Canvas canvas = context.canvas;
     if (_timeline == null) {
       return;
     }
+    print("timeline_render_widget  paint offset:$offset  size:$size");
 
     /// Fetch the background colors from the [Timeline] and compute the fill.
     List<TimelineBackgroundColor> backgroundColors = timeline.backgroundColors;
@@ -203,85 +208,224 @@ class TimelineRenderObject extends RenderBox {
     _tapTargets.clear();
     double renderStart = _timeline.renderStart;
     double renderEnd = _timeline.renderEnd;
-    double scale = size.height / (renderEnd - renderStart);
+    double scale = size.width / (renderEnd - renderStart);
 
     /// Paint the [Ticks] on the left side of the screen.
     canvas.save();
     // canvas.translate(0, size.height - offset.dy - topOverlap);
 
-    print(
-        "ticks offset.dx: $offset.dx, offset.dy: ${offset.dy + topOverlap}, size.width: $size.width, size.height: $size.height ");
+    // print(
+    //     "TimelineRenderWidget paint  renderStart:$renderStart  renderEnd:$renderEnd  scale:$scale");
+    // print(
+    //     "ticks offset.dx: $offset.dx, offset.dy: ${offset.dy + topOverlap}, size.width: $size.width, size.height: $size.height ");
     canvas.clipRect(Rect.fromLTWH(
         offset.dx, offset.dy + topOverlap, size.width, size.height));
     // canvas.drawColor(Colors.red, BlendMode.srcOver);
-    canvas.drawRect(
-        Rect.fromLTWH(0, 0, 500, 1000.0), Paint()..color = Colors.red);
-    _ticks.paint(context, offset, -renderStart * scale, scale, size, timeline);
+    // canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy + topOverlap, 200, 200), Paint()..color = Colors.red);
+    // _ticks.paint(context, offset, -renderStart * scale, scale, size, timeline);
+    double xWidth = 80;
+    Function measureXAxisWidth = (double xAxisWidth) {
+      if (xWidth < xAxisWidth) xWidth = xAxisWidth;
+      print("xWidth: $xWidth   xAxisWidth:$xAxisWidth");
+    };
+    _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline);
     canvas.restore();
 
     /// And then draw the rest of the timeline.
-    if (_timeline.entries != null) {
+    if (_timeline.timelineData != null) {
       canvas.save();
-      canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline.gutterWidth,
-          offset.dy, size.width - _timeline.gutterWidth, size.height));
+      drawYaxis(context, offset, _timeline.timelineData, measureXAxisWidth);
+      canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline.gutterWidth + xWidth,
+          offset.dy, size.width - _timeline.gutterWidth - xWidth, size.height));
       drawItems(
           context,
           offset,
-          _timeline.entries,
+          _timeline.timelineData,
           _timeline.gutterWidth +
               Timeline.LineSpacing -
               Timeline.DepthOffset * _timeline.renderOffsetDepth,
           scale,
           0);
       canvas.restore();
+    } else {
+      print("timelineData is null");
     }
   }
+
+  void drawYaxis(PaintingContext context, Offset offset, TimelineData data,
+      Function measureAxisWidth) {
+    final Canvas canvas = context.canvas;
+
+    // canvas.clipRect(Rect.fromLTWH(
+    //     offset.dx, offset.dy, _timeline.gutterWidth, size.height));
+    final TextPainter _textPainter = TextPainter(
+      textDirection: ui.TextDirection.ltr,
+      textAlign: TextAlign.left,
+    );
+    final Paint painter = Paint()..color = Colors.red;
+    int j = 0;
+    for (MapEntry<String, TimelineSeriesData> seriesEntry
+        in data.series.entries) {
+      if (seriesEntry.value.y == null) return;
+      Color color = cs[j % cs.length];
+      j++;
+      _yAxis.paint(context, offset, 0, 200, 45, seriesEntry.value, color,
+          measureAxisWidth);
+      TextSpan text = TextSpan(
+          text: seriesEntry.value.meta.name,
+          style: TextStyle(fontSize: 11, color: color));
+
+      _textPainter.text = text;
+      _textPainter.layout(); // 进行布局
+      Size textSize = _textPainter.size;
+
+      // canvas.drawArc(
+      //     Rect.fromCenter(
+      //         center: Offset(offset.dx, seriesEntry.value.y),
+      //         height: 20,
+      //         width: 20),
+      //     0,
+      //     3.1415926 * 2,
+      //     false,
+      //     painter);
+      canvas.save();
+      canvas.translate(
+          offset.dx + 10, seriesEntry.value.y + 100 + textSize.width / 2);
+      canvas.rotate(3.1415926 * 1.5);
+      _textPainter.paint(canvas, Offset(0, 0));
+      canvas.restore();
+    }
+  }
+
+  var cs = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.brown,
+    Colors.pink,
+    Colors.purple
+  ];
 
   /// Given a list of [entries], draw the label with its bubble beneath.
   /// Draw also the dots&lines on the left side of the timeline. These represent
   /// the starting/ending points for a given event and are meant to give the idea of
   /// the timespan encompassing that event, as well as putting the vent into context
   /// relative to the other events.
-  void drawItems(PaintingContext context, Offset offset,
-      List<TimelineEntry> entries, double y, double scale, int depth) {
+  void drawItems(PaintingContext context, Offset offset, TimelineData data,
+      double y, double scale, int depth) {
+    print("drawItems in series.length: ${data.series.length}");
     final Canvas canvas = context.canvas;
 
-    for (TimelineEntry item in entries) {
-      if (!item.isVisible ||
-          item.x > size.width + Timeline.BubbleWidth ||
-          item.endX < -Timeline.BubbleWidth) {
-        /// Don't paint this item.
-        continue;
+    Path path = new Path();
+    Paint paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    final marginTop = size.height + topOverlap - 200;
+    int j = 0;
+    for (MapEntry<String, TimelineSeriesData> seriesEntry
+        in data.series.entries) {
+      print("seriesEntry.value.y: ${seriesEntry.value.y},  size:$size");
+      if (seriesEntry.value.y == null) return;
+      Rect t = Offset(0, seriesEntry.value.y) & Size(size.width, 200);
+      Paint p = Paint()
+        ..color = Color.fromARGB(100, (seriesEntry.value.y ~/ 5).toInt(),
+            255 - (seriesEntry.value.y ~/ 5).toInt(), 100);
+      canvas.saveLayer(t, p);
+      canvas.drawRect(t, p);
+      canvas.restore();
+      Paint p2 = Paint()
+        ..color = cs[j % cs.length]
+        ..strokeWidth = 3.0
+        ..style = PaintingStyle.stroke;
+      print(
+          "drawItems in , entries.length: ${seriesEntry.value.entries}  j:$j");
+      j++;
+
+      ////////////////////////////
+      // canvas.save();
+      // canvas.translate(
+      //     offset.dx + _timeline.gutterWidth, seriesEntry.value.y + 200);
+      // canvas.rotate(3.1415926 * 1.5);
+      // ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+      //     textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
+      //   ..pushStyle(ui.TextStyle(color: cs[j % cs.length]));
+      // builder.addText(seriesEntry.value.meta.name);
+      // ui.Paragraph seriesParagraph = builder.build();
+      // seriesParagraph.layout(ui.ParagraphConstraints(width: 200));
+      // canvas.drawParagraph(seriesParagraph, Offset(0, 0));
+      // canvas.restore();
+      /////////////////////////////
+      for (TimelineEntry item in seriesEntry.value.entries) {
+        // if (!item.isVisible ||
+        if (item.x > size.width + Timeline.BubbleWidth ||
+            item.endX < -Timeline.BubbleWidth) {
+          /// Don't paint this item.
+          continue;
+        }
+
+        if (item.next != null) {
+          path.reset();
+          path.moveTo(item.x + offset.dx, item.y);
+          if (item.value != item.next.value) {
+            path.lineTo(item.next.x + offset.dx, item.y);
+          }
+          path.lineTo(item.next.x + offset.dx, item.next.y);
+          canvas.drawPath(path, p2);
+          print(
+              "x1:${item.x} y1:${item.y}   x2:${item.next.x} y2:${item.next.y} ");
+        }
+        print("x1:${item.x} y1:${item.y}");
       }
 
-      double legOpacity = item.legOpacity * item.opacity;
-      Offset entryOffset = Offset(y + Timeline.LineWidth / 2.0, item.x);
+      // for (TimelineEntry item in entries) {
+      //   if (!item.isVisible ||
+      //       item.x > size.width + Timeline.BubbleWidth ||
+      //       item.endX < -Timeline.BubbleWidth) {
+      //     /// Don't paint this item.
+      //     continue;
+      //   }
 
-      /// Draw the small circle on the left side of the timeline.
-      canvas.drawCircle(
-          entryOffset,
-          Timeline.EdgeRadius,
-          Paint()
-            ..color = (item.accent != null
-                    ? item.accent
-                    : LineColors[depth % LineColors.length])
-                .withOpacity(item.opacity));
-      if (legOpacity > 0.0) {
-        Paint legPaint = Paint()
-          ..color = (item.accent != null
-                  ? item.accent
-                  : LineColors[depth % LineColors.length])
-              .withOpacity(legOpacity);
+      //   if (item.next != null) {
+      //     path.reset();
+      //     path.moveTo(item.x + offset.dx, item.value * 50 + marginTop);
+      //     if (item.value != item.next.value) {
+      //       path.lineTo(item.next.x + offset.dx, item.value * 50 + marginTop);
+      //     }
+      //     path.lineTo(item.next.x + offset.dx, item.next.value * 50 + marginTop);
+      //     canvas.drawPath(path, paint);
 
-        /// Draw the line connecting the start&point of this item on the timeline.
-        canvas.drawRect(
-            Offset(y, item.x) & Size(Timeline.LineWidth, item.length),
-            legPaint);
-        canvas.drawCircle(
-            Offset(y + Timeline.LineWidth / 2.0, item.x + item.length),
-            Timeline.EdgeRadius,
-            legPaint);
-      }
+      //     // print("x1:${item.x} y1:500   x2:${item.next.x} y2:500 ");
+      //   }
+      //   double legOpacity = item.legOpacity * item.opacity;
+      //   Offset entryOffset = Offset(y + Timeline.LineWidth / 2.0, item.x);
+
+      //   /// Draw the small circle on the left side of the timeline.
+      //   canvas.drawCircle(
+      //       entryOffset,
+      //       Timeline.EdgeRadius,
+      //       Paint()
+      //         ..color = (item.accent != null
+      //                 ? item.accent
+      //                 : LineColors[depth % LineColors.length])
+      //             .withOpacity(item.opacity));
+      //   if (legOpacity > 0.0) {
+      //     Paint legPaint = Paint()
+      //       ..color = (item.accent != null
+      //               ? item.accent
+      //               : LineColors[depth % LineColors.length])
+      //           .withOpacity(legOpacity);
+
+      //     /// Draw the line connecting the start&point of this item on the timeline.
+      //     canvas.drawRect(
+      //         Offset(item.x, 100) & Size(Timeline.LineWidth, item.length),
+      //         legPaint);
+      //     canvas.drawCircle(
+      //         Offset(y + Timeline.LineWidth / 2.0, item.x + item.length),
+      //         Timeline.EdgeRadius,
+      //         legPaint);
+      //   }
     }
   }
 }

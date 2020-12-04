@@ -72,7 +72,8 @@ class ReplayFilterDialog extends HookWidget {
     final textController = useTextEditingController();
     final search = _useDecouncedSearch(textController);
     final signalMetas = useProvider(filteredSignalProvider(search));
-
+    FocusNode searchFocus = FocusNode();
+    searchFocus.requestFocus();
     return Material(
         child: Center(
             child: Container(
@@ -93,6 +94,8 @@ class ReplayFilterDialog extends HookWidget {
                 maxLines: 1,
                 onChanged: (str) {},
                 controller: textController,
+                autofocus: true,
+                // focusNode: searchFocus,
                 decoration: new InputDecoration(
                     prefixIcon: Icon(Icons.search),
                     suffixIcon: IconButton(

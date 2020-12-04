@@ -18,6 +18,7 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_show(GTK_WIDGET(window));
   gtk_widget_set_size_request(GTK_WIDGET(window), kFlutterWindowWidth,
                               kFlutterWindowHeight);
+  gtk_window_maximize(window);
   gtk_window_set_title(window, kFlutterWindowTitle);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();

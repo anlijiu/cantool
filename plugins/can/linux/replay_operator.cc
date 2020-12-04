@@ -3,6 +3,7 @@
 #include "replay_operator.h"
 #include "log.h"
 #include "asc_reader.h"
+#include "blfreader.h"
 
 
 static char* g_path;
@@ -40,6 +41,8 @@ void replay_operator_get_filted_signals(FlValue *filter, FlValue *result)
     if(strcmp("asc", get_filename_ext(g_path)) == 0) {
         ok = parse_asc(g_path, filter, result);
     } else if(strcmp("blf", get_filename_ext(g_path)) == 0) {
+        debug_info("replay_operator  parse blf in %s.\n", __FUNCTION__);
+        ok = parse_blf(g_path, filter, result);
     } else {
     }
 }

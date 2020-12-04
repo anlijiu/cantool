@@ -1,20 +1,3 @@
-/*  ascReader.c --  parse ASC files
-    Copyright (C) 2007-2011 Andreas Heitmann
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -95,25 +78,41 @@ static void processheaderline(char *str, FlValue *result) {
     if(!tail) return;
 
     if(!strcmp(str, "date")) {
-        struct tm *timeinfo = (struct tm *)malloc(sizeof(struct tm));
-        debug_info("processheader: date:%s|\n", tail);
-        time_t rawtime = 0;
-        memset(timeinfo, 0, sizeof(struct tm));
-        debug_info("timeinfo after memset 0 : %s",  printtm(*timeinfo));
-        // strptime(tail, "%a %b %d %I:%M:%S %p %y",  timeinfo);
-        strptime("Mon Sep 21 10:56:01 pm 2020", "%a %b %d %I:%M:%S %p %y",  timeinfo);
 
-        debug_info("processheader: date:%s|timeinfo:%s|\n", tail, printtm(*timeinfo));
-        rawtime = mktime(timeinfo);
-        debug_info("rawtime: %ld, %s", rawtime, printtm(*timeinfo));
+        const char* months[12] = { 
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        };  
+        int h = 0;
+        int m = 0;
+        int s = 0;
+        int d = 0;
+        int Y = 0;
+        int ms = 0;
+        int MM = 0;
+        char ampm[3];
+        char M[4];
 
+        sscanf(tail, "%*[a-zA-Z] %s %d %d:%d:%d.%d %s %d", M, &d, &h, &m, &s, &ms, ampm, &Y);
+        if(strcmp(ampm, "pm") == 0) {
+            h+=12;
+        }
+        for(int i = 0; i < 12; ++i) {
+            if(strcmp(M, months[i]) == 0) {
+                MM = i+1;
+            }
+        }
 
-        // struct tm *ti = getdate("Mon Sep 21 10:56:01 pm 2020");
-        // printf(" ti: %s              year:%d, hour:%d\n", printtm(*ti), ti->tm_year, ti->tm_hour);
+        FlValue* datetime = fl_value_new_map();
+        fl_value_set_string_take(datetime, "year", fl_value_new_int(Y));
+        fl_value_set_string_take(datetime, "month", fl_value_new_int(MM));
+        fl_value_set_string_take(datetime, "day", fl_value_new_int(d));
+        fl_value_set_string_take(datetime, "hour", fl_value_new_int(h));
+        fl_value_set_string_take(datetime, "minute", fl_value_new_int(m));
+        fl_value_set_string_take(datetime, "second", fl_value_new_int(s));
+        fl_value_set_string_take(datetime, "millisecond", fl_value_new_int(ms));
+        fl_value_set_string_take(result, "date", datetime);
 
-
-        fl_value_set_string_take(result, "date", fl_value_new_string(tail));
-        fl_value_set_string_take(result, "timestamp", fl_value_new_int(rawtime));
     } else if(!strcmp(str,"base")) {              /* parse numeric base */
         cp = strtok(tail, " ");    /* dec/hex */
         if(!cp) return;
@@ -121,11 +120,11 @@ static void processheaderline(char *str, FlValue *result) {
         if(!strcmp(cp,"dec")) {
             fl_value_set_string_take(result, "numbase", fl_value_new_string("decimal"));
             numbase = decimal;
-            // printf("processheader:dec\n");
+            debug_info("processheader: dec\n");
         } else if(!strcmp(cp,"hex")) {
             fl_value_set_string_take(result, "numbase", fl_value_new_string("hex"));
             numbase = hexadecimal;
-            // printf("processheader:hec\n");
+            debug_info("processheader: hec\n");
         } else {
         }
     } else if(!strcmp(str,"internal")) {
@@ -135,17 +134,24 @@ static void processheaderline(char *str, FlValue *result) {
     } else if(!strcmp(str,"Start")) {
         // printf("processheader: start content\n");
         in_asc_header = false;
+    } else if(!strcmp(str, "//")) {
+        char *version = split(tail, " ");   /* get first token */
+        if(version != NULL && !strcmp(tail, "version")) {
+            debug_info("processheader: version:%s\n", version);
+        }
+        in_asc_header = false;
     }
 
-    printf("processheader: end\n");
+    debug_info("processheader: end\n");
 }
 
 static void processline(char *str, filter_repo_map* filter, FlValue* result) {
 
+    // debug_info("processline: processline start %s\n", str);
     char *cp, *buffer_lasts;
 
     if(numbase == unset) {
-        fprintf(stderr,"processline(): missing numeric base\n");
+        debug_info("processline: missing numeric base\n");
     }
 
     // printf("len: %ld, processline :%s    -\n", strlen(str), str);
@@ -177,17 +183,25 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     // t += nt;
     // printf("processcontent  t: %f\n", t);
 
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
+    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL || !isdigit((int)*cp)) return;//正常的数据帧这个应该是bus通道
     // int bus = atoi(cp);
     // printf("processcontent  bus is %d\n", bus);
 
       /* get message identifier */
     cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
-    uint32_t id = atoi(cp);
-    // printf("processcontent  id is %d %ld\n", id, hashmap_size(filter));
+    uint32_t id = 0;
+    if(numbase == hexadecimal) {
+        id = strtol(cp, NULL, 16);
+    } else {
+        id = atoi(cp);
+    }
+    // debug_info("processcontent  id is %d %ld\n", id, hashmap_size(filter));
 
     struct message* m = hashmap_get(filter, &id);
-    if(m == NULL) return;
+    if(m == NULL) {
+        // debug_info("processcontent  m is NULL return\n");
+        return;
+    }
 
     cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
 
@@ -197,7 +211,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
 
     int dlc = atoi(cp);
-    // printf("processcontent  dlc is %d\n", dlc);
+    // debug_info("processcontent  dlc is %d\n", dlc);
 
     uint8_t data[8];
     for(int i = 0; i < dlc; i++) {
@@ -209,7 +223,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     list_node_t *nt = NULL;
     while((nt = list_iterator_next(it)) != NULL ) { 
         struct signal_meta * s_meta = get_signal_meta_by_id((const char *)nt->val);
-        printf("processcontent s_meta name is %s\n ", s_meta->name);
+        // debug_info("processcontent s_meta name is %s\n ", s_meta->name);
         if(s_meta == NULL) continue;
         FlValue *signal_list = fl_value_lookup_string(result, (const char *)nt->val);
         if(signal_list == NULL) {
@@ -227,7 +241,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     }   
     list_iterator_destroy(it);
 
-    printf(" %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    // debug_info(" %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 }
 
 bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
@@ -278,8 +292,9 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
     memset( buffer, 0, sizeof(char)*(buffer_size+1));
     size_t readsize = 0;
     // char lastline[65] = "\0";
-    char currline[64];
-    memset( currline, 0, sizeof(char)*64);
+    size_t line_size = 1024;
+    char currline[line_size];
+    memset( currline, 0, sizeof(char)*line_size);
     bool half_enter = false;
     while((readsize = read(fd, buffer, buffer_size)) != 0) {
         buffer[ readsize ] = '\0';
@@ -295,7 +310,7 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                 } else {
                     processline(currline, &filter_repo, data);
                 }
-                memset( currline, 0, sizeof(currline) );
+                memset( currline, 0, sizeof(char)*line_size );
                 p = currline;
             } else if(*q == '\n') {
                 if(half_enter) {
@@ -307,7 +322,7 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                     } else {
                         processline(currline, &filter_repo, data);
                     }
-                    memset( currline, 0, sizeof(char)*64 );
+                    memset( currline, 0, sizeof(char)*line_size );
                     p = currline;
                 }
             } else {

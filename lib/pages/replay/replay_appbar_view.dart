@@ -75,7 +75,8 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                           var sss = await can.replayFiltedSignals(filter);
                           result.state = ReplayResult.fromJson(sss);
                           print('sss summary is ' +
-                              ReplayResult.fromJson(sss).summary.toString());
+                              result.state.summary.toString());
+                          print('sss data is ' + result.state.data.toString());
                         }
                       : null,
                   color: needRefresh.value ? Colors.blue : Colors.white,

@@ -12,7 +12,6 @@ class AppDrawer extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useProvider(dbcMetaProvider);
-    final router = useProvider(routerProvider);
     final drawerKey = useProvider(drawerKeyProvider);
     final currentTab = useProvider(currentTabInDrawerProvider);
     return Drawer(
@@ -34,7 +33,6 @@ class AppDrawer extends HookWidget {
               title: Text("Home".i18n),
               onTap: () {
                 currentTab.state = 0;
-                //router.navigateTo(context, "home");
               }),
           ListTile(
               title: Text("Load DBC".i18n),
@@ -45,13 +43,11 @@ class AppDrawer extends HookWidget {
               title: Text("Replay".i18n),
               onTap: () {
                 currentTab.state = 1;
-                //router.navigateTo(context, "replay");
               }),
           ListTile(
               title: Text("About".i18n),
               onTap: () {
                 currentTab.state = 2;
-                //router.navigateTo(context, "about");
               })
         ],
       ),

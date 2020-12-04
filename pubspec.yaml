@@ -32,7 +32,7 @@ dependencies:
     path: plugins/menubar
   window_size:
     path: plugins/window_size
-  fluro: ^1.7.4
+  fluro: ^1.7.7
   flutter_portal:
   animated_text_kit: ^2.2.0
   cupertino_icons: ^0.1.3
@@ -62,7 +62,7 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.10.2
   json_serializable: ^3.5.0
-  freezed: ^0.12.2
+  freezed: ^0.12.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

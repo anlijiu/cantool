@@ -4,18 +4,34 @@ import 'package:intl/intl.dart';
 
 part 'models.g.dart';
 
-class CustomDateTimeConverter implements JsonConverter<DateTime, String> {
+class CustomDateTimeConverter
+    implements JsonConverter<DateTime, Map<dynamic, dynamic>> {
   const CustomDateTimeConverter();
 
   static DateFormat formatter = DateFormat(r'''E MMM dd hh:mm:ss a yyyy''');
+  static DateFormat formatter1 =
+      DateFormat(r'''E MMM dd hh:mm:ss.mmm a yyyy''');
 
   @override
-  DateTime fromJson(String json) {
-    return formatter.parse(json.replaceAll("am", "AM").replaceAll("pm", "PM"));
+  DateTime fromJson(Map<dynamic, dynamic> json) {
+    DateTime t = DateTime(json["year"], json["month"], json["day"],
+        json["hour"], json["minute"], json["second"], json["millisecond"]);
+    print(" CustomDateTimeConverter   datetime is ${t.toIso8601String()}");
+    return t;
   }
 
   @override
-  String toJson(DateTime json) => json.toIso8601String();
+  Map<String, int> toJson(DateTime t) {
+    return {
+      "year": t.year,
+      "month": t.month,
+      "day": t.day,
+      "hour": t.hour,
+      "minute": t.minute,
+      "second": t.second,
+      "millisecond": t.millisecond
+    };
+  }
 }
 
 enum Numbase {
@@ -42,7 +58,6 @@ class ReplayResult {
             (e as List)
                 ?.map((e) => e == null ? null : Map<String, dynamic>.from(e))
                 ?.toList())));
-    // json['data'] = Map<String, dynamic>.from(json['data']);
     return _$ReplayResultFromJson(json);
   }
 
@@ -65,7 +80,7 @@ class ReplaySummary {
   Map<String, dynamic> toJson() => _$ReplaySummaryToJson(this);
 
   String toString() {
-    return 'ReplaySummary date:$date, numbase:$numbase, size:$size, chunks:$chunks';
+    return 'ReplaySummary date:$date, ${date.millisecondsSinceEpoch} numbase:$numbase, size:$size, chunks:$chunks';
   }
 }
 
@@ -79,6 +94,10 @@ class ReplayEntry {
       _$ReplayEntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$ReplayEntryToJson(this);
+
+  String toString() {
+    return "value: $value, time: $time";
+  }
 }
 
 @JsonSerializable()

@@ -1,6 +1,5 @@
 import 'package:cantool/repository/dbc_meta_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:fluro/fluro.dart';
 
 import 'entity/message_meta.dart';
 import 'entity/replay_file_entity.dart';
@@ -25,4 +24,3 @@ final signalMetasProvider = StateProvider<Map<String, SignalMeta>>((ref) {
 });
 
 final currentTabInDrawerProvider = StateProvider<int>((ref) => 0);
-final routerProvider = Provider<FluroRouter>((ref) => FluroRouter());

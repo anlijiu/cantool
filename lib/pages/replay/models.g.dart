@@ -31,7 +31,7 @@ Map<String, dynamic> _$ReplayResultToJson(ReplayResult instance) =>
 
 ReplaySummary _$ReplaySummaryFromJson(Map<String, dynamic> json) {
   return ReplaySummary(
-    const CustomDateTimeConverter().fromJson(json['date'] as String),
+    const CustomDateTimeConverter().fromJson(json['date'] as Map),
     _$enumDecodeNullable(_$NumbaseEnumMap, json['numbase']),
     json['size'] as int,
     json['chunks'] as int,

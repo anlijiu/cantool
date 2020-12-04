@@ -1,9 +1,13 @@
 import 'dart:ui';
 
+import 'package:cantool/widget/timeline/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
+import 'mouse_coordinate_painter.dart';
 import 'timeline.dart';
 import 'timeline_entry.dart';
 import 'timeline_render_widget.dart';
@@ -26,12 +30,20 @@ class TimelineWidget extends StatefulWidget {
 class _TimelineWidgetState extends State<TimelineWidget> {
   static const String DefaultEraName = "Birth of the Universe";
   static const double TopOverlap = 56.0;
+  final FocusNode _focusNode = FocusNode();
 
   /// These variables are used to calculate the correct viewport for the timeline
   /// when performing a scaling operation as in [_scaleStart], [_scaleUpdate], [_scaleEnd].
   Offset _lastFocalPoint;
   double _scaleStartYearStart = -100.0;
   double _scaleStartYearEnd = 100.0;
+  double _scaleTopOffset = 0.0;
+
+  Offset _lastTapDownPoint;
+  double _chipStartYearStart = -10.0;
+  double _chipStartYearEnd = 10.0;
+
+  Offset _mouseHoverPoint;
 
   /// When touching a bubble on the [Timeline] keep track of which
   /// element has been touched in order to move to the [article_widget].
@@ -59,32 +71,70 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   /// and pass the relevant information down to the [Timeline], so that it can display
   /// all the relevant information properly.
   void _scaleStart(ScaleStartDetails details) {
-    _lastFocalPoint = details.focalPoint;
-    _scaleStartYearStart = timeline.start;
-    _scaleStartYearEnd = timeline.end;
+    if (!isShiftPressed) {
+      _lastFocalPoint = details.focalPoint;
+      _scaleStartYearStart = timeline.start;
+      _scaleStartYearEnd = timeline.end;
+      _scaleTopOffset = timeline.topOffset;
+    }
+
     timeline.isInteracting = true;
     timeline.setViewport(velocity: 0.0, animate: true);
   }
 
   void _scaleUpdate(ScaleUpdateDetails details) {
+    if (isShiftPressed) return;
+
     double changeScale = details.scale;
     double scale =
-        (_scaleStartYearEnd - _scaleStartYearStart) / context.size.height;
+        (_scaleStartYearEnd - _scaleStartYearStart) / context.size.width;
 
-    double focus = _scaleStartYearStart + details.focalPoint.dy * scale;
+    double focus = _scaleStartYearStart + details.focalPoint.dx * scale;
+    double topOffset =
+        _scaleTopOffset + _lastFocalPoint.dy - details.focalPoint.dy;
     double focalDiff =
-        (_scaleStartYearStart + _lastFocalPoint.dy * scale) - focus;
+        (_scaleStartYearStart + _lastFocalPoint.dx * scale) - focus;
+    print("ScaleUpdateDetails ${details.toString()} ");
+    // print(
+    //     "_scaleStartYearStart : $_scaleStartYearStart changeScale: $changeScale scale:$scale  focalDiff: $focalDiff    focus: $focus");
     timeline.setViewport(
         start: focus + (_scaleStartYearStart - focus) / changeScale + focalDiff,
         end: focus + (_scaleStartYearEnd - focus) / changeScale + focalDiff,
-        height: context.size.height,
+        width: context.size.width,
+        topOffset: topOffset,
         animate: true);
   }
 
   void _scaleEnd(ScaleEndDetails details) {
     timeline.isInteracting = false;
     timeline.setViewport(
-        velocity: details.velocity.pixelsPerSecond.dy, animate: true);
+        velocity: details.velocity.pixelsPerSecond.dx, animate: true);
+  }
+
+  void _zoom({double delta = 20}) {
+    print(
+        "_zoom delta:$delta   timeline.timelineData.minUnit:${timeline.minUnit}  start:${timeline.start} end:${timeline.end}");
+    if (timeline.minUnit == "year" && delta < 0) return;
+    // if (timeline.end - timeline.start < 100 && delta > 0) return;
+    double distance = (timeline.end - timeline.start) / 2;
+
+    for (var entry in timeDividers.entries) {
+      delta = entry.value * delta;
+      if (entry.key == timeline.minUnit) break;
+    }
+
+    if (delta.abs() < distance) {
+      distance = delta;
+    } else if (delta.isNegative) {
+      distance = -distance;
+    }
+    if (!distance.isNegative && distance < 1) return;
+
+    double start = timeline.start + distance / 2;
+    double end = timeline.end - distance / 2;
+    print("_zoom    start:$start  end:$end distance:$distance");
+    timeline.setViewport(
+        start: start, end: end, width: context.size.width, animate: true);
   }
 
   /// The following two callbacks are passed down to the [TimelineRenderWidget] so
@@ -98,6 +148,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   }
 
   void _tapDown(TapDownDetails details) {
+    print("TimlineWidget _tapDown");
     timeline.setViewport(velocity: 0.0, animate: true);
   }
 
@@ -109,6 +160,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   /// Otherwise trigger a [Navigator.push()] for the tapped bubble. This moves
   /// the app into the [ArticleWidget].
   void _tapUp(TapUpDetails details) {
+    print("TimlineWidget _tapUp");
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     if (_touchedBubble != null) {
       if (_touchedBubble.zoom) {
@@ -123,13 +175,8 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     }
   }
 
-  /// When performing a long-press operation, the viewport will be adjusted so that
-  /// the visible start and end times will be updated according to the [TimelineEntry]
-  /// information. The long-pressed bubble will float to the top of the viewport,
-  /// and the viewport will be scaled appropriately.
-  void _longPress() {
-    EdgeInsets devicePadding = MediaQuery.of(context).padding;
-    if (_touchedBubble != null) {}
+  void _tapCancel() {
+    print("TimlineWidget _tapCancel");
   }
 
   @override
@@ -194,11 +241,74 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   /// so that we can properly update the [Timeline] widget.
   @override
   deactivate() {
+    print("timeline_widget deactivate");
+    FocusScope.of(context).unfocus();
     super.deactivate();
     if (timeline != null) {
       timeline.onHeaderColorsChanged = null;
       timeline.onEraChanged = null;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("timeline_widget didChangeDependencies");
+  }
+
+  @override
+  void dispose() {
+    FocusScope.of(context).unfocus();
+    super.dispose();
+  }
+
+  bool isControlPressed = false;
+  bool isShiftPressed = false;
+
+  void onKeyEvent(RawKeyEvent event) {
+    isControlPressed = event.isControlPressed;
+    isShiftPressed = event.isShiftPressed;
+    bool isKeyDown;
+    switch (event.runtimeType) {
+      case RawKeyDownEvent:
+        isKeyDown = true;
+        break;
+      case RawKeyUpEvent:
+        isKeyDown = false;
+        break;
+      default:
+        throw new Exception('Unexpected runtimeType of RawKeyEvent');
+    }
+
+    int keyCode;
+    String logicalKey;
+    String physicalKey;
+    switch (event.data.runtimeType) {
+      case RawKeyEventDataMacOs:
+        final data = event.data as RawKeyEventDataMacOs;
+        keyCode = data.keyCode;
+        logicalKey = data.logicalKey.debugName;
+        physicalKey = data.physicalKey.debugName;
+        break;
+      case RawKeyEventDataLinux:
+        final data = event.data as RawKeyEventDataLinux;
+        keyCode = data.keyCode;
+        logicalKey = data.logicalKey.debugName;
+        physicalKey = data.physicalKey.debugName;
+        break;
+      case RawKeyEventDataWindows:
+        final data = event.data as RawKeyEventDataWindows;
+        keyCode = data.keyCode;
+        logicalKey = data.logicalKey.debugName;
+        physicalKey = data.physicalKey.debugName;
+        break;
+      default:
+        throw new Exception('Unsupported platform ${event.data.runtimeType}');
+    }
+
+    print(
+        '${isKeyDown ? 'KeyDown' : 'KeyUp'}: $keyCode \nLogical key: $logicalKey\n'
+        'Physical key: $physicalKey      isControlPressed ${event.data.isControlPressed}');
   }
 
   /// This widget is wrapped in a [Scaffold] to have the classic Material Design visual layout structure.
@@ -210,69 +320,136 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   @override
   Widget build(BuildContext context) {
     print("TimelineWidget build in");
+
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     if (timeline != null) {
       timeline.devicePadding = devicePadding;
     }
+
+    _chipStartYearStart = timeline.start;
+    _chipStartYearEnd = timeline.end;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: GestureDetector(
-          onLongPress: _longPress,
-          onTapDown: _tapDown,
-          onScaleStart: _scaleStart,
-          onScaleUpdate: _scaleUpdate,
-          onScaleEnd: _scaleEnd,
-          onTapUp: _tapUp,
-          child: Stack(children: <Widget>[
-            TimelineRenderWidget(
-                timeline: timeline,
-                topOverlap: TopOverlap + devicePadding.top,
-                touchBubble: onTouchBubble,
-                touchEntry: onTouchEntry),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                      height: devicePadding.top,
-                      color: _headerBackgroundColor != null
-                          ? _headerBackgroundColor
-                          : Color.fromRGBO(238, 240, 242, 0.81)),
-                  Container(
-                      color: _headerBackgroundColor != null
-                          ? _headerBackgroundColor
-                          : Color.fromRGBO(238, 240, 242, 0.81),
-                      height: 56.0,
-                      width: double.infinity,
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            IconButton(
-                              padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                              color: _headerTextColor != null
-                                  ? _headerTextColor
-                                  : Colors.black.withOpacity(0.5),
-                              alignment: Alignment.centerLeft,
-                              icon: Icon(Icons.arrow_back),
-                              onPressed: () {
-                                widget.timeline.isActive = false;
-                                Navigator.of(context).pop();
-                                return true;
-                              },
-                            ),
-                            Text(
-                              _eraName,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontFamily: "RobotoMedium",
-                                  fontSize: 20.0,
-                                  color: _headerTextColor != null
-                                      ? _headerTextColor
-                                      : darkText.withOpacity(
-                                          darkText.opacity * 0.75)),
-                            ),
-                          ]))
-                ])
-          ])),
+      body: new RawKeyboardListener(
+          focusNode: _focusNode,
+          onKey: onKeyEvent,
+          child: Listener(
+              onPointerUp: (pointerUpEvent) {
+                if (isShiftPressed) {
+                  double scale = (_chipStartYearEnd - _chipStartYearStart) /
+                      context.size.width;
+                  final start =
+                      _chipStartYearStart + _lastTapDownPoint.dx * scale;
+                  final end = _chipStartYearStart +
+                      pointerUpEvent.localPosition.dx * scale;
+                  timeline.setViewport(
+                      start: start,
+                      end: end,
+                      width: context.size.width,
+                      animate: true);
+                  print(
+                      "shift scale: $scale _lastTapDownPoint.dx:${_lastTapDownPoint.dx}   pointerUpEvent.localPosition.dx:${pointerUpEvent.localPosition.dx}");
+                  print(
+                      "shift onPointerUp start:$start end:$end   _chipStartYearStart :$_chipStartYearStart ");
+                }
+              },
+              onPointerSignal: (pointerSignal) {
+                print(
+                    "onPointerSignal ${pointerSignal is PointerScrollEvent}  $isControlPressed");
+                if (isControlPressed && (pointerSignal is PointerScrollEvent)) {
+                  print(
+                      "onPointerSignal distance: ${pointerSignal.scrollDelta.distance}");
+                  _zoom(delta: -pointerSignal.scrollDelta.dy);
+                }
+              },
+              onPointerHover: (event) {
+                FocusScope.of(context).requestFocus(_focusNode);
+                setState(() {
+                  _mouseHoverPoint = event.localPosition;
+                });
+              },
+              onPointerMove: (event) {
+                setState(() {
+                  _mouseHoverPoint = event.localPosition;
+                });
+              },
+              onPointerDown: (event) {
+                if (isShiftPressed) {
+                  print(
+                      "shift onPointerDown lastTapDown: ${event.localPosition}");
+                  _lastTapDownPoint = event.localPosition;
+                }
+              },
+              child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTapDown: _tapDown,
+                  onScaleStart: _scaleStart,
+                  onScaleUpdate: _scaleUpdate,
+                  onScaleEnd: _scaleEnd,
+                  onTapUp: _tapUp,
+                  onTapCancel: _tapCancel,
+                  child: Stack(children: <Widget>[
+                    RepaintBoundary(
+                        child: SizedBox.expand(
+                            child: CustomPaint(
+                                painter:
+                                    MouseCoordinatePainter(_mouseHoverPoint)))),
+                    TimelineRenderWidget(
+                        timeline: timeline,
+                        topOverlap: TopOverlap + devicePadding.top,
+                        touchBubble: onTouchBubble,
+                        touchEntry: onTouchEntry),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                              height: devicePadding.top,
+                              color: _headerBackgroundColor != null
+                                  ? _headerBackgroundColor
+                                  : Color.fromRGBO(238, 240, 242, 0.81)),
+                          Container(
+                              color: _headerBackgroundColor != null
+                                  ? _headerBackgroundColor
+                                  : Color.fromRGBO(238, 240, 242, 0.81),
+                              height: 56.0,
+                              width: double.infinity,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    IconButton(
+                                      padding: EdgeInsets.only(
+                                          left: 20.0, right: 20.0),
+                                      color: _headerTextColor != null
+                                          ? _headerTextColor
+                                          : Colors.black.withOpacity(0.5),
+                                      alignment: Alignment.centerLeft,
+                                      icon: Icon(Icons.zoom_in),
+                                      onPressed: () {
+                                        _zoom(delta: 20.0);
+                                        // widget.timeline.isActive = false;
+                                        // Navigator.of(context).pop();
+                                        return true;
+                                      },
+                                    ),
+                                    IconButton(
+                                      padding: EdgeInsets.only(
+                                          left: 20.0, right: 20.0),
+                                      color: _headerTextColor != null
+                                          ? _headerTextColor
+                                          : Colors.black.withOpacity(0.5),
+                                      alignment: Alignment.centerLeft,
+                                      icon: Icon(Icons.zoom_out),
+                                      onPressed: () {
+                                        _zoom(delta: -20.0);
+                                        // widget.timeline.isActive = false;
+                                        // Navigator.of(context).pop();
+                                        return true;
+                                      },
+                                    ),
+                                  ]))
+                        ])
+                  ])))),
     );
   }
 }
