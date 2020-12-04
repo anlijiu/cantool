@@ -20,8 +20,6 @@ class XAxis {
   /// [size] 图表canvas 宽高
   void paint(PaintingContext context, Offset offset, double translation,
       double scale, Size size, Timeline timeline) {
-    print(
-        "xaxis print    offset:$offset, translation:$translation, scale:$scale, size:$size");
     final Canvas canvas = context.canvas;
 
     double width = size.width;
@@ -45,8 +43,6 @@ class XAxis {
     final Paint painter = Paint()..color = Colors.black;
 
     while (tickTimestamp < timeline.renderEnd.ceil() + 1) {
-      print(
-          "tttttttttttttickTimestamp: $tickTimestamp,    ${timeline.renderEnd}   $primaryUnit");
       distance = scale * (tickTimestamp - timeline.renderStart);
       canvas.drawRect(
           Rect.fromLTWH(offset.dx + distance, height, 1.0, TickSize),
@@ -64,7 +60,6 @@ class XAxis {
           Offset(offset.dx + distance - textSize.width / 2, height + TickSize));
 
       if (tickTime.millisecondsSinceEpoch % timeDistance[secondUnit] == 0) {
-        print("xaxis , paint second unit");
         String formatStr = secondUnitTimeFormat[secondUnit];
         DateFormat format = DateFormat(formatStr);
 
@@ -84,7 +79,6 @@ class XAxis {
       tickTime = addFunc(tickTime, 1);
       tickTimestamp = tickTime.millisecondsSinceEpoch -
           timeline.timelineData.baseTime.millisecondsSinceEpoch;
-      print("after add tttttttttttttickTimestamp: $tickTimestamp,");
     }
 
     //坐标轴

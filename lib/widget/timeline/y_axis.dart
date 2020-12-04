@@ -23,17 +23,8 @@ class YAxis {
   /// a reference to the [Timeline].
   ///
   /// [offset] 图表canvas起点
-  void paint(
-      PaintingContext context,
-      Offset offset,
-      double translation,
-      double height,
-      double width,
-      TimelineSeriesData seriesData,
-      Color color,
-      Function measureXAxisWidth) {
-    // print(
-    //     "ticks print    offset:$offset, translation:$translation, scale:$scale, size:$size");
+  void paint(PaintingContext context, Offset offset, double translation,
+      double height, double width, TimelineSeriesData seriesData, Color color) {
     final Canvas canvas = context.canvas;
 
     double top = seriesData.y;
@@ -52,7 +43,6 @@ class YAxis {
       tickDistance = TickDistance.toDouble();
       textTickDistance = TextTickDistance.toDouble();
 
-      print("yaxis scaledTickDistance is $scaledTickDistance");
       if (scaledTickDistance > 2 * TickDistance) {
         while (scaledTickDistance > 2 * TickDistance && tickDistance >= 2.0) {
           scaledTickDistance /= 2.0;
@@ -69,9 +59,7 @@ class YAxis {
 
       /// The number of ticks to draw.
       numTicks = (height / scaledTickDistance).ceil();
-      print("yaxissssss  numTicks    is $numTicks");
     }
-    // print("ticks  numTicks is $numTicks");
     if (scaledTickDistance > TextTickDistance) {
       textTickDistance = tickDistance.roundToDouble();
     }
@@ -91,11 +79,6 @@ class YAxis {
       ..start = 0.1
       ..screenY = 0.0;
 
-    // print("ticks  offset is dx:${offset.dx}, dy:${offset.dy}");
-    // print("ticks  size is width:${size.width}, height:${size.height}");
-    print(
-        "yaxis  numTicks is $numTicks, tickOffset: $tickOffset   scale: $scale,  scaledTickDistance:$scaledTickDistance startingTickMarkValue:$startingTickMarkValue  tickDistance: $tickDistance   textTickDistance: $textTickDistance");
-
     double tickValue = seriesData.scope / (numTicks);
     int value = seriesData.meta.minimum.round();
 
@@ -104,10 +87,6 @@ class YAxis {
       textAlign: TextAlign.left,
     );
 
-    double xAxisWidth = 80;
-
-    List<Rect> bigTicks = [];
-
     /// Draw all the ticks.
     for (int i = 0; i < numTicks; i++) {
       tickOffset += scaledTickDistance;
@@ -115,28 +94,22 @@ class YAxis {
       int tt = startingTickMarkValue.round();
       tt = -tt;
       int o = tickOffset.floor();
-      print(
-          "yaxis o is $o  tt:$tt   textTickDistance:$textTickDistance    startingTickMarkValue:$startingTickMarkValue ");
       // TickColors colors = timeline.findTickColors(offset.dy + width - o);
       // canvas.drawRect(Rect.fromLTWH(offset.dx + width - o, height, 1, TickSize),
       // Paint()..color = Colors.red);
       if (tt % textTickDistance == 0) {
         /// 每个 `textTickDistance`, 大刻度.
-        // canvas.drawRect(
-        //     Rect.fromLTWH(
-        //         offset.dx + width - 5 - TickSize, bottom - o, TickSize, 1.0),
-        //     Paint()..color = color);
-        bigTicks.add(Rect.fromLTWH(
-            offset.dx + width - 5 - TickSize, bottom - o, TickSize, 1.0));
+        canvas.drawRect(
+            Rect.fromLTWH(
+                offset.dx + width + 45 - TickSize, bottom - o, TickSize, 1.0),
+            Paint()..color = color);
 
         /// Drawing text to [canvas] is done by using the [ParagraphBuilder] directly.
         ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-            textAlign: TextAlign.start, fontFamily: "wqy", fontSize: 11.0))
+            textAlign: TextAlign.end, fontFamily: "wqy", fontSize: 11.0))
           ..pushStyle(ui.TextStyle(color: color));
 
         value = (i * tickValue + seriesData.meta.minimum).round();
-        print(
-            "vvvvvalue: $value  tickValue:$tickValue,  min:${seriesData.meta.minimum}  ");
 
         /// Format the label nicely depending on how long ago the tick is placed at.
         String label = value.toStringAsFixed(0);
@@ -145,11 +118,7 @@ class YAxis {
           label += " (";
           label += seriesData.meta.options[value];
           label += ")";
-          print("llllabel: $label ");
         }
-        label.runes.forEach((element) {
-          print("rune is   $element");
-        });
         // TextSpan text =
         //     TextSpan(text: label, style: TextStyle(fontSize: 11, color: color));
 
@@ -166,11 +135,7 @@ class YAxis {
         builder.addText(label);
         ui.Paragraph tickParagraph = builder.build();
 
-        tickParagraph.layout(ui.ParagraphConstraints(width: double.maxFinite));
-        if (xAxisWidth < tickParagraph.longestLine)
-          xAxisWidth = tickParagraph.longestLine;
-        print(
-            "yAxis   xAxisWidth:$xAxisWidth,  tickParagraph.width:${tickParagraph.longestLine} ");
+        tickParagraph.layout(ui.ParagraphConstraints(width: width));
         //刻度文字
         canvas.drawParagraph(
             tickParagraph,
@@ -187,17 +152,8 @@ class YAxis {
       startingTickMarkValue += tickDistance.round();
     }
 
-    bigTicks.forEach((rect) {
-      canvas.drawRect(
-          Rect.fromLTWH(
-              rect.left + xAxisWidth, rect.top, rect.width, rect.height),
-          Paint()..color = color);
-    });
-    measureXAxisWidth(xAxisWidth);
     //坐标轴
-    canvas.drawLine(
-        Offset(offset.dx + width - 5 + xAxisWidth, top),
-        Offset(offset.dx + width - 5 + xAxisWidth, bottom),
-        Paint()..color = color);
+    canvas.drawLine(Offset(offset.dx + width + 45, top),
+        Offset(offset.dx + width + 45, bottom), Paint()..color = color);
   }
 }

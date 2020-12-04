@@ -312,14 +312,11 @@ class Timeline {
     }
     if (topOffset != double.maxFinite) {
       _topOffset = topOffset;
-      print("topOffset: $_topOffset");
     }
 
     if (height != double.maxFinite) {
       _height = height;
     }
-    // print(
-    //     "timeline setViewport: start:$start, end:$end, width:$width, velocity: $velocity   animate:$animate _isFrameScheduled:$_isFrameScheduled");
 
     /// If a value for start&end has been provided, evaluate the top/bottom position
     /// for the current viewport accordingly.
@@ -390,7 +387,6 @@ class Timeline {
   /// Make sure that all the visible assets are being rendered and advanced
   /// according to the current state of the timeline.
   void beginFrame(Duration timeStamp) {
-    print("beginFrame in $timeStamp ");
     _isFrameScheduled = false;
     final double t =
         timeStamp.inMicroseconds / Duration.microsecondsPerMillisecond / 1000.0;
@@ -453,7 +449,6 @@ class Timeline {
     /// The current scale based on the rendering area.
     double scale = _width / (_renderEnd - _renderStart);
     _minUnit = getMinUnit(_renderEnd - _renderStart, _width, defaultTimeSteps);
-    print("minUnit ${_minUnit}");
 
     bool doneRendering = true;
     bool stillScaling = true;
@@ -467,8 +462,6 @@ class Timeline {
       double velocity = _scrollSimulation.dx(_simulationTime);
 
       double displace = velocity * elapsed / scale;
-      // print(
-      //     "advance    displace:$displace, velocity:$velocity,  elapsed:$elapsed");
       _start -= displace;
       _end -= displace;
 
@@ -496,9 +489,6 @@ class Timeline {
         min(1.0, elapsed * (_isInteracting ? MoveSpeedInteracting : MoveSpeed));
     double ds = _start - _renderStart;
     double de = _end - _renderEnd;
-
-    // print(
-    //     "timeline.advance ds:$ds, scale:$scale, de:$de, animate:$animate, _start:$_start _end:$_end  _renderStart:$_renderStart ");
 
     /// If the current view is animating, adjust the [_renderStart]/[_renderEnd] based on the interaction speed.
     if (!animate || ((ds * scale).abs() < 1.0 && (de * scale).abs() < 1.0)) {
@@ -859,10 +849,7 @@ class Timeline {
             (item.value - seriesData.meta.minimum) * step -
             10 * j -
             3;
-        print(
-            "  step issss height:$_height, offsetHeight:${offsetHeight},  itemHeight:${(item.value - seriesData.meta.minimum) * step}, step:${step}, itemValue:${item.value} y:${item.y}   ${max - seriesData.meta.minimum} ${seriesHeight / (max - seriesData.meta.minimum)}");
       }
-      print("-----------------------------------------------");
     }
 
     return stillAnimating;

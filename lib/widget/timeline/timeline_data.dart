@@ -4,6 +4,7 @@ import 'timeline_entry.dart';
 class TimelineData {
   DateTime baseTime;
   Map<String, TimelineSeriesData> series;
+  double yAxisTextWidth;
   TimelineData();
   TimelineData.x(this.baseTime, this.series);
   String toString() {

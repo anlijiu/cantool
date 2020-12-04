@@ -168,7 +168,6 @@ class TimelineRenderObject extends RenderBox {
     if (_timeline == null) {
       return;
     }
-    print("timeline_render_widget  paint offset:$offset  size:$size");
 
     /// Fetch the background colors from the [Timeline] and compute the fill.
     List<TimelineBackgroundColor> backgroundColors = timeline.backgroundColors;
@@ -212,31 +211,29 @@ class TimelineRenderObject extends RenderBox {
 
     /// Paint the [Ticks] on the left side of the screen.
     canvas.save();
-    // canvas.translate(0, size.height - offset.dy - topOverlap);
 
-    // print(
-    //     "TimelineRenderWidget paint  renderStart:$renderStart  renderEnd:$renderEnd  scale:$scale");
-    // print(
-    //     "ticks offset.dx: $offset.dx, offset.dy: ${offset.dy + topOverlap}, size.width: $size.width, size.height: $size.height ");
     canvas.clipRect(Rect.fromLTWH(
         offset.dx, offset.dy + topOverlap, size.width, size.height));
     // canvas.drawColor(Colors.red, BlendMode.srcOver);
     // canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy + topOverlap, 200, 200), Paint()..color = Colors.red);
     // _ticks.paint(context, offset, -renderStart * scale, scale, size, timeline);
-    double xWidth = 80;
-    Function measureXAxisWidth = (double xAxisWidth) {
-      if (xWidth < xAxisWidth) xWidth = xAxisWidth;
-      print("xWidth: $xWidth   xAxisWidth:$xAxisWidth");
-    };
+
     _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline);
     canvas.restore();
 
     /// And then draw the rest of the timeline.
     if (_timeline.timelineData != null) {
       canvas.save();
-      drawYaxis(context, offset, _timeline.timelineData, measureXAxisWidth);
-      canvas.clipRect(Rect.fromLTWH(offset.dx + _timeline.gutterWidth + xWidth,
-          offset.dy, size.width - _timeline.gutterWidth - xWidth, size.height));
+      drawYaxis(context, offset, _timeline.timelineData);
+      canvas.clipRect(Rect.fromLTWH(
+          offset.dx +
+              _timeline.gutterWidth +
+              timeline.timelineData.yAxisTextWidth,
+          offset.dy,
+          size.width -
+              _timeline.gutterWidth -
+              timeline.timelineData.yAxisTextWidth,
+          size.height));
       drawItems(
           context,
           offset,
@@ -252,8 +249,7 @@ class TimelineRenderObject extends RenderBox {
     }
   }
 
-  void drawYaxis(PaintingContext context, Offset offset, TimelineData data,
-      Function measureAxisWidth) {
+  void drawYaxis(PaintingContext context, Offset offset, TimelineData data) {
     final Canvas canvas = context.canvas;
 
     // canvas.clipRect(Rect.fromLTWH(
@@ -269,8 +265,8 @@ class TimelineRenderObject extends RenderBox {
       if (seriesEntry.value.y == null) return;
       Color color = cs[j % cs.length];
       j++;
-      _yAxis.paint(context, offset, 0, 200, 45, seriesEntry.value, color,
-          measureAxisWidth);
+      _yAxis.paint(context, offset, 0, 200, data.yAxisTextWidth,
+          seriesEntry.value, color);
       TextSpan text = TextSpan(
           text: seriesEntry.value.meta.name,
           style: TextStyle(fontSize: 11, color: color));
@@ -314,7 +310,6 @@ class TimelineRenderObject extends RenderBox {
   /// relative to the other events.
   void drawItems(PaintingContext context, Offset offset, TimelineData data,
       double y, double scale, int depth) {
-    print("drawItems in series.length: ${data.series.length}");
     final Canvas canvas = context.canvas;
 
     Path path = new Path();
@@ -326,7 +321,6 @@ class TimelineRenderObject extends RenderBox {
     int j = 0;
     for (MapEntry<String, TimelineSeriesData> seriesEntry
         in data.series.entries) {
-      print("seriesEntry.value.y: ${seriesEntry.value.y},  size:$size");
       if (seriesEntry.value.y == null) return;
       Rect t = Offset(0, seriesEntry.value.y) & Size(size.width, 200);
       Paint p = Paint()
@@ -339,8 +333,6 @@ class TimelineRenderObject extends RenderBox {
         ..color = cs[j % cs.length]
         ..strokeWidth = 3.0
         ..style = PaintingStyle.stroke;
-      print(
-          "drawItems in , entries.length: ${seriesEntry.value.entries}  j:$j");
       j++;
 
       ////////////////////////////
@@ -373,10 +365,7 @@ class TimelineRenderObject extends RenderBox {
           }
           path.lineTo(item.next.x + offset.dx, item.next.y);
           canvas.drawPath(path, p2);
-          print(
-              "x1:${item.x} y1:${item.y}   x2:${item.next.x} y2:${item.next.y} ");
         }
-        print("x1:${item.x} y1:${item.y}");
       }
 
       // for (TimelineEntry item in entries) {

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:can/can.dart';
 import 'package:cantool/providers.dart';
 import 'package:cantool/widget/timeline/timeline_data.dart';
@@ -22,9 +23,26 @@ final timelineProvider = Provider<Timeline>((ref) {
 
   final timelineData = new TimelineData();
   timelineData.baseTime = result?.summary?.date;
+  String widest = "";
+  int charactersWidth = 0;
   timelineData.series = result?.data?.map((key, value) {
         final series = new TimelineSeriesData();
         series.meta = signalMetas[key];
+        series.meta?.options?.values?.forEach((option) {
+          int w = 0;
+          option.codeUnits.forEach((c) {
+            var cw = characterWidthMap[String.fromCharCode(c)];
+            if (cw != null) {
+              w += cw;
+            } else {
+              w += 120;
+            }
+          });
+          if (charactersWidth < w) {
+            charactersWidth = w;
+            widest = option;
+          }
+        });
         series.isStep = series.meta.options != null;
         series.scope =
             (math.pow(2, series.meta.length) * series.meta.scaling).ceil();
@@ -50,7 +68,22 @@ final timelineProvider = Provider<Timeline>((ref) {
       }) ??
       new Map();
 
-  print("timelineData: " + timelineData.toString());
+  double widestWidth = 50;
+  if (charactersWidth > 0) {
+    ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+        textAlign: TextAlign.start, fontFamily: "wqy", fontSize: 11.0))
+      ..pushStyle(ui.TextStyle());
+    builder.addText(widest);
+    ui.Paragraph tickParagraph = builder.build();
+    tickParagraph.layout(ui.ParagraphConstraints(width: double.maxFinite));
+    widestWidth = widestWidth < tickParagraph.longestLine
+        ? tickParagraph.longestLine
+        : widestWidth;
+  }
+  timelineData.yAxisTextWidth = widestWidth;
+  print("timelineData: " +
+      timelineData.toString() +
+      "charactersWidth: $charactersWidth ,  widest : $widest");
 
   if (timelineData.series.isNotEmpty) {
     timeline.loadData(timelineData);
@@ -105,3 +138,58 @@ class ReplayChartView extends HookWidget {
       return TimelineWidget(timeline);
   }
 }
+
+var characterWidthMap = {
+  'a': 60,
+  'b': 60,
+  'c': 52,
+  'd': 60,
+  'e': 60,
+  'f': 30,
+  'g': 60,
+  'h': 60,
+  'i': 25,
+  'j': 25,
+  'k': 52,
+  'l': 25,
+  'm': 87,
+  'n': 60,
+  'o': 60,
+  'p': 60,
+  'q': 60,
+  'r': 35,
+  's': 52,
+  't': 30,
+  'u': 60,
+  'v': 52,
+  'w': 77,
+  'x': 52,
+  'y': 52,
+  'z': 52,
+  'A': 70,
+  'B': 70,
+  'C': 77,
+  'D': 77,
+  'E': 70,
+  'F': 65,
+  'G': 82,
+  'H': 77,
+  'I': 30,
+  'J': 55,
+  'K': 70,
+  'L': 60,
+  'M': 87,
+  'N': 77,
+  'O': 82,
+  'P': 70,
+  'Q': 82,
+  'R': 77,
+  'S': 70,
+  'T': 65,
+  'U': 77,
+  'V': 70,
+  'W': 100,
+  'X': 70,
+  'Y': 70,
+  'Z': 65
+};
