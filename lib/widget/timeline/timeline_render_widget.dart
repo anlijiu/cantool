@@ -161,7 +161,9 @@ class TimelineRenderObject extends RenderBox {
   void performLayout() {
     if (_timeline != null) {
       _timeline.setViewport(
-          width: size.width, height: size.height, animate: true);
+          width: size.width,
+          height: size.height - 3 * topOverlap,
+          animate: true);
     }
   }
 
@@ -269,8 +271,8 @@ class TimelineRenderObject extends RenderBox {
       if (seriesEntry.value.y == null) return;
       Color color = cs[j % cs.length];
       j++;
-      _yAxis.paint(context, offset, 0, 200, data.yAxisTextWidth,
-          seriesEntry.value, color);
+      _yAxis.paint(context, offset, 0, seriesEntry.value.height,
+          data.yAxisTextWidth, seriesEntry.value, color);
       TextSpan text = TextSpan(
           text: seriesEntry.value.meta.name,
           style: TextStyle(fontSize: 11, color: color));
@@ -321,12 +323,12 @@ class TimelineRenderObject extends RenderBox {
       ..color = Colors.red
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
-    final marginTop = size.height + topOverlap - 200;
     int j = 0;
     for (MapEntry<String, TimelineSeriesData> seriesEntry
         in data.series.entries) {
       if (seriesEntry.value.y == null) return;
-      Rect t = Offset(0, seriesEntry.value.y) & Size(size.width, 200);
+      Rect t = Offset(0, seriesEntry.value.y) &
+          Size(size.width, seriesEntry.value.height);
       Paint p = Paint()
         ..color = Color.fromARGB(100, (seriesEntry.value.y ~/ 5).toInt(),
             255 - (seriesEntry.value.y ~/ 5).toInt(), 100);

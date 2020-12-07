@@ -59,6 +59,7 @@ class Timeline {
   double _lastFrameTime = 0.0;
   double _width = 0.0;
   double _height = 0.0;
+  double _seriesHeight = 0.0;
   double _firstOnScreenEntryY = 0.0;
   double _lastEntryX = 0.0;
   double _lastOnScreenEntryY = 0.0;
@@ -314,8 +315,13 @@ class Timeline {
       _topOffset = topOffset;
     }
 
-    if (height != double.maxFinite) {
+    if (height != double.maxFinite && height != _height) {
       _height = height;
+      var seriesHeight = height / _timelineData.series.length;
+      if (seriesHeight < 200) seriesHeight = 200;
+      _timelineData.series.values.forEach((element) {
+        element.height = seriesHeight;
+      });
     }
 
     /// If a value for start&end has been provided, evaluate the top/bottom position
@@ -384,6 +390,25 @@ class Timeline {
     }
   }
 
+  void zoomVertical({double delta = 20, Offset hover}) {
+    timelineData.series.entries.forEach((element) {
+      if (element.value.y < hover.dy &&
+          hover.dy < element.value.y + element.value.height) {
+        final height = element.value.height + delta;
+        print(" zoomVertical   height: $height");
+        if (height >= 200 && height < _height) {
+          element.value.height = height;
+
+          if (!_isFrameScheduled) {
+            _isFrameScheduled = true;
+            _lastFrameTime = 0.0;
+            SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+          }
+        }
+      }
+    });
+  }
+
   /// Make sure that all the visible assets are being rendered and advanced
   /// according to the current state of the timeline.
   void beginFrame(Duration timeStamp) {
@@ -441,7 +466,7 @@ class Timeline {
   }
 
   bool advance(double elapsed, bool animate) {
-    if (_width <= 0) {
+    if (_width <= 0 || _height <= 0) {
       /// Done rendering. Need to wait for height.
       return true;
     }
@@ -823,14 +848,12 @@ class Timeline {
     bool stillAnimating = false;
 
     final series = _timelineData.series;
-    double seriesHeight = 200.0;
+    var leftHeight = _height;
 
     for (int j = 0; j < series.length; ++j) {
       final seriesData = series.entries.elementAt(j).value;
       final entries = seriesData.entries;
-      final offsetHeight = _height - seriesHeight * j;
-      seriesData.y = _height - j * 200.0 - 200 - _topOffset - 10 * j;
-      seriesData.height = 200;
+      seriesData.y = leftHeight - seriesData.height - _topOffset - 10 * j;
       for (int i = 0; i < entries.length; i++) {
         TimelineEntry item = entries[i];
         double start = item.start - _renderStart;
@@ -843,13 +866,15 @@ class Timeline {
             ? item.value
             : seriesData.meta.maximum;
 
-        step = seriesHeight / (seriesData.scope - 1);
-        item.y = offsetHeight -
+        step = seriesData.height / (seriesData.scope - 1);
+        item.y = leftHeight -
             _topOffset -
             (item.value - seriesData.meta.minimum) * step -
             10 * j -
             3;
       }
+
+      leftHeight -= seriesData.height;
     }
 
     return stillAnimating;

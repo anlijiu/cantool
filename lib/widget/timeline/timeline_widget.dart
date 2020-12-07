@@ -137,6 +137,10 @@ class _TimelineWidgetState extends State<TimelineWidget> {
         start: start, end: end, width: context.size.width, animate: true);
   }
 
+  void _zoomVertical({double delta = 20, Offset hover}) {
+    timeline.zoomVertical(delta: delta, hover: hover);
+  }
+
   /// The following two callbacks are passed down to the [TimelineRenderWidget] so
   /// that it can pass the information back to this widget.
   onTouchBubble(TapTarget bubble) {
@@ -361,6 +365,11 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                   print(
                       "onPointerSignal distance: ${pointerSignal.scrollDelta.distance}");
                   _zoom(delta: -pointerSignal.scrollDelta.dy);
+                } else if (isShiftPressed &&
+                    (pointerSignal is PointerScrollEvent)) {
+                  _zoomVertical(
+                      delta: -pointerSignal.scrollDelta.dy,
+                      hover: _mouseHoverPoint);
                 }
               },
               onPointerHover: (event) {

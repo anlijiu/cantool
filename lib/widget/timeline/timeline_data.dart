@@ -17,7 +17,7 @@ class TimelineSeriesData {
   bool isStep;
   int scope;
   double y;
-  double height;
+  double height = 0.0;
   List<TimelineEntry> entries;
   TimelineSeriesData();
   String toString() {
