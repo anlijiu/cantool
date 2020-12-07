@@ -361,15 +361,16 @@ class _TimelineWidgetState extends State<TimelineWidget> {
               onPointerSignal: (pointerSignal) {
                 print(
                     "onPointerSignal ${pointerSignal is PointerScrollEvent}  $isControlPressed");
-                if (isControlPressed && (pointerSignal is PointerScrollEvent)) {
-                  print(
-                      "onPointerSignal distance: ${pointerSignal.scrollDelta.distance}");
-                  _zoom(delta: -pointerSignal.scrollDelta.dy);
-                } else if (isShiftPressed &&
-                    (pointerSignal is PointerScrollEvent)) {
-                  _zoomVertical(
-                      delta: -pointerSignal.scrollDelta.dy,
-                      hover: _mouseHoverPoint);
+                if (pointerSignal is PointerScrollEvent) {
+                  if (isControlPressed) {
+                    print(
+                        "onPointerSignal distance: ${pointerSignal.scrollDelta.distance}");
+                    _zoom(delta: -pointerSignal.scrollDelta.dy);
+                  } else if (isShiftPressed) {
+                    _zoomVertical(
+                        delta: -pointerSignal.scrollDelta.dy,
+                        hover: _mouseHoverPoint);
+                  }
                 }
               },
               onPointerHover: (event) {

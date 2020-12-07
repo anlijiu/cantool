@@ -27,7 +27,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final filterMsgSignal = useProvider(filterMsgSignalProvider);
     final result = useProvider(replayResultProvider);
-
+    final replayFile = useProvider(replayFileProvider);
     final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
@@ -52,6 +52,20 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                     Scaffold.of(context).openDrawer();
                   },
                 ),
+          ProviderListener(
+            provider: replayFileProvider.state,
+            onChange: (context, value) {
+              print("replayFileProvider  changed ");
+              filterMsgSignal.state = {};
+              result.state = null;
+            },
+            child: FlatButton.icon(
+                onPressed: () {
+                  replayFile.load();
+                },
+                label: Text('Open'),
+                icon: Icon(Icons.folder_open)),
+          ),
           FlatButton.icon(
               onPressed: () => showAddSignalDialog(context),
               icon: Icon(Icons.add),

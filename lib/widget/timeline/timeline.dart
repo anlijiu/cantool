@@ -396,7 +396,7 @@ class Timeline {
           hover.dy < element.value.y + element.value.height) {
         final height = element.value.height + delta;
         print(" zoomVertical   height: $height");
-        if (height >= 200 && height < _height) {
+        if (height >= 200 && height < 2 * _height) {
           element.value.height = height;
 
           if (!_isFrameScheduled) {

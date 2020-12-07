@@ -140,7 +140,7 @@ class YAxis {
         canvas.drawParagraph(
             tickParagraph,
             Offset(
-              offset.dx + width / 2,
+              offset.dx + width / 2 - TickSize,
               bottom - o - tickParagraph.height / 2,
             ));
       } else {

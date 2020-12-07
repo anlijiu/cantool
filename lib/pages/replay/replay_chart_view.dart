@@ -18,6 +18,7 @@ final timelineProvider = Provider<Timeline>((ref) {
   final timeline = Timeline(TargetPlatform.linux);
   final signalMetas = ref.watch(signalMetasProvider).state;
   final result = ref.watch(replayResultProvider).state;
+  final filterMessage = ref.watch(filterMsgSignalProvider).state;
   double start = double.maxFinite;
   double end = -double.maxFinite;
 
@@ -28,16 +29,25 @@ final timelineProvider = Provider<Timeline>((ref) {
   timelineData.series = result?.data?.map((key, value) {
         final series = new TimelineSeriesData();
         series.meta = signalMetas[key];
-        series.meta?.options?.values?.forEach((option) {
+        filterMessage.values.forEach((element) {
+          element.signals.values.forEach((element) {
+            return;
+          });
+        });
+
+        ///从options中找到显示最宽的字符串 决定y轴宽度
+        series.meta?.options?.entries?.forEach((entry) {
           int w = 0;
+          String option = "${entry.key} (${entry.value})";
           option.codeUnits.forEach((c) {
             var cw = characterWidthMap[String.fromCharCode(c)];
             if (cw != null) {
               w += cw;
             } else {
-              w += 120;
+              w += 180;
             }
           });
+          print("loop options w:$w, option is $option");
           if (charactersWidth < w) {
             charactersWidth = w;
             widest = option;
@@ -77,7 +87,7 @@ final timelineProvider = Provider<Timeline>((ref) {
     ui.Paragraph tickParagraph = builder.build();
     tickParagraph.layout(ui.ParagraphConstraints(width: double.maxFinite));
     widestWidth = widestWidth < tickParagraph.longestLine
-        ? tickParagraph.longestLine
+        ? tickParagraph.longestLine + 10
         : widestWidth;
   }
   timelineData.yAxisTextWidth = widestWidth;
@@ -87,7 +97,7 @@ final timelineProvider = Provider<Timeline>((ref) {
 
   if (timelineData.series.isNotEmpty) {
     timeline.loadData(timelineData);
-    timeline.setViewport(start: start - 1, end: end + 1, animate: true);
+    timeline.setViewport(start: start - 1, end: end + 1, animate: false);
 
     /// Advance the timeline to its starting position.
     timeline.advance(0.0, false);
@@ -131,9 +141,9 @@ class ReplayChartView extends HookWidget {
         [], (value, element) => [...value, ...element.signals.values]);
     final result = useProvider(replayResultProvider).state;
     if (result == null)
-      return Text("asdf");
+      return Center(child: Text("Add filter signals"));
     else if (result.data.isEmpty)
-      return Text("empty");
+      return Center(child: Text("No data with these filter signals"));
     else
       return TimelineWidget(timeline);
   }
