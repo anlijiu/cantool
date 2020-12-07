@@ -19,8 +19,10 @@ class XAxis {
   /// [scale] 缩放 像素宽度/(开始-结束时间段)
   /// [size] 图表canvas 宽高
   void paint(PaintingContext context, Offset offset, double translation,
-      double scale, Size size, Timeline timeline) {
+      double scale, Size size, Timeline timeline, String languageCode) {
     final Canvas canvas = context.canvas;
+
+    Intl.defaultLocale = 'zh_CN';
 
     double width = size.width;
     double height = size.height;
@@ -32,6 +34,15 @@ class XAxis {
         timeline.timelineData.baseTime
             .add(Duration(milliseconds: timeline.renderStart.ceil())),
         primaryUnit);
+    DateTime secondStartTickTime = startOf(
+        timeline.timelineData.baseTime
+            .add(Duration(milliseconds: timeline.renderStart.ceil())),
+        secondUnit);
+    DateTime secondEndTickTime = startOf(
+        timeline.timelineData.baseTime
+            .add(Duration(milliseconds: timeline.renderEnd.ceil())),
+        secondUnit);
+
     int tickTimestamp = tickTime.millisecondsSinceEpoch -
         timeline.timelineData.baseTime.millisecondsSinceEpoch;
     double distance = 0;
@@ -50,7 +61,8 @@ class XAxis {
 
       TextSpan text = TextSpan(
           text: getValueByUnit(tickTime, primaryUnit).toString(),
-          style: TextStyle(fontSize: 11, color: Colors.black));
+          style:
+              TextStyle(fontFamily: "wqy", fontSize: 11, color: Colors.black));
 
       _textPainter.text = text;
       _textPainter.layout(); // 进行布局
@@ -60,12 +72,13 @@ class XAxis {
           Offset(offset.dx + distance - textSize.width / 2, height + TickSize));
 
       if (tickTime.millisecondsSinceEpoch % timeDistance[secondUnit] == 0) {
-        String formatStr = secondUnitTimeFormat[secondUnit];
+        String formatStr = timeFormatByUnit[secondUnit];
         DateFormat format = DateFormat(formatStr);
 
         TextSpan text = TextSpan(
             text: format.format(tickTime),
-            style: TextStyle(fontSize: 11, color: Colors.black));
+            style: TextStyle(
+                fontFamily: "wqy", fontSize: 11, color: Colors.black));
 
         _textPainter.text = text;
         _textPainter.layout(); // 进行布局
@@ -79,6 +92,26 @@ class XAxis {
       tickTime = addFunc(tickTime, 1);
       tickTimestamp = tickTime.millisecondsSinceEpoch -
           timeline.timelineData.baseTime.millisecondsSinceEpoch;
+    }
+
+    print(
+        "x_axis secondStartTickTime:$secondStartTickTime secondEndTickTime:$secondEndTickTime");
+
+    if (secondStartTickTime == secondEndTickTime) {
+      String formatStr = timeFormatByUnit[secondUnit];
+      DateFormat format = DateFormat(formatStr, languageCode);
+
+      ;
+      TextSpan text = TextSpan(
+          text: format.format(secondStartTickTime),
+          style:
+              TextStyle(fontFamily: "wqy", fontSize: 11, color: Colors.blue));
+      _textPainter.text = text;
+      _textPainter.layout(); // 进行布局
+      Size textSize = _textPainter.size;
+
+      _textPainter.paint(canvas,
+          Offset(offset.dx + TickSize, height + TickSize + textSize.height));
     }
 
     //坐标轴

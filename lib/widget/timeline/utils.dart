@@ -155,14 +155,14 @@ var addFucByUnit = {
   'year': _addByYears,
 };
 
-var secondUnitTimeFormat = {
+var timeFormatByUnit = {
   'second': "y/M/d hh:mm:ss",
-  'minute': "y/M/d hh:mm",
-  'hour': "y/M/d hh",
-  'day': "y/M/d",
+  'minute': "y/M/d hh点mm分",
+  'hour': "y/M/d hh点整",
+  'day': "y年M月d日",
   'week': "y/M/E/d",
-  'month': "y/M",
-  'year': "y",
+  'month': "y/M月",
+  'year': "y年",
 };
 
 int getValueByUnit(DateTime dateTime, String unit) {

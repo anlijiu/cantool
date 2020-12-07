@@ -7,6 +7,7 @@ import 'package:cantool/widget/timeline/y_axis.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'ticks.dart';
 import 'timeline.dart';
@@ -58,11 +59,13 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant TimelineRenderObject renderObject) {
+    String languageCode = Localizations.localeOf(context).languageCode;
     renderObject
       ..timeline = timeline
       ..touchBubble = touchBubble
       ..touchEntry = touchEntry
       ..favorites = favorites
+      ..languageCode = languageCode
       ..topOverlap = topOverlap;
   }
 
@@ -95,7 +98,7 @@ class TimelineRenderObject extends RenderBox {
   List<TimelineEntry> _favorites;
   TouchBubbleCallback touchBubble;
   TouchEntryCallback touchEntry;
-
+  String languageCode;
   @override
   bool get sizedByParent => true;
 
@@ -218,7 +221,8 @@ class TimelineRenderObject extends RenderBox {
     // canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy + topOverlap, 200, 200), Paint()..color = Colors.red);
     // _ticks.paint(context, offset, -renderStart * scale, scale, size, timeline);
 
-    _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline);
+    _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline,
+        languageCode);
     canvas.restore();
 
     /// And then draw the rest of the timeline.
