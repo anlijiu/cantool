@@ -101,6 +101,8 @@ void *can_send_func(void *param)
     pthread_mutex_lock(&sender.mutex);
     while (sender.flag) {
         index = 0;
+        int aa = hashmap_size(&sender.m_assembler_map);
+        debug_info("%s sender assembler map size : %d ",__FUNCTION__,  aa);
         hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
             debug_info("can_send_func  %d ", *m_key);
             list_iterator_t *it = list_iterator_new(m_assembler->meta->signal_ids, LIST_HEAD);
@@ -311,11 +313,15 @@ void can_operator_add_const_signal_builder(const char* name, double value) {
 void can_operator_add_message(uint32_t mid) {
     message_assembler * ma = hashmap_get(&sender.m_assembler_map, &mid);
     if(ma == NULL) {
+        debug_info("can_operator_add_message mid: %u", mid);
         ma = (message_assembler *)malloc(sizeof(message_assembler));
         struct message_meta * m_meta = get_message_meta_by_id(mid);
         ma->id = mid;
         ma->meta = m_meta;
         hashmap_put(&sender.m_assembler_map, &ma->id, ma);
+
+        int s= hashmap_size(&sender.m_assembler_map);
+        debug_info("after %s sender assembler map size : %d ",__FUNCTION__,  s);
     }
 }
 

@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <glib.h>
+#include <iconv.h>
 
 #include <candbc-model.h>
 #include <candbc-reader.h>
@@ -23,6 +24,32 @@ typedef struct
 
 static bool dbc_synced = false;
 
+int code_convert(const char *from_charset, const char *to_charset, char *inbuf, size_t inlen,
+		char *outbuf, size_t outlen) {
+	iconv_t cd;
+	char **pin = &inbuf;
+	char **pout = &outbuf;
+ 
+	cd = iconv_open(to_charset, from_charset);
+	if (cd == 0)
+		return -1;
+	memset(outbuf, 0, outlen);
+	if (iconv(cd, pin, &inlen, pout, &outlen) == -1)
+		return -1;
+	iconv_close(cd);
+    **pout = '\0';
+ 
+	return 0;
+}
+
+int u2g(char *inbuf, size_t inlen, char *outbuf, size_t outlen) {
+	return code_convert("utf-8", "gbk", inbuf, inlen, outbuf, outlen);
+}
+ 
+int g2u(char *inbuf, size_t inlen, char *outbuf, size_t outlen) {
+	return code_convert("gbk", "utf-8", inbuf, inlen, outbuf, outlen);
+}
+
 bool has_dbc_synced() {
     return dbc_synced;
 }
@@ -31,6 +58,16 @@ static void put_string(FlValue* result, const char* key, const char* value) {
     if(key != nullptr && value != nullptr) {
         fl_value_set_string_take(result, key, fl_value_new_string(value));
     }
+}
+
+static void put_g2u_string(FlValue* result, const char* key, char* value) {
+    size_t len = strlen(value);
+    size_t ulength = len * 2 * sizeof(char);
+    char* ustr = (char*)malloc(ulength);
+    memset(ustr, 0, ulength);
+    g2u(value, len, ustr, ulength);
+    put_string(result, key, ustr);
+    free(ustr);
 }
 
 static char *convert_attribute_value_to_string(attribute_value_t *attribute_value)
@@ -151,11 +188,11 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
         fl_value_set_string_take(fv_signal, "minimum", fl_value_new_float(signal->min));
         fl_value_set_string_take(fv_signal, "maximum", fl_value_new_float(signal->max));
         if (signal->unit) {
-            put_string(fv_signal, "unit", signal->unit);
+            put_g2u_string(fv_signal, "unit", signal->unit);
         }
 
         if (signal->comment) {
-            put_string(fv_signal, "comment", signal->comment);
+            put_g2u_string(fv_signal, "comment", signal->comment);
         }
 
         if (signal->attribute_list) {
@@ -169,7 +206,8 @@ static void extract_message_signals(FlValue *result, FlValue *signals, signal_li
             {
                 val_map_entry_t *val_map_entry = val_map->val_map_entry;
                 gchar *key = g_strdup_printf("%lu", val_map_entry->index);
-                put_string(fv_options, key, val_map_entry->value);
+
+                put_g2u_string(fv_options, key, val_map_entry->value);
 
                 val_map = val_map->next;
             }

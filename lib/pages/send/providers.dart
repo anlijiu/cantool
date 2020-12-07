@@ -1,3 +1,4 @@
+import 'package:cantool/repository/can_repository.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/entity/dbc_meta.dart';
@@ -56,6 +57,11 @@ class SendPageController {
       return;
     }
     msgs[idx] = m.copyWith(selected: !m.selected);
+    if (msgs[idx].selected) {
+      read(canRepository).loadAmmo(msgs[idx].meta.id);
+    } else {
+      read(canRepository).unloadAmmo(msgs[idx].meta.id);
+    }
     read(messages).state = msgs;
   }
 
@@ -78,5 +84,7 @@ class SendPageController {
         .signalIds
         .map((e) => read(strategyMap).state[e])
         .toList();
+
+    read(canRepository).setConstStrategyValue(name, value);
   }
 }
