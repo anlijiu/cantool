@@ -48,6 +48,7 @@ class MessageListView extends HookWidget {
   Widget build(BuildContext context) {
     final List<MessageItem> msgs = useProvider(messages).state;
 
+    print("message_list_view  build  msgs size is : ${msgs.length}");
     if (msgs == null) {
       return Container(child: const Center(child: CircularProgressIndicator()));
     }

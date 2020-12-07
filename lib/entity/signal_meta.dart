@@ -22,6 +22,8 @@ abstract class SignalMeta with _$SignalMeta {
     Map<int, String> options,
   }) = _SignalMeta;
 
-  factory SignalMeta.fromJson(Map<String, dynamic> json) =>
-      _$SignalMetaFromJson(json);
+  factory SignalMeta.fromJson(Map<String, dynamic> json) {
+    json['options'] = json['options'] == null ? null : Map<String, dynamic>.from(json['options']);
+    return _$SignalMetaFromJson(json);
+  }
 }

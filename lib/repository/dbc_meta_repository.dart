@@ -16,11 +16,13 @@ class DbcMetaRepository extends StateNotifier<DbcMeta> {
 
   void loadFromLocalStorage() async {
     final storage = await read(localStorageProvider(_dbName).future);
-    final dbcJson = storage.getItem(_dbcKey);
-    print("getDbcMeta   json : " + dbcJson.toString());
-    state = DbcMeta.fromJson(dbcJson);
+    storage.watchItem(_dbcKey).listen((event) {
+      state = DbcMeta.fromJson(event);
 
-    can.syncMetaDatas(dbcJson);
+      can.syncMetaDatas(event);
+    });
+    // final dbcJson = storage.getItem(_dbcKey);
+    // print("getDbcMeta   json : " + dbcJson.toString());
   }
 
   Future<void> loadDbcFile() async {
@@ -41,9 +43,8 @@ class DbcMetaRepository extends StateNotifier<DbcMeta> {
 
   Future<Map<String, dynamic>> _setDbc(String path) async {
     Map<String, dynamic> dbcInJson = await can.parseDbc(path);
-    _saveDbcMeta(dbcInJson);
-    can.syncMetaDatas(dbcInJson);
-    this.state = DbcMeta.fromJson(dbcInJson);
+    await _saveDbcMeta(dbcInJson);
+    // loadFromLocalStorage();
     return dbcInJson;
   }
 

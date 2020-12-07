@@ -10,11 +10,11 @@ _$_DbcMeta _$_$_DbcMetaFromJson(Map<String, dynamic> json) {
   return _$_DbcMeta(
     filename: json['filename'] as String,
     version: json['version'] as String ?? '',
-    messages: (json['messages'] as Map<String, dynamic>)?.map(
+    messages: (json['messages'] as Map<dynamic, dynamic>)?.map(
       (k, e) => MapEntry(int.parse(k),
           e == null ? null : MessageMeta.fromJson(e as Map<String, dynamic>)),
     ),
-    signals: (json['signals'] as Map<String, dynamic>)?.map(
+    signals: (json['signals'] as Map<dynamic, dynamic>)?.map(
       (k, e) => MapEntry(
           k, e == null ? null : SignalMeta.fromJson(e as Map<String, dynamic>)),
     ),
