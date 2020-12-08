@@ -94,9 +94,6 @@ class XAxis {
           timeline.timelineData.baseTime.millisecondsSinceEpoch;
     }
 
-    print(
-        "x_axis secondStartTickTime:$secondStartTickTime secondEndTickTime:$secondEndTickTime");
-
     if (secondStartTickTime == secondEndTickTime) {
       String formatStr = timeFormatByUnit[secondUnit];
       DateFormat format = DateFormat(formatStr, languageCode);

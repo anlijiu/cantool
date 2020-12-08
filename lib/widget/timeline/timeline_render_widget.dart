@@ -230,16 +230,25 @@ class TimelineRenderObject extends RenderBox {
     /// And then draw the rest of the timeline.
     if (_timeline.timelineData != null) {
       canvas.save();
+
+      canvas.clipRect(Rect.fromLTWH(
+          offset.dx,
+          offset.dy + topOverlap,
+          _timeline.gutterWidth + timeline.timelineData.yAxisTextWidth,
+          size.height - topOverlap - 46)); //减去本页面bar 再减去appbar 高度
       drawYaxis(context, offset, _timeline.timelineData);
+      canvas.restore();
+
+      canvas.save();
       canvas.clipRect(Rect.fromLTWH(
           offset.dx +
               _timeline.gutterWidth +
               timeline.timelineData.yAxisTextWidth,
-          offset.dy,
+          offset.dy + topOverlap,
           size.width -
               _timeline.gutterWidth -
               timeline.timelineData.yAxisTextWidth,
-          size.height));
+          size.height - topOverlap - 46));
       drawItems(
           context,
           offset,
@@ -327,17 +336,15 @@ class TimelineRenderObject extends RenderBox {
     for (MapEntry<String, TimelineSeriesData> seriesEntry
         in data.series.entries) {
       if (seriesEntry.value.y == null) return;
-      Rect t = Offset(0, seriesEntry.value.y) &
+      Rect t = Offset(offset.dx, seriesEntry.value.y) &
           Size(size.width, seriesEntry.value.height);
-      Paint p = Paint()
-        ..color = Color.fromARGB(100, (seriesEntry.value.y ~/ 5).toInt(),
-            255 - (seriesEntry.value.y ~/ 5).toInt(), 100);
+      Paint p = Paint()..color = cs[j % cs.length].withOpacity(0.2);
       canvas.saveLayer(t, p);
       canvas.drawRect(t, p);
       canvas.restore();
       Paint p2 = Paint()
         ..color = cs[j % cs.length]
-        ..strokeWidth = 3.0
+        ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke;
       j++;
 

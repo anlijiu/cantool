@@ -94,9 +94,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
         _scaleTopOffset + _lastFocalPoint.dy - details.focalPoint.dy;
     double focalDiff =
         (_scaleStartYearStart + _lastFocalPoint.dx * scale) - focus;
-    print("ScaleUpdateDetails ${details.toString()} ");
-    // print(
-    //     "_scaleStartYearStart : $_scaleStartYearStart changeScale: $changeScale scale:$scale  focalDiff: $focalDiff    focus: $focus");
     timeline.setViewport(
         start: focus + (_scaleStartYearStart - focus) / changeScale + focalDiff,
         end: focus + (_scaleStartYearEnd - focus) / changeScale + focalDiff,
@@ -112,8 +109,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   }
 
   void _zoom({double delta = 20}) {
-    print(
-        "_zoom delta:$delta   timeline.timelineData.minUnit:${timeline.minUnit}  start:${timeline.start} end:${timeline.end}");
     if (timeline.minUnit == "year" && delta < 0) return;
     // if (timeline.end - timeline.start < 100 && delta > 0) return;
     double distance = (timeline.end - timeline.start) / 2;
@@ -132,7 +127,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
 
     double start = timeline.start + distance / 2;
     double end = timeline.end - distance / 2;
-    print("_zoom    start:$start  end:$end distance:$distance");
     timeline.setViewport(
         start: start, end: end, width: context.size.width, animate: true);
   }
@@ -152,7 +146,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   }
 
   void _tapDown(TapDownDetails details) {
-    print("TimlineWidget _tapDown");
     timeline.setViewport(velocity: 0.0, animate: true);
   }
 
@@ -164,7 +157,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   /// Otherwise trigger a [Navigator.push()] for the tapped bubble. This moves
   /// the app into the [ArticleWidget].
   void _tapUp(TapUpDetails details) {
-    print("TimlineWidget _tapUp");
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     if (_touchedBubble != null) {
       if (_touchedBubble.zoom) {
@@ -179,9 +171,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     }
   }
 
-  void _tapCancel() {
-    print("TimlineWidget _tapCancel");
-  }
+  void _tapCancel() {}
 
   @override
   initState() {
@@ -245,7 +235,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   /// so that we can properly update the [Timeline] widget.
   @override
   deactivate() {
-    print("timeline_widget deactivate");
     FocusScope.of(context).unfocus();
     super.deactivate();
     if (timeline != null) {
@@ -257,7 +246,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print("timeline_widget didChangeDependencies");
   }
 
   @override
@@ -309,10 +297,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
       default:
         throw new Exception('Unsupported platform ${event.data.runtimeType}');
     }
-
-    print(
-        '${isKeyDown ? 'KeyDown' : 'KeyUp'}: $keyCode \nLogical key: $logicalKey\n'
-        'Physical key: $physicalKey      isControlPressed ${event.data.isControlPressed}');
   }
 
   /// This widget is wrapped in a [Scaffold] to have the classic Material Design visual layout structure.
@@ -323,8 +307,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   ///   - [BackdropFilter] that wraps the top header bar, with the back button, the favorites button, and its coloring.
   @override
   Widget build(BuildContext context) {
-    print("TimelineWidget build in");
-
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     if (timeline != null) {
       timeline.devicePadding = devicePadding;
@@ -352,19 +334,11 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                       end: end,
                       width: context.size.width,
                       animate: true);
-                  print(
-                      "shift scale: $scale _lastTapDownPoint.dx:${_lastTapDownPoint.dx}   pointerUpEvent.localPosition.dx:${pointerUpEvent.localPosition.dx}");
-                  print(
-                      "shift onPointerUp start:$start end:$end   _chipStartYearStart :$_chipStartYearStart ");
                 }
               },
               onPointerSignal: (pointerSignal) {
-                print(
-                    "onPointerSignal ${pointerSignal is PointerScrollEvent}  $isControlPressed");
                 if (pointerSignal is PointerScrollEvent) {
                   if (isControlPressed) {
-                    print(
-                        "onPointerSignal distance: ${pointerSignal.scrollDelta.distance}");
                     _zoom(delta: -pointerSignal.scrollDelta.dy);
                   } else if (isShiftPressed) {
                     _zoomVertical(
@@ -386,8 +360,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
               },
               onPointerDown: (event) {
                 if (isShiftPressed) {
-                  print(
-                      "shift onPointerDown lastTapDown: ${event.localPosition}");
                   _lastTapDownPoint = event.localPosition;
                 }
               },

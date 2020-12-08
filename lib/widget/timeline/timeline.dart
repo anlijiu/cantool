@@ -316,10 +316,12 @@ class Timeline {
     }
 
     if (height != double.maxFinite && height != _height) {
+      print("timeline --- setViewport   height: $height");
       _height = height;
-      var seriesHeight = height / _timelineData.series.length;
+      var seriesHeight = (_height - 10) / _timelineData.series.length;
       if (seriesHeight < 200) seriesHeight = 200;
       _timelineData.series.values.forEach((element) {
+        print("timeline --- setViewport   seriesHeight: $seriesHeight");
         element.height = seriesHeight;
       });
     }
@@ -848,12 +850,14 @@ class Timeline {
     bool stillAnimating = false;
 
     final series = _timelineData.series;
-    var leftHeight = _height;
+    var leftHeight = _height + 160;
 
     for (int j = 0; j < series.length; ++j) {
       final seriesData = series.entries.elementAt(j).value;
       final entries = seriesData.entries;
       seriesData.y = leftHeight - seriesData.height - _topOffset - 10 * j;
+      print(
+          "timeline --- leftHeight: $leftHeight, seriesData.height:${seriesData.height}");
       for (int i = 0; i < entries.length; i++) {
         TimelineEntry item = entries[i];
         double start = item.start - _renderStart;
@@ -870,8 +874,7 @@ class Timeline {
         item.y = leftHeight -
             _topOffset -
             (item.value - seriesData.meta.minimum) * step -
-            10 * j -
-            3;
+            10 * j;
       }
 
       leftHeight -= seriesData.height;

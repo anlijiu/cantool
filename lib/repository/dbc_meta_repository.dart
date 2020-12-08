@@ -11,12 +11,13 @@ class DbcMetaRepository extends StateNotifier<DbcMeta> {
   final _dbName = 'dbc_database';
 
   DbcMetaRepository(this.read, [DbcMeta meta]) : super(meta ?? null) {
-    loadFromLocalStorage();
+    _loadFromLocalStorage();
   }
 
-  void loadFromLocalStorage() async {
+  void _loadFromLocalStorage() async {
     final storage = await read(localStorageProvider(_dbName).future);
     storage.watchItem(_dbcKey).listen((event) {
+      if (event == null) return;
       state = DbcMeta.fromJson(event);
 
       can.syncMetaDatas(event);
