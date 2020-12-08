@@ -102,10 +102,8 @@ void *can_send_func(void *param)
     pthread_mutex_lock(&sender.mutex);
     while (sender.flag) {
         index = 0;
-        int aa = hashmap_size(&sender.m_assembler_map);
-        debug_info("%s sender assembler map size : %d ",__FUNCTION__,  aa);
         hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
-            debug_info("can_send_func  %d ", *m_key);
+            // debug_info("can_send_func  %d ", *m_key);
             list_iterator_t *it = list_iterator_new(m_assembler->meta->signal_ids, LIST_HEAD);
             can_obj[index].ID = m_assembler->id;
             can_obj[index].ExternFlag = 0;
@@ -166,13 +164,13 @@ void *can_receive_func(void *param)
         if (device->ports[USB_CAN_PORT_0].started
             && (receive_can0_len = usb_can_receive(device, USB_CAN_PORT_0, can0_cache, cache_len, 20)) > 0)
         {
-            debug_info("can_receive_func  notifyListeners  can0 %d frame\n", receive_can0_len);
+            // debug_info("can_receive_func  notifyListeners  can0 %d frame\n", receive_can0_len);
             notifyListeners(can0_cache, receive_can0_len);
         }
         if (device->ports[USB_CAN_PORT_1].started
            && (receive_can1_len = usb_can_receive(device, USB_CAN_PORT_1, can1_cache, cache_len, 20)) > 0)
         {
-            debug_info("can_receive_func  notifyListeners  can1 %d frame\n", receive_can1_len);
+            // debug_info("can_receive_func  notifyListeners  can1 %d frame\n", receive_can1_len);
             notifyListeners(can1_cache, receive_can1_len);
         }
 
@@ -278,11 +276,8 @@ void can_operator_ceasefire()
 }
 
 void can_operator_add_listener(can_listener_t t) {
-  debug_info("can_operator_add_listener  start");
   list_node_t *listener = list_node_new((void*)t);
-  debug_info("can_operator_add_listener  111111  ");
   list_rpush(receiver.listeners, listener);
-  debug_info("can_operator_add_listener  end");
 }
 void can_operator_remove_listener(can_listener_t t) {
     list_node_t *listener = list_find(receiver.listeners, (void*)t);
@@ -314,15 +309,11 @@ void can_operator_add_const_signal_builder(const char* name, double value) {
 void can_operator_add_message(uint32_t mid) {
     message_assembler * ma = hashmap_get(&sender.m_assembler_map, &mid);
     if(ma == NULL) {
-        debug_info("can_operator_add_message mid: %u", mid);
         ma = (message_assembler *)malloc(sizeof(message_assembler));
         struct message_meta * m_meta = get_message_meta_by_id(mid);
         ma->id = mid;
         ma->meta = m_meta;
         hashmap_put(&sender.m_assembler_map, &ma->id, ma);
-
-        int s= hashmap_size(&sender.m_assembler_map);
-        debug_info("after %s sender assembler map size : %d ",__FUNCTION__,  s);
     }
 }
 

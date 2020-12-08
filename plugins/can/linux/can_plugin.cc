@@ -64,7 +64,7 @@ GtkWindow *get_window(FLCanPlugin *self)
 
 static bool can_receiver_cb(FlValue * result) {
 
-  debug_info("can_plugin.cc   can_receiver_cb");
+  // debug_info("can_plugin.cc   can_receiver_cb");
   fl_method_channel_invoke_method(channel, kCanReceiveCallbackMethod,
                                      result, nullptr, nullptr, nullptr);
   return true;

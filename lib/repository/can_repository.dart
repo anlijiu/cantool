@@ -56,7 +56,6 @@ class CanRepositoryImpl implements CanRepository {
   final Reader read;
 
   CanRepositoryImpl(this.read) {
-    print("CanRepositoryImpl  constructor");
     can.openDevice();
     can.addCanDataListener(this.onReceiveCanData);
   }
@@ -73,7 +72,6 @@ class CanRepositoryImpl implements CanRepository {
   }
 
   void onReceiveCanData(List<can.CanSignalData> list) {
-    print(" onReceiveCanData start ");
     bool needNotify = false;
 
     for (var data in list) {
@@ -89,18 +87,13 @@ class CanRepositoryImpl implements CanRepository {
     }
 
     if (needNotify) {
-      print("  _notifyReceivedMsg messages begin");
       final messages = mapReceiveSignalToMessage();
-      print("  _notifyReceivedMsg messages is ${messages.toString()} ");
       _recvMessageSubject.add(messages);
       // _recvMessageSubject.add(msgMap.values);
     }
-    print(
-        " onReceiveCanData  needNotify:${needNotify}, receivedSignalMap.length: ${receivedSignalMap.length}");
   }
 
   List<Message> mapReceiveSignalToMessage() {
-    print("mapReceiveSignalToMessage start");
     final msgMetaMap = read(messageMetasProvider).state;
     final signalMetaMap = read(signalMetasProvider).state;
     final Map<int, Message> result = new Map();
@@ -127,7 +120,6 @@ class CanRepositoryImpl implements CanRepository {
       }
     });
 
-    print("mapReceiveSignalToMessage end");
     // return result.values;
     return List.from(result.values);
   }
