@@ -19,9 +19,11 @@ class MessageTile extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final message = useProvider(_currentMessage);
-    final msgID = useProvider(selectedMsgId);
+    final msgID = useProvider(selectedMsgId).state;
     return Material(
-      color: msgID == message.meta.id ? Colors.lightGreen : Colors.white,
+      color: msgID == message.meta.id
+          ? Colors.lightBlue.withOpacity(0.15)
+          : Colors.white,
       child: ListTile(
           title: Text('0x${message.meta.id.toRadixString(16).toUpperCase()}'),
           leading: IconButton(

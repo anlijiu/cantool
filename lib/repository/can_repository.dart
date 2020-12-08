@@ -36,6 +36,9 @@ class Message {
   String name;
   int id;
   Message(this.signals, {this.name, this.id});
+  String toString() {
+    return "messages 0x${id.toRadixString(16)} $name ";
+  }
 }
 
 class Signal {
@@ -44,6 +47,9 @@ class Signal {
   String comment;
   Map<int, String> options;
   Signal(this.name, this.value, this.comment, this.options);
+  String toString() {
+    return "signal $name:$value";
+  }
 }
 
 class CanRepositoryImpl implements CanRepository {

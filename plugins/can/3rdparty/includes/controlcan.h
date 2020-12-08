@@ -164,6 +164,17 @@ DWORD VCI_StartCAN(DWORD DeviceType,DWORD DeviceInd,DWORD CANInd);
 DWORD VCI_ResetCAN(DWORD DeviceType,DWORD DeviceInd,DWORD CANInd);
 
 ULONG VCI_Transmit(DWORD DeviceType,DWORD DeviceInd,DWORD CANInd,PVCI_CAN_OBJ pSend,UINT Len);
+
+/**
+ * @brief 接受CAN数据帧
+ * @param[in] DeviceType 
+ * @param[in] DeviceInd
+ * @param[in] CANInd
+ * @param[out] pReceive
+ * @param[in] Len
+ * @param[in] WaitTime
+ * @return 接收到的帧数
+ */
 ULONG VCI_Receive(DWORD DeviceType,DWORD DeviceInd,DWORD CANInd,PVCI_CAN_OBJ pReceive,UINT Len,int WaitTime);
 
 DWORD VCI_GetReference2(DWORD DevType,DWORD DevIndex,DWORD CANIndex,DWORD Reserved,BYTE *pData);

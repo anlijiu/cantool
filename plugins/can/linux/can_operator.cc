@@ -54,13 +54,14 @@ static void notifyListeners(PVCI_CAN_OBJ pObj, unsigned int len) {
 
     for(int i = 0; i < len; ++i, ++p) {
         struct message_meta * m_meta = get_message_meta_by_id(p->ID);
+        // debug_info("notifyListeners  msg id:%d", p->ID);
         if(m_meta == NULL) continue;
         list_iterator_t *it = list_iterator_new(m_meta->signal_ids, LIST_HEAD);
         list_node_t *t = NULL;
         while((t = list_iterator_next(it)) != NULL ) {
             struct signal_meta * s_meta = get_signal_meta_by_id((const char *)t->val);
             if(s_meta == NULL) continue;
-            uint64_t origvalue = extract(pObj->Data, s_meta->start_bit, s_meta->length, UNSIGNED, MOTOROLA);
+            uint64_t origvalue = extract(p->Data, s_meta->start_bit, s_meta->length, UNSIGNED, MOTOROLA);
             double signal_value = origvalue * s_meta->scaling;
             FlValue* fv_signal = fl_value_new_map();
             fl_value_set_string_take(fv_signal, "name", fl_value_new_string(s_meta->name));
@@ -165,21 +166,21 @@ void *can_receive_func(void *param)
         if (device->ports[USB_CAN_PORT_0].started
             && (receive_can0_len = usb_can_receive(device, USB_CAN_PORT_0, can0_cache, cache_len, 20)) > 0)
         {
-            debug_info("can_receive_func  notifyListeners  can0 %dbytes\n", receive_can0_len);
+            debug_info("can_receive_func  notifyListeners  can0 %d frame\n", receive_can0_len);
             notifyListeners(can0_cache, receive_can0_len);
         }
         if (device->ports[USB_CAN_PORT_1].started
            && (receive_can1_len = usb_can_receive(device, USB_CAN_PORT_1, can1_cache, cache_len, 20)) > 0)
         {
-            debug_info("can_receive_func  notifyListeners  can1 %dbytes\n", receive_can1_len);
+            debug_info("can_receive_func  notifyListeners  can1 %d frame\n", receive_can1_len);
             notifyListeners(can1_cache, receive_can1_len);
         }
 
         receive_can0_len = 0;
         receive_can1_len = 0;
         gettimeofday(&now, NULL);
-        outtime.tv_sec = now.tv_sec + 1;
-        outtime.tv_nsec = now.tv_usec * 1000;
+        outtime.tv_sec = now.tv_sec;
+        outtime.tv_nsec = now.tv_usec * 100000;
         pthread_cond_timedwait(&receiver.cond, &receiver.mutex, &outtime);
     }
     pthread_mutex_unlock(&receiver.mutex);

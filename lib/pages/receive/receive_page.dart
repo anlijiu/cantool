@@ -12,13 +12,13 @@ import 'package:cantool/repository/can_repository.dart';
 
 final receiveMsgStreamProvider =
     StreamProvider.autoDispose<List<MessageSection>>((ref) {
-  final collapseMsgIds = ref.watch(collapsMsgProvider);
+  final collapseMsgIds = ref.watch(collapsMsgProvider).state;
   return ref.watch(canRepository).receiveMessagesStream().map((msgs) => msgs
       .map((msg) => MessageSection(msg, !collapseMsgIds.contains(msg.id)))
       .toList());
 });
 
-final collapsMsgProvider = Provider<List<int>>((ref) => []);
+final collapsMsgProvider = StateProvider<List<int>>((ref) => []);
 
 class ReceivePage extends HookWidget {
   const ReceivePage({Key key}) : super(key: key);
@@ -26,7 +26,8 @@ class ReceivePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final receiveMsg = useProvider(receiveMsgStreamProvider);
-
+    final collapsMsgs = useProvider(collapsMsgProvider);
+    ;
     return receiveMsg.maybeWhen(
         data: (msgList) {
           var _buildHeader =
@@ -43,6 +44,16 @@ class ReceivePage extends HookWidget {
                       style: TextStyle(color: Colors.white),
                     )),
                 onTap: () {
+                  section.setSectionExpanded(!section.isSectionExpanded());
+                  print("receive  message click !!   ${section.expanded}");
+                  List<int> collapseIds = collapsMsgs.state;
+                  if (collapseIds.contains(section.msg.id)) {
+                    collapseIds.remove(section.msg.id);
+                    collapsMsgs.state = collapseIds;
+                  } else {
+                    collapsMsgs.state = [section.msg.id, ...collapseIds];
+                  }
+
                   //toggle section expand state
                 });
           };
