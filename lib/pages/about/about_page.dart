@@ -14,13 +14,13 @@ class AboutPage extends HookWidget {
     return Offstage(
         offstage: currentTab != 2,
         child: Center(
-            child: new FlatButton(
-              child: const Text('https://github.com/anlijiu/cantool'),
-              onPressed: () {
-                url_launcher.launch('https://github.com/anlijiu/cantool');
-              },
-            ),
-          )
-    );
+          child: new FlatButton(
+            child: const Text('https://github.com/anlijiu/cantool',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+            onPressed: () {
+              url_launcher.launch('https://github.com/anlijiu/cantool');
+            },
+          ),
+        ));
   }
 }

@@ -53,7 +53,6 @@ class ReceivePage extends HookWidget {
                   } else {
                     collapsMsgs.state = [section.msg.id, ...collapseIds];
                   }
-
                   //toggle section expand state
                 });
           };

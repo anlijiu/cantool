@@ -35,8 +35,9 @@ class HomePage extends HookWidget {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    new Flexible(child: SendPage()),
-                    new Flexible(child: ReceivePage()),
+                    Flexible(child: SendPage()),
+                    Padding(padding: EdgeInsets.only(right: 30)),
+                    Flexible(child: ReceivePage()),
                   ])),
         ));
   }

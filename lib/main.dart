@@ -50,10 +50,29 @@ class MyApp extends HookWidget {
               // Define the default TextTheme. Use this to specify the default
               // text styling for headlines, titles, bodies of text, and more.
               textTheme: TextTheme(
-                headline:
-                    TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-                title: TextStyle(fontSize: 48.0, fontStyle: FontStyle.italic),
-                body1: TextStyle(fontSize: 20.0),
+                headline1: TextStyle(
+                  fontSize: 72.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey[900],
+                ),
+                subtitle1: TextStyle(
+                    fontSize: 20.0,
+                    fontStyle: FontStyle.normal,
+                    color: Colors.blueGrey[900]),
+                subtitle2: TextStyle(
+                    fontSize: 18.0,
+                    fontStyle: FontStyle.normal,
+                    color: Colors.blueGrey[900]),
+                bodyText1: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.blueGrey[800],
+                ),
+                bodyText2: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.blueGrey[800],
+                ),
               ),
             ),
             localizationsDelegates: const [

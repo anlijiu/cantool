@@ -1,3 +1,4 @@
+import 'package:cantool/providers.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,6 +11,7 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import './providers.dart';
 import './message_item.dart';
 import './strategy_item.dart';
+import 'package:cantool/utils/text.dart';
 
 final _currentMessage = ScopedProvider<MessageItem>(null);
 
@@ -44,15 +46,29 @@ class MessageTile extends HookWidget {
 }
 
 class MessageListView extends HookWidget {
+  MessageListView(this.msgs);
   ScrollController _messageListController = ScrollController();
-
+  final List<MessageItem> msgs;
   @override
   Widget build(BuildContext context) {
-    final List<MessageItem> msgs = useProvider(messages).state;
+    // final List<MessageItem> msgs = useProvider(messages).state;
 
     if (msgs == null) {
       return Container(child: const Center(child: CircularProgressIndicator()));
     }
+
+    // TextStyle posRes = TextStyle(
+    //         color: Colors.blueGrey,
+    //         backgroundColor: Colors.yellow,
+    //         fontSize: 12,
+    //         fontWeight: FontWeight.normal,
+    //         inherit: true),
+    //     negRes = TextStyle(
+    //         color: Colors.blueGrey[900],
+    //         backgroundColor: Colors.transparent,
+    //         fontSize: 12,
+    //         fontWeight: FontWeight.normal,
+    //         inherit: true);
 
     return Flexible(
         child: DraggableScrollbar.semicircle(
