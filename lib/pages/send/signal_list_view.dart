@@ -29,8 +29,15 @@ class SignalTile extends HookWidget {
     print("SignalTile, signal: " + signalMeta.toString());
     print("SignalTile, strategy: " + strategy.toString());
     print("SignalTile, strategies: " + strategies.toString());
+    String options = "";
+    if (signalMeta.options != null) {
+      options = signalMeta.options.entries.fold(
+          "", (previousValue, e) => "$previousValue\n${e.key}: ${e.value}");
+    }
+    String tooltipMsg = "${signalMeta.comment}\n $options";
     return Tooltip(
-        message: signalMeta.comment + signalMeta.options.toString(),
+        message: tooltipMsg,
+        textStyle: TextStyle(fontSize: 20, color: Colors.white70),
         child: Container(
             height: 50,
             child: Row(

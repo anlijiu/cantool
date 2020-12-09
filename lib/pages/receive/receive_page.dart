@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:core';
+import 'package:cantool/utils/text.dart';
+import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,69 +11,131 @@ import 'package:cantool/entity/dbc_meta.dart';
 import 'package:cantool/entity/message_meta.dart';
 import 'package:cantool/entity/signal_meta.dart';
 import 'package:cantool/repository/can_repository.dart';
+import 'receive_page.i18n.dart';
 
-final receiveMsgStreamProvider =
-    StreamProvider.autoDispose<List<MessageSection>>((ref) {
-  final collapseMsgIds = ref.watch(collapsMsgProvider).state;
-  return ref.watch(canRepository).receiveMessagesStream().map((msgs) => msgs
-      .map((msg) => MessageSection(msg, !collapseMsgIds.contains(msg.id)))
-      .toList());
+final _currentMessage = ScopedProvider<MessageSection>(null);
+
+final receiveMsgStreamProvider = StreamProvider.autoDispose
+    .family<List<MessageSection>, String>((ref, search) {
+  final transformer =
+      StreamTransformer<List<Message>, List<Message>>.fromHandlers(
+          handleData: (msgs, sink) {
+    final result = msgs
+        .where((msg) =>
+            msg.name.contains(search.toLowerCase()) ||
+            "0x${msg.id.toRadixString(16)}".contains(search.toLowerCase()) ||
+            msg.signals.firstWhereOrNull((s) =>
+                    s.name.toLowerCase().contains(search.toLowerCase()) ||
+                    s.comment.contains(search.toLowerCase())) !=
+                null)
+        .toList();
+    sink.add(result);
+  });
+
+  return ref
+      .watch(canRepository)
+      .receiveMessagesStream()
+      .transform(transformer)
+      .map((msgs) => msgs.map((msg) => MessageSection(msg)).toList());
 });
 
 final collapsMsgProvider = StateProvider<List<int>>((ref) => []);
 
-class ReceivePage extends HookWidget {
-  const ReceivePage({Key key}) : super(key: key);
+class MessageTile extends HookWidget {
+  const MessageTile();
 
   @override
   Widget build(BuildContext context) {
-    final receiveMsg = useProvider(receiveMsgStreamProvider);
-    final collapsMsgs = useProvider(collapsMsgProvider);
-    ;
+    final section = useProvider(_currentMessage);
+    final collapsMsgIds = useProvider(collapsMsgProvider);
+    final isExpanded = !collapsMsgIds.state.contains(section.msg.id);
+    final msgView = InkWell(
+        child: Container(
+            color: Colors.lightBlue,
+            height: 48,
+            padding: EdgeInsets.only(left: 20),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "${section.msg.name}",
+              style: TextStyle(color: Colors.white),
+            )),
+        onTap: () {
+          print("receive  message click !!   ${section.msg.id}");
+          List<int> collapseIds = collapsMsgIds.state;
+          if (collapseIds.contains(section.msg.id)) {
+            collapseIds.remove(section.msg.id);
+            collapsMsgIds.state = collapseIds;
+          } else {
+            collapsMsgIds.state = [section.msg.id, ...collapseIds];
+          }
+          //toggle section expand state
+        });
+
+    if (isExpanded) {
+      final listView = section.msg.signals.asMap().entries.map((e) {
+        List<InlineSpan> texts = [
+          TextSpan(text: e.value.name),
+          TextSpan(text: ': '),
+          TextSpan(text: e.value.comment),
+          TextSpan(text: '， '),
+          TextSpan(
+              text: e.value.value.toString(),
+              style: TextStyle(color: Colors.red)),
+        ];
+        if (e.value.options != null && e.value.options[e.value.value] != null) {
+          texts.add(TextSpan(text: ": ${e.value.options[e.value.value]}"));
+        }
+        return Container(
+          color: e.key.isEven ? Colors.lightGreen.shade50 : Colors.white,
+          padding: EdgeInsets.only(left: 30, top: 10, bottom: 10),
+          alignment: Alignment.centerLeft,
+          child: RichText(
+              text: TextSpan(
+            children: texts,
+            style: DefaultTextStyle.of(context).style,
+          )),
+          // Text(
+          //   "${e.value.name} ${e.value.comment} $value",
+          //   textAlign: TextAlign.left,
+          // )
+        );
+      }).toList();
+      return Column(
+        children: [msgView, ...listView],
+      );
+    } else {
+      return msgView;
+    }
+  }
+}
+
+class ReceiveListPage extends HookWidget {
+  String search;
+  ReceiveListPage(this.search, {Key key}) : super(key: key);
+
+  @override
+  Widget build(Object context) {
+    final receiveMsg = useProvider(receiveMsgStreamProvider(search));
+    ScrollController _messageListController = ScrollController();
     return receiveMsg.maybeWhen(
         data: (msgList) {
-          var _buildHeader =
-              (BuildContext context, int sectionIndex, int index) {
-            MessageSection section = msgList[sectionIndex];
-            return InkWell(
-                child: Container(
-                    color: Colors.lightBlue,
-                    height: 48,
-                    padding: EdgeInsets.only(left: 20),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "${section.msg.name}",
-                      style: TextStyle(color: Colors.white),
-                    )),
-                onTap: () {
-                  section.setSectionExpanded(!section.isSectionExpanded());
-                  print("receive  message click !!   ${section.expanded}");
-                  List<int> collapseIds = collapsMsgs.state;
-                  if (collapseIds.contains(section.msg.id)) {
-                    collapseIds.remove(section.msg.id);
-                    collapsMsgs.state = collapseIds;
-                  } else {
-                    collapsMsgs.state = [section.msg.id, ...collapseIds];
-                  }
-                  //toggle section expand state
-                });
-          };
-
-          return ExpandableListView(
-              builder: SliverExpandableChildDelegate<Signal, MessageSection>(
-                  sticky: false,
-                  sectionList: msgList,
-                  headerBuilder: _buildHeader,
-                  itemBuilder: (context, sectionIndex, itemIndex, index) {
-                    Signal s = msgList[sectionIndex].getItems()[itemIndex];
-                    String item = "${s.name} ${s.value} ${s.comment}";
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text("$index"),
-                      ),
-                      title: Text(item),
-                    );
-                  }));
+          return Flexible(
+              child: DraggableScrollbar.semicircle(
+                  controller: _messageListController,
+                  child: ListView.separated(
+                    scrollDirection: Axis.vertical,
+                    controller: _messageListController,
+                    itemCount: msgList.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(color: Colors.transparent);
+                    },
+                    itemBuilder: (ctx, int idx) => ProviderScope(
+                      overrides: [
+                        _currentMessage.overrideWithValue(msgList[idx]),
+                      ],
+                      child: const MessageTile(),
+                    ),
+                  )));
         },
         loading: () => CircularProgressIndicator(),
         error: (e, s) => Text("error: ${e.toString()}"),
@@ -79,22 +143,40 @@ class ReceivePage extends HookWidget {
   }
 }
 
-class MessageSection implements ExpandableListSection<Signal> {
-  MessageSection(this.msg, this.expanded);
-  bool expanded;
-  Message msg;
+class ReceivePage extends HookWidget {
+  const ReceivePage({Key key}) : super(key: key);
+
   @override
+  Widget build(BuildContext context) {
+    final textController = useTextEditingController();
+    final search = useDecouncedSearch(textController);
+    return Column(children: [
+      Text("Receive".i18n),
+      Container(
+          margin: EdgeInsets.only(bottom: 10),
+          child: TextField(
+            maxLines: 1,
+            onChanged: (str) {},
+            controller: textController,
+            autofocus: true,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    textController.text = "";
+                  },
+                )),
+          )),
+      ReceiveListPage(search)
+    ]);
+  }
+}
+
+class MessageSection {
+  MessageSection(this.msg);
+  Message msg;
   List<Signal> getItems() {
     return msg.signals;
-  }
-
-  @override
-  bool isSectionExpanded() {
-    return expanded;
-  }
-
-  @override
-  void setSectionExpanded(bool expanded) {
-    this.expanded = expanded;
   }
 }
