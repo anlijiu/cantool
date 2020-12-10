@@ -328,10 +328,7 @@ class TimelineRenderObject extends RenderBox {
     final Canvas canvas = context.canvas;
 
     Path path = new Path();
-    Paint paint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
+
     int j = 0;
     for (MapEntry<String, TimelineSeriesData> seriesEntry
         in data.series.entries) {
@@ -342,33 +339,18 @@ class TimelineRenderObject extends RenderBox {
       canvas.saveLayer(t, p);
       canvas.drawRect(t, p);
       canvas.restore();
+      Paint p1 = Paint()
+        ..color = cs[j % cs.length]
+        ..strokeWidth = 1
+        ..style = PaintingStyle.fill;
       Paint p2 = Paint()
         ..color = cs[j % cs.length]
         ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke;
       j++;
 
-      ////////////////////////////
-      // canvas.save();
-      // canvas.translate(
-      //     offset.dx + _timeline.gutterWidth, seriesEntry.value.y + 200);
-      // canvas.rotate(3.1415926 * 1.5);
-      // ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-      //     textAlign: TextAlign.end, fontFamily: "Roboto", fontSize: 10.0))
-      //   ..pushStyle(ui.TextStyle(color: cs[j % cs.length]));
-      // builder.addText(seriesEntry.value.meta.name);
-      // ui.Paragraph seriesParagraph = builder.build();
-      // seriesParagraph.layout(ui.ParagraphConstraints(width: 200));
-      // canvas.drawParagraph(seriesParagraph, Offset(0, 0));
-      // canvas.restore();
-      /////////////////////////////
       for (TimelineEntry item in seriesEntry.value.entries) {
-        // if (!item.isVisible ||
-        if (item.x > size.width + Timeline.BubbleWidth ||
-            item.endX < -Timeline.BubbleWidth) {
-          /// Don't paint this item.
-          continue;
-        }
+        canvas.drawCircle(Offset(item.x + offset.dx, item.y), 5, p1);
 
         if (item.next != null) {
           path.reset();

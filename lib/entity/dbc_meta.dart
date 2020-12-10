@@ -17,17 +17,19 @@ abstract class DbcMeta with _$DbcMeta {
     @required Map<String, SignalMeta> signals,
   }) = _DbcMeta;
 
-  factory DbcMeta.fromJson(Map<String, dynamic> json) {
-    var messages = Map<String, dynamic>.from(json['messages']).map(
-        (key, value) => MapEntry<String, Map<String, dynamic>>(
-            key, Map<String, dynamic>.from(value)));
-    var signals = Map<String, dynamic>.from(json['signals']).map((key, value) =>
-        MapEntry<String, Map<String, dynamic>>(
-            key, Map<String, dynamic>.from(value)));
+  factory DbcMeta.fromJson(Map<String, dynamic> json) => _fromJson(json);
+}
 
-    json['messages'] = messages;
-    json['signals'] = signals;
+DbcMeta _fromJson(Map<String, dynamic> json) {
+  var messages = Map<String, dynamic>.from(json['messages']).map((key, value) =>
+      MapEntry<String, Map<String, dynamic>>(
+          key, Map<String, dynamic>.from(value)));
+  var signals = Map<String, dynamic>.from(json['signals']).map((key, value) =>
+      MapEntry<String, Map<String, dynamic>>(
+          key, Map<String, dynamic>.from(value)));
 
-    return _$DbcMetaFromJson(json);
-  }
+  json['messages'] = messages;
+  json['signals'] = signals;
+
+  return _$DbcMetaFromJson(json);
 }

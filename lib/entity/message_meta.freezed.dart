@@ -22,12 +22,14 @@ class _$MessageMetaTearOff {
       @required String name,
       @required String sender,
       @required int length,
+      @required Map<String, dynamic> attributes,
       @required List<String> signalIds}) {
     return _MessageMeta(
       id: id,
       name: name,
       sender: sender,
       length: length,
+      attributes: attributes,
       signalIds: signalIds,
     );
   }
@@ -47,7 +49,8 @@ mixin _$MessageMeta {
   int get id;
   String get name;
   String get sender;
-  int get length; // @required List<SignalMeta> signals;
+  int get length;
+  Map<String, dynamic> get attributes; // @required List<SignalMeta> signals;
   List<String> get signalIds;
 
   Map<String, dynamic> toJson();
@@ -60,7 +63,12 @@ abstract class $MessageMetaCopyWith<$Res> {
           MessageMeta value, $Res Function(MessageMeta) then) =
       _$MessageMetaCopyWithImpl<$Res>;
   $Res call(
-      {int id, String name, String sender, int length, List<String> signalIds});
+      {int id,
+      String name,
+      String sender,
+      int length,
+      Map<String, dynamic> attributes,
+      List<String> signalIds});
 }
 
 /// @nodoc
@@ -77,6 +85,7 @@ class _$MessageMetaCopyWithImpl<$Res> implements $MessageMetaCopyWith<$Res> {
     Object name = freezed,
     Object sender = freezed,
     Object length = freezed,
+    Object attributes = freezed,
     Object signalIds = freezed,
   }) {
     return _then(_value.copyWith(
@@ -84,6 +93,9 @@ class _$MessageMetaCopyWithImpl<$Res> implements $MessageMetaCopyWith<$Res> {
       name: name == freezed ? _value.name : name as String,
       sender: sender == freezed ? _value.sender : sender as String,
       length: length == freezed ? _value.length : length as int,
+      attributes: attributes == freezed
+          ? _value.attributes
+          : attributes as Map<String, dynamic>,
       signalIds:
           signalIds == freezed ? _value.signalIds : signalIds as List<String>,
     ));
@@ -98,7 +110,12 @@ abstract class _$MessageMetaCopyWith<$Res>
       __$MessageMetaCopyWithImpl<$Res>;
   @override
   $Res call(
-      {int id, String name, String sender, int length, List<String> signalIds});
+      {int id,
+      String name,
+      String sender,
+      int length,
+      Map<String, dynamic> attributes,
+      List<String> signalIds});
 }
 
 /// @nodoc
@@ -117,6 +134,7 @@ class __$MessageMetaCopyWithImpl<$Res> extends _$MessageMetaCopyWithImpl<$Res>
     Object name = freezed,
     Object sender = freezed,
     Object length = freezed,
+    Object attributes = freezed,
     Object signalIds = freezed,
   }) {
     return _then(_MessageMeta(
@@ -124,13 +142,16 @@ class __$MessageMetaCopyWithImpl<$Res> extends _$MessageMetaCopyWithImpl<$Res>
       name: name == freezed ? _value.name : name as String,
       sender: sender == freezed ? _value.sender : sender as String,
       length: length == freezed ? _value.length : length as int,
+      attributes: attributes == freezed
+          ? _value.attributes
+          : attributes as Map<String, dynamic>,
       signalIds:
           signalIds == freezed ? _value.signalIds : signalIds as List<String>,
     ));
   }
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, createToJson: true)
 
 /// @nodoc
 class _$_MessageMeta implements _MessageMeta {
@@ -139,11 +160,13 @@ class _$_MessageMeta implements _MessageMeta {
       @required this.name,
       @required this.sender,
       @required this.length,
+      @required this.attributes,
       @required this.signalIds})
       : assert(id != null),
         assert(name != null),
         assert(sender != null),
         assert(length != null),
+        assert(attributes != null),
         assert(signalIds != null);
 
   factory _$_MessageMeta.fromJson(Map<String, dynamic> json) =>
@@ -157,12 +180,14 @@ class _$_MessageMeta implements _MessageMeta {
   final String sender;
   @override
   final int length;
+  @override
+  final Map<String, dynamic> attributes;
   @override // @required List<SignalMeta> signals;
   final List<String> signalIds;
 
   @override
   String toString() {
-    return 'MessageMeta(id: $id, name: $name, sender: $sender, length: $length, signalIds: $signalIds)';
+    return 'MessageMeta(id: $id, name: $name, sender: $sender, length: $length, attributes: $attributes, signalIds: $signalIds)';
   }
 
   @override
@@ -177,6 +202,9 @@ class _$_MessageMeta implements _MessageMeta {
                 const DeepCollectionEquality().equals(other.sender, sender)) &&
             (identical(other.length, length) ||
                 const DeepCollectionEquality().equals(other.length, length)) &&
+            (identical(other.attributes, attributes) ||
+                const DeepCollectionEquality()
+                    .equals(other.attributes, attributes)) &&
             (identical(other.signalIds, signalIds) ||
                 const DeepCollectionEquality()
                     .equals(other.signalIds, signalIds)));
@@ -189,6 +217,7 @@ class _$_MessageMeta implements _MessageMeta {
       const DeepCollectionEquality().hash(name) ^
       const DeepCollectionEquality().hash(sender) ^
       const DeepCollectionEquality().hash(length) ^
+      const DeepCollectionEquality().hash(attributes) ^
       const DeepCollectionEquality().hash(signalIds);
 
   @override
@@ -207,6 +236,7 @@ abstract class _MessageMeta implements MessageMeta {
       @required String name,
       @required String sender,
       @required int length,
+      @required Map<String, dynamic> attributes,
       @required List<String> signalIds}) = _$_MessageMeta;
 
   factory _MessageMeta.fromJson(Map<String, dynamic> json) =
@@ -220,6 +250,8 @@ abstract class _MessageMeta implements MessageMeta {
   String get sender;
   @override
   int get length;
+  @override
+  Map<String, dynamic> get attributes;
   @override // @required List<SignalMeta> signals;
   List<String> get signalIds;
   @override

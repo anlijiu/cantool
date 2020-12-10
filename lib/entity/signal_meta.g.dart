@@ -24,6 +24,7 @@ _$_SignalMeta _$_$_SignalMetaFromJson(Map<String, dynamic> json) {
     options: (json['options'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(int.parse(k), e as String),
     ),
+    attributes: json['attributes'] as Map<String, dynamic>,
   );
 }
 
@@ -43,4 +44,5 @@ Map<String, dynamic> _$_$_SignalMetaToJson(_$_SignalMeta instance) =>
       'comment': instance.comment,
       'mid': instance.mid,
       'options': instance.options?.map((k, e) => MapEntry(k.toString(), e)),
+      'attributes': instance.attributes,
     };

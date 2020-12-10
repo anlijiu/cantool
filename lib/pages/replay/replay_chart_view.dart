@@ -60,11 +60,12 @@ final timelineProvider = Provider<Timeline>((ref) {
         series.entries =
             value.fold<List<TimelineEntry>>([], (previousValue, element) {
           length--;
-          if (element.value == previousValue.lastOrNull?.value && length > 0) {
-            print(
-                "hahahahlength: ${length}  value: ${element.value} ${previousValue.lastOrNull?.value}");
-            return previousValue;
-          }
+          // 过滤掉和前一个值一样的点
+          // if (element.value == previousValue.lastOrNull?.value && length > 0) {
+          //   print(
+          //       "hahahahlength: ${length}  value: ${element.value} ${previousValue.lastOrNull?.value}");
+          //   return previousValue;
+          // }
           final TimelineEntry entry = TimelineEntry();
           if (start > element.time) start = element.time;
           if (end < element.time) end = element.time;

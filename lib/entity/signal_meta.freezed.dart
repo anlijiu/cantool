@@ -31,7 +31,8 @@ class _$SignalMetaTearOff {
       @required @nullable String unit,
       @required String comment,
       @required int mid,
-      Map<int, String> options}) {
+      Map<int, String> options,
+      Map<String, dynamic> attributes}) {
     return _SignalMeta(
       name: name,
       start_bit: start_bit,
@@ -47,6 +48,7 @@ class _$SignalMetaTearOff {
       comment: comment,
       mid: mid,
       options: options,
+      attributes: attributes,
     );
   }
 
@@ -77,6 +79,7 @@ mixin _$SignalMeta {
   String get comment;
   int get mid;
   Map<int, String> get options;
+  Map<String, dynamic> get attributes;
 
   Map<String, dynamic> toJson();
   $SignalMetaCopyWith<SignalMeta> get copyWith;
@@ -101,7 +104,8 @@ abstract class $SignalMetaCopyWith<$Res> {
       @nullable String unit,
       String comment,
       int mid,
-      Map<int, String> options});
+      Map<int, String> options,
+      Map<String, dynamic> attributes});
 }
 
 /// @nodoc
@@ -128,6 +132,7 @@ class _$SignalMetaCopyWithImpl<$Res> implements $SignalMetaCopyWith<$Res> {
     Object comment = freezed,
     Object mid = freezed,
     Object options = freezed,
+    Object attributes = freezed,
   }) {
     return _then(_value.copyWith(
       name: name == freezed ? _value.name : name as String,
@@ -148,6 +153,9 @@ class _$SignalMetaCopyWithImpl<$Res> implements $SignalMetaCopyWith<$Res> {
       mid: mid == freezed ? _value.mid : mid as int,
       options:
           options == freezed ? _value.options : options as Map<int, String>,
+      attributes: attributes == freezed
+          ? _value.attributes
+          : attributes as Map<String, dynamic>,
     ));
   }
 }
@@ -172,7 +180,8 @@ abstract class _$SignalMetaCopyWith<$Res> implements $SignalMetaCopyWith<$Res> {
       @nullable String unit,
       String comment,
       int mid,
-      Map<int, String> options});
+      Map<int, String> options,
+      Map<String, dynamic> attributes});
 }
 
 /// @nodoc
@@ -201,6 +210,7 @@ class __$SignalMetaCopyWithImpl<$Res> extends _$SignalMetaCopyWithImpl<$Res>
     Object comment = freezed,
     Object mid = freezed,
     Object options = freezed,
+    Object attributes = freezed,
   }) {
     return _then(_SignalMeta(
       name: name == freezed ? _value.name : name as String,
@@ -221,11 +231,14 @@ class __$SignalMetaCopyWithImpl<$Res> extends _$SignalMetaCopyWithImpl<$Res>
       mid: mid == freezed ? _value.mid : mid as int,
       options:
           options == freezed ? _value.options : options as Map<int, String>,
+      attributes: attributes == freezed
+          ? _value.attributes
+          : attributes as Map<String, dynamic>,
     ));
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake, createToJson: true)
 
 /// @nodoc
 class _$_SignalMeta implements _SignalMeta {
@@ -243,7 +256,8 @@ class _$_SignalMeta implements _SignalMeta {
       @required @nullable this.unit,
       @required this.comment,
       @required this.mid,
-      this.options})
+      this.options,
+      this.attributes})
       : assert(name != null),
         assert(start_bit != null),
         assert(length != null),
@@ -289,10 +303,12 @@ class _$_SignalMeta implements _SignalMeta {
   final int mid;
   @override
   final Map<int, String> options;
+  @override
+  final Map<String, dynamic> attributes;
 
   @override
   String toString() {
-    return 'SignalMeta(name: $name, start_bit: $start_bit, length: $length, little_endian: $little_endian, is_signed: $is_signed, value_type: $value_type, scaling: $scaling, offset: $offset, minimum: $minimum, maximum: $maximum, unit: $unit, comment: $comment, mid: $mid, options: $options)';
+    return 'SignalMeta(name: $name, start_bit: $start_bit, length: $length, little_endian: $little_endian, is_signed: $is_signed, value_type: $value_type, scaling: $scaling, offset: $offset, minimum: $minimum, maximum: $maximum, unit: $unit, comment: $comment, mid: $mid, options: $options, attributes: $attributes)';
   }
 
   @override
@@ -334,7 +350,11 @@ class _$_SignalMeta implements _SignalMeta {
             (identical(other.mid, mid) ||
                 const DeepCollectionEquality().equals(other.mid, mid)) &&
             (identical(other.options, options) ||
-                const DeepCollectionEquality().equals(other.options, options)));
+                const DeepCollectionEquality()
+                    .equals(other.options, options)) &&
+            (identical(other.attributes, attributes) ||
+                const DeepCollectionEquality()
+                    .equals(other.attributes, attributes)));
   }
 
   @override
@@ -353,7 +373,8 @@ class _$_SignalMeta implements _SignalMeta {
       const DeepCollectionEquality().hash(unit) ^
       const DeepCollectionEquality().hash(comment) ^
       const DeepCollectionEquality().hash(mid) ^
-      const DeepCollectionEquality().hash(options);
+      const DeepCollectionEquality().hash(options) ^
+      const DeepCollectionEquality().hash(attributes);
 
   @override
   _$SignalMetaCopyWith<_SignalMeta> get copyWith =>
@@ -380,7 +401,8 @@ abstract class _SignalMeta implements SignalMeta {
       @required @nullable String unit,
       @required String comment,
       @required int mid,
-      Map<int, String> options}) = _$_SignalMeta;
+      Map<int, String> options,
+      Map<String, dynamic> attributes}) = _$_SignalMeta;
 
   factory _SignalMeta.fromJson(Map<String, dynamic> json) =
       _$_SignalMeta.fromJson;
@@ -414,6 +436,8 @@ abstract class _SignalMeta implements SignalMeta {
   int get mid;
   @override
   Map<int, String> get options;
+  @override
+  Map<String, dynamic> get attributes;
   @override
   _$SignalMetaCopyWith<_SignalMeta> get copyWith;
 }

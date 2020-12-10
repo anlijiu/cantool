@@ -5,6 +5,7 @@ part 'signal_meta.g.dart';
 
 @freezed
 abstract class SignalMeta with _$SignalMeta {
+  @JsonSerializable(fieldRename: FieldRename.snake, createToJson: true)
   factory SignalMeta({
     @required String name,
     @required int start_bit,
@@ -20,10 +21,18 @@ abstract class SignalMeta with _$SignalMeta {
     @required String comment,
     @required int mid,
     Map<int, String> options,
+    Map<String, dynamic> attributes,
   }) = _SignalMeta;
 
-  factory SignalMeta.fromJson(Map<String, dynamic> json) {
-    json['options'] = json['options'] == null ? null : Map<String, dynamic>.from(json['options']);
-    return _$SignalMetaFromJson(json);
-  }
+  factory SignalMeta.fromJson(Map<String, dynamic> json) => _fromJson(json);
+}
+
+SignalMeta _fromJson(Map<String, dynamic> json) {
+  json['options'] = json['options'] == null
+      ? null
+      : Map<String, dynamic>.from(json['options']);
+  json['attributes'] = json['attributes'] == null
+      ? null
+      : Map<String, dynamic>.from(json['attributes']);
+  return _$SignalMetaFromJson(json);
 }
