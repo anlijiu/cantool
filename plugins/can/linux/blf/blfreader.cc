@@ -166,7 +166,7 @@ static void init_filter_map(FilterRepoMap * filterMap, FlValue * filter) {
         for (size_t j = 0; j < s_length; ++j) {
             FlValue* skey = fl_value_get_map_key(ss, j);
             const char* sid = fl_value_get_string(skey);
-            printf("parse_blf sid is %s\n", sid);
+            debug_info("parse_blf sid is %s\n", sid);
             list_node_t *s_node = list_node_new((void*)sid);
             list_rpush(msg->signal_ids, s_node);
         }

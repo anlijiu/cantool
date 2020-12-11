@@ -350,6 +350,11 @@ class TimelineRenderObject extends RenderBox {
       j++;
 
       for (TimelineEntry item in seriesEntry.value.entries) {
+        if (item.x > size.width + Timeline.BubbleWidth ||
+            item.x < -Timeline.BubbleWidth) {
+          /// Don't paint this item.
+          continue;
+        }
         canvas.drawCircle(Offset(item.x + offset.dx, item.y), 5, p1);
 
         if (item.next != null) {
