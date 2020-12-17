@@ -13,8 +13,10 @@
 #include "controlcan.h"
 #include "dbc_parser.h"
 
+
 // See channel_controller.dart for documentation.
 const char kChannelName[] = "flutter/can_channel";
+const char kCanTraceChannelName[] = "flutter/can_trace_channel";
 
 const char kOpenDeviceMethod[] = "Can.OpenDevice";
 const char kCloseDeviceMethod[] = "Can.CloseDevice";
@@ -33,8 +35,11 @@ const char kCanReceiveCallbackMethod[] = "Can.ReceiveCallback";
 
 const char kReplaySetFile[] = "Can.ReplaySetFile";
 const char kReplayGetFiltedSignals[] = "Can.ReplayGetFiltedSignals";
+const char kReplayParseFiltedSignals[] = "Can.ReplayParseFiltedSignals";
 
 static FlMethodChannel *channel;
+static FlEventChannel *event_channel;
+static bool is_send_events = true;
 
 struct _FLCanPlugin
 {
@@ -44,6 +49,8 @@ struct _FLCanPlugin
 
   // Connection to Flutter engine.
   FlMethodChannel *channel;
+
+  FlEventChannel* event_channel;
 
   // Dialog currently being shown.
   // GtkColorChooserDialog* color_chooser_dialog;
@@ -63,7 +70,6 @@ GtkWindow *get_window(FLCanPlugin *self)
 
 
 static bool can_receiver_cb(FlValue * result) {
-
   // debug_info("can_plugin.cc   can_receiver_cb");
   fl_method_channel_invoke_method(channel, kCanReceiveCallbackMethod,
                                      result, nullptr, nullptr, nullptr);
@@ -180,6 +186,26 @@ static FlMethodResponse *replay_get_filted_signals(FLCanPlugin *self, FlValue *a
     return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
+static void send_trace_event(FlValue* event) {
+  if (!is_send_events) {
+    return;
+  }
+
+  // g_autoptr(FlValue) event = fl_value_new_map();
+  // fl_value_set_string_take(event, "type", fl_value_new_string("FromLinux"));
+  // fl_value_set_string_take(event, "time", fl_value_new_int(time(nullptr)));
+
+  fl_event_channel_send(event_channel, event, nullptr, nullptr);
+}
+
+
+static FlMethodResponse *replay_parse_filted_signals(FLCanPlugin *self, FlValue *args) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_LIST) {
+        replay_operator_parse_filted_signals(args, send_trace_event);
+    }
+    return FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
+}
+
 
 // Called when a method call is received from Flutter.
 static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
@@ -213,6 +239,8 @@ static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
     response = replay_set_file(self, args);
   } else if (strcmp(method, kReplayGetFiltedSignals) == 0) {
     response = replay_get_filted_signals(self, args);
+  } else if (strcmp(method, kReplayParseFiltedSignals) == 0) {
+    response = replay_parse_filted_signals(self, args);
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
@@ -220,6 +248,20 @@ static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
   g_autoptr(GError) error = nullptr;
   if (!fl_method_call_respond(method_call, response, &error))
     g_warning("Failed to send method call response: %s", error->message);
+}
+
+static FlMethodErrorResponse* event_channel_listen_cb(FlEventChannel* channel,
+                                                      FlValue* args,
+                                                      gpointer user_data) {
+  is_send_events = true;
+  return NULL;
+}
+
+static FlMethodErrorResponse* event_channel_cancel_cb(FlEventChannel* channel,
+                                                      FlValue* args,
+                                                      gpointer user_data) {
+  is_send_events = false;
+  return NULL;
 }
 
 static void fl_can_plugin_init(FLCanPlugin *self)
@@ -253,6 +295,19 @@ FLCanPlugin *fl_can_plugin_new(FlPluginRegistrar *registrar)
   fl_method_channel_set_method_call_handler(self->channel, method_call_cb,
                                             g_object_ref(self), g_object_unref);
   channel = self->channel;
+
+  self->event_channel = fl_event_channel_new(
+      fl_plugin_registrar_get_messenger(registrar),
+      kCanTraceChannelName,
+      FL_METHOD_CODEC(codec));
+  fl_event_channel_set_stream_handlers(
+      self->event_channel, event_channel_listen_cb, event_channel_cancel_cb,
+      nullptr, nullptr);
+  event_channel = self->event_channel;
+
+
+
+
   GtkWindow *window = get_window(self);
     g_signal_connect(G_OBJECT(window),
         "destroy", can_destroy, NULL);

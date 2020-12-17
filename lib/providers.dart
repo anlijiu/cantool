@@ -1,4 +1,5 @@
 import 'package:cantool/repository/dbc_meta_repository.dart';
+import 'package:cantool/repository/replay_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'entity/message_meta.dart';
@@ -11,6 +12,10 @@ final replayFileProvider = StateNotifierProvider((ref) {
 
 final dbcMetaProvider = StateNotifierProvider((ref) {
   return DbcMetaRepository(ref.read);
+});
+
+final replayRepoProvider = StateNotifierProvider((ref) {
+  return ReplayRepository(ref.read);
 });
 
 final messageMetasProvider = StateProvider<Map<int, MessageMeta>>((ref) {

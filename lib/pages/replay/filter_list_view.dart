@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers.dart';
-import 'models.dart';
+import 'package:cantool/entity/replay_model.dart';
 
 final _currentSignal = ScopedProvider<Signal>(null);
 
@@ -45,7 +45,7 @@ class FilterListView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final filterMsgSignal = useProvider(filterMsgSignalProvider);
-    final signals = filterMsgSignal.state.values.fold<List<Signal>>(
+    final signals = filterMsgSignal.state.messages.values.fold<List<Signal>>(
         [], (value, element) => [...value, ...element.signals.values]);
     print('FilterListView  signals :' + signals.toString());
     if (signals.isEmpty) return Text('');

@@ -32,21 +32,25 @@ class AppDrawer extends HookWidget {
           ListTile(
               title: Text("Home".i18n),
               onTap: () {
+                Navigator.pop(context);
                 currentTab.state = 0;
               }),
           ListTile(
               title: Text("Load DBC".i18n),
               onTap: () {
+                Navigator.pop(context);
                 controller.loadDbcFile();
               }),
           ListTile(
               title: Text("Replay".i18n),
               onTap: () {
                 currentTab.state = 1;
+                Navigator.pop(context);
               }),
           ListTile(
               title: Text("About".i18n),
               onTap: () {
+                Navigator.pop(context);
                 currentTab.state = 2;
               })
         ],

@@ -6,7 +6,9 @@
 #include <time.h>
 #include <flutter_linux/flutter_linux.h>
 #include <stdbool.h>
+#include <replay_operator.h>
 
-bool parse_asc(const char *path, FlValue* filter, FlValue* result);
+// bool parse_asc(const char *path, FlValue* filter, FlValue* result);
+bool parse_asc(const char *path, filter_repo_map* filter, can_trace_cb cb);
 
 #endif

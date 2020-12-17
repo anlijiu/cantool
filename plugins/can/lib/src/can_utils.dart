@@ -55,6 +55,15 @@ Future<Map<String, dynamic>> setReplayFile(String path) {
   return CanChannel.instance.setReplayFile(path);
 }
 
+@deprecated
 Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
   return CanChannel.instance.replayFiltedSignals(filter);
+}
+
+Future<Map<String, dynamic>> replayParseFiltedSignals(List<dynamic> filter) {
+  return CanChannel.instance.replayParseFiltedSignals(filter);
+}
+
+Stream eventChannelStream([dynamic arguments]) {
+  return CanChannel.instance.eventChannelStream(arguments);
 }

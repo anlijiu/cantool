@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:can/can.dart';
+import 'package:cantool/entity/signal_meta.dart';
 import 'package:cantool/providers.dart';
 import 'package:cantool/widget/timeline/timeline_data.dart';
 import 'package:collection/collection.dart';
@@ -11,48 +12,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'models.dart';
+import 'package:cantool/entity/replay_model.dart';
 import 'providers.dart';
 
-final timelineProvider = Provider<Timeline>((ref) {
-  final timeline = Timeline(TargetPlatform.linux);
-  final signalMetas = ref.watch(signalMetasProvider).state;
-  final result = ref.watch(replayResultProvider).state;
-  final filterMessage = ref.watch(filterMsgSignalProvider).state;
-  double start = double.maxFinite;
-  double end = -double.maxFinite;
-
+TimelineData mapReplayResultToTimelineData(ReplayResult result,
+    FilteredMessageMap filterMessage, Map<String, SignalMeta> signalMetas) {
   final timelineData = new TimelineData();
   timelineData.baseTime = result?.summary?.date;
-  String widest = "";
-  int charactersWidth = 0;
+  String widest = filterMessage.maxLengthStr ?? "nothing";
   timelineData.series = result?.data?.map((key, value) {
         final series = new TimelineSeriesData();
         series.meta = signalMetas[key];
-        filterMessage.values.forEach((element) {
-          element.signals.values.forEach((element) {
-            return;
-          });
-        });
-
-        ///从options中找到显示最宽的字符串 决定y轴宽度
-        series.meta?.options?.entries?.forEach((entry) {
-          int w = 0;
-          String option = "${entry.key} (${entry.value})";
-          option.codeUnits.forEach((c) {
-            var cw = characterWidthMap[String.fromCharCode(c)];
-            if (cw != null) {
-              w += cw;
-            } else {
-              w += 180;
-            }
-          });
-          print("loop options w:$w, option is $option");
-          if (charactersWidth < w) {
-            charactersWidth = w;
-            widest = option;
-          }
-        });
         series.isStep = series.meta.options != null;
         series.scope =
             (math.pow(2, series.meta.length) * series.meta.scaling).ceil();
@@ -67,8 +37,6 @@ final timelineProvider = Provider<Timeline>((ref) {
           //   return previousValue;
           // }
           final TimelineEntry entry = TimelineEntry();
-          if (start > element.time) start = element.time;
-          if (end < element.time) end = element.time;
           entry.start = element.time; // + baseTime;
           entry.value = element.value;
           entry.previous = previousValue.lastOrNull;
@@ -80,28 +48,44 @@ final timelineProvider = Provider<Timeline>((ref) {
       new Map();
 
   double widestWidth = 50;
-  if (charactersWidth > 0) {
-    ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
-        textAlign: TextAlign.start, fontFamily: "wqy", fontSize: 11.0))
-      ..pushStyle(ui.TextStyle());
-    builder.addText(widest);
-    ui.Paragraph tickParagraph = builder.build();
-    tickParagraph.layout(ui.ParagraphConstraints(width: double.maxFinite));
-    widestWidth = widestWidth < tickParagraph.longestLine
-        ? tickParagraph.longestLine + 10
-        : widestWidth;
-  }
+  ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle(
+      textAlign: TextAlign.start, fontFamily: "wqy", fontSize: 11.0))
+    ..pushStyle(ui.TextStyle());
+  builder.addText(widest);
+  ui.Paragraph tickParagraph = builder.build();
+  tickParagraph.layout(ui.ParagraphConstraints(width: double.maxFinite));
+  widestWidth = widestWidth < tickParagraph.longestLine
+      ? tickParagraph.longestLine + 10
+      : widestWidth;
   timelineData.yAxisTextWidth = widestWidth;
-  print("timelineData: " +
-      timelineData.toString() +
-      "charactersWidth: $charactersWidth ,  widest : $widest");
+  print("timelineData: " + timelineData.toString() + " widest : $widest");
+  return timelineData;
+}
 
+final timelineProvider = Provider<Timeline>((ref) {
+  final timeline = Timeline(TargetPlatform.linux);
+  final replayRepo = ref.watch(replayRepoProvider);
+  final result = ref.watch(replayRepoProvider.state);
+  final signalMetas = ref.watch(signalMetasProvider).state;
+  // final result = ref.watch(replayResultProvider).state;
+  final filterMessage = ref.watch(filterMsgSignalProvider).state;
+
+  timeline.onViewPortChanged = (start, end, width) =>
+      replayRepo.visbleTimeBoundariesChanged(start, end, width);
+  replayRepo.callback = (result) async {
+    final timelineData =
+        mapReplayResultToTimelineData(result, filterMessage, signalMetas);
+    timeline.reloadData(timelineData.series);
+  };
+
+  final timelineData =
+      mapReplayResultToTimelineData(result, filterMessage, signalMetas);
   if (timelineData.series.isNotEmpty) {
     timeline.loadData(timelineData);
-    timeline.setViewport(start: start - 1, end: end + 1, animate: false);
+    timeline.setViewport(start: result.start, end: result.end, animate: true);
 
     /// Advance the timeline to its starting position.
-    timeline.advance(0.0, false);
+    timeline.advance(0.0, true);
   }
 
   // final baseTime = result?.summary?.date?.millisecondsSinceEpoch ?? 0;
@@ -138,9 +122,9 @@ class ReplayChartView extends HookWidget {
   Widget build(BuildContext context) {
     final filterMsgSignal = useProvider(filterMsgSignalProvider);
     final timeline = useProvider(timelineProvider);
-    final signals = filterMsgSignal.state.values.fold<List<Signal>>(
+    final signals = filterMsgSignal.state.messages.values.fold<List<Signal>>(
         [], (value, element) => [...value, ...element.signals.values]);
-    final result = useProvider(replayResultProvider).state;
+    final result = useProvider(replayRepoProvider.state);
     if (result == null)
       return Center(child: Text("Add filter signals"));
     else if (result.data.isEmpty)

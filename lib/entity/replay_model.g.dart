@@ -1,10 +1,31 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'models.dart';
+part of 'replay_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
+
+ReplayDataChunk _$ReplayDataChunkFromJson(Map<String, dynamic> json) {
+  return ReplayDataChunk(
+    json['sequence'] as int,
+    (json['data'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(
+          k,
+          (e as List)
+              ?.map((e) => e == null
+                  ? null
+                  : ReplayEntry.fromJson(e as Map<String, dynamic>))
+              ?.toList()),
+    ),
+  );
+}
+
+Map<String, dynamic> _$ReplayDataChunkToJson(ReplayDataChunk instance) =>
+    <String, dynamic>{
+      'sequence': instance.sequence,
+      'data': instance.data,
+    };
 
 ReplayResult _$ReplayResultFromJson(Map<String, dynamic> json) {
   return ReplayResult(
@@ -124,4 +145,20 @@ Message _$MessageFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'signals': instance.signals,
       'id': instance.id,
+    };
+
+FilteredMessageMap _$FilteredMessageMapFromJson(Map<String, dynamic> json) {
+  return FilteredMessageMap(
+    (json['messages'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(int.parse(k),
+          e == null ? null : Message.fromJson(e as Map<String, dynamic>)),
+    ),
+    json['maxLengthStr'] as String,
+  );
+}
+
+Map<String, dynamic> _$FilteredMessageMapToJson(FilteredMessageMap instance) =>
+    <String, dynamic>{
+      'messages': instance.messages?.map((k, e) => MapEntry(k.toString(), e)),
+      'maxLengthStr': instance.maxLengthStr,
     };

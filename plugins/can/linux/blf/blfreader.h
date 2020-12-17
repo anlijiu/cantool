@@ -25,6 +25,8 @@
 #include <flutter_linux/flutter_linux.h>
 #include <stdbool.h>
 #include "blfapi.h"
+#include <replay_operator.h>
+
 
 /* CAN message type */
 typedef struct {
@@ -44,15 +46,9 @@ typedef struct {
 extern "C" {
 #endif
 
-typedef void (* msgRxCb_t)(canMessage_t *message, void *cbData);
-typedef void (* timeCb_t)(SYSTEMTIME *startTime, SYSTEMTIME *endTime, void *cbData);
 
-/* blfRead function */
-
-void blfReader_processFile(FILE *fp, int verbose_level, timeCb_t timeCb,
-                           msgRxCb_t msgRxCb, void *cbData);
-
-bool parse_blf(const char *path, FlValue* filter, FlValue* result);
+// bool parse_blf(const char *path, FlValue* filter, FlValue* result);
+bool parse_blf(const char *path, filter_repo_map* filter, can_trace_cb cb);
 
 #ifdef __cplusplus
 }

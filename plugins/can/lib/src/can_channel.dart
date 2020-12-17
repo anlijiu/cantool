@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'models.dart';
 
 const String _canChannelName = 'flutter/can_channel';
+const String _canTraceChannelName = 'flutter/can_trace_channel';
 const String _canEventChannelName = 'flutter/can_event';
 const String _openDeviceMethod = "Can.OpenDevice";
 const String _closeDeviceMethod = "Can.CloseDevice";
@@ -20,6 +21,7 @@ const String _canReceiveCallbackMethod = "Can.ReceiveCallback";
 
 const String _replaySetFile = "Can.ReplaySetFile";
 const String _replayGetFiltedSignals = "Can.ReplayGetFiltedSignals";
+const String _replayParseFiltedSignals = "Can.ReplayParseFiltedSignals";
 
 const MethodChannel _platformChannel = const MethodChannel(_canChannelName);
 
@@ -29,7 +31,15 @@ class CanChannel {
   CanChannel._() {
     // _eventChannel.setMessageHandler(_handleCanData);
     _platformChannel.setMethodCallHandler(_handleCanData);
+    // _eventChannel.receiveBroadcastStream().listen(_handleEventChannelOnData,
+    //     onError: _handleEventChannelOnError,
+    //     onDone: _handleEventChannelOnDone,
+    //     cancelOnError: false);
   }
+
+  static const EventChannel _eventChannel =
+      const EventChannel(_canTraceChannelName);
+  static StreamSubscription _streamSubscription;
 
   // final BasicMessageChannel<dynamic> _eventChannel =
   //     BasicMessageChannel<dynamic>(
@@ -49,6 +59,10 @@ class CanChannel {
 
   void removeCanDataListener(ValueChanged<List<CanSignalData>> listener) {
     _listeners.remove(listener);
+  }
+
+  Stream eventChannelStream([dynamic arguments]) {
+    return _eventChannel.receiveBroadcastStream(arguments);
   }
 
   Future<Null> _handleCanData(MethodCall methodCall) async {
@@ -161,6 +175,7 @@ class CanChannel {
     }
   }
 
+  @deprecated
   Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
     try {
       final response = _platformChannel.invokeMapMethod<String, dynamic>(
@@ -169,5 +184,50 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('replayFiltedSignals Platform exception fire : ${e.message}');
     }
+  }
+
+  Future<Map<String, dynamic>> replayParseFiltedSignals(List<dynamic> filter) {
+    try {
+      final response = _platformChannel.invokeMapMethod<String, dynamic>(
+          _replayParseFiltedSignals, filter);
+      return response;
+    } on PlatformException catch (e) {
+      print('replayFiltedSignals Platform exception fire : ${e.message}');
+    }
+  }
+
+  StreamSubscription createReplayStreamByFiltedSignals(List<dynamic> filter,
+      void onStart(dynamic), void onData(dynamic), void onEnd()) {
+    EventChannel eventChannel = EventChannel(_canTraceChannelName);
+    Stream stream = eventChannel.receiveBroadcastStream().timeout(
+        Duration(seconds: 1),
+        onTimeout: (sink) => sink.addError(
+            ChannelTimeoutError("createReplayStreamByFiltedSignals")));
+
+    StreamSubscription streamSubscription = stream.listen((event) {
+      final data = Map<String, dynamic>.from(event);
+      print(data);
+      String type = data["name"];
+      switch (type) {
+        case "summary":
+          onStart(data);
+          break;
+        case "data":
+          onData(data["data"]);
+          break;
+        case "end":
+          onEnd();
+          break;
+        default:
+          onEnd();
+      }
+    }, onError: (error) {
+      print("event channel error: $error");
+    }, onDone: () {
+      print("event channel done");
+      onEnd();
+    }, cancelOnError: true);
+
+    return streamSubscription;
   }
 }

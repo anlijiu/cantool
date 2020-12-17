@@ -17,6 +17,7 @@ import 'timeline_entry.dart';
 typedef PaintCallback();
 typedef ChangeEraCallback(TimelineEntry era);
 typedef ChangeHeaderColorCallback(Color background, Color text);
+typedef ViewPortCallback(double start, double end, double width);
 
 class Timeline {
   /// Some aptly named constants for properly aligning the Timeline view.
@@ -75,6 +76,7 @@ class Timeline {
   double _timeMin = 0.0;
   double _timeMax = 0.0;
   double _gutterWidth = GutterLeft;
+  double _zoom = 0.0;
 
   bool _showFavorites = false;
   bool _isFrameScheduled = false;
@@ -82,6 +84,7 @@ class Timeline {
   bool _isScaling = false;
   bool _isActive = false;
   bool _isSteady = false;
+  bool _needRecalMinUnit = true;
 
   HeaderColors _currentHeaderColors;
 
@@ -130,6 +133,8 @@ class Timeline {
   /// Callback set by [TimelineRenderWidget] when adding a reference to this object.
   /// It'll trigger [RenderBox.markNeedsPaint()].
   PaintCallback onNeedPaint;
+
+  ViewPortCallback onViewPortChanged;
 
   /// These next two callbacks are bound to set the state of the [TimelineWidget]
   /// so it can change the appeareance of the top AppBar.
@@ -246,47 +251,8 @@ class Timeline {
   }
 
   void load(List<TimelineEntry> entries) {
-    _entries = List<TimelineEntry>();
+    _entries = [];
     _entries.addAll(entries);
-  }
-
-  /// Make sure that while scrolling we're within the correct timeline bounds.
-  clampScroll() {
-    _scrollMetrics = null;
-    _scrollPhysics = null;
-    _scrollSimulation = null;
-
-    /// Get measurements values for the current viewport.
-    double scale = computeScale(_start, _end);
-    double padTop = (devicePadding.top + ViewportPaddingTop) / scale;
-    double padBottom = (devicePadding.bottom + ViewportPaddingBottom) / scale;
-    bool fixStart = _start < _timeMin - padTop;
-    bool fixEnd = _end > _timeMax + padBottom;
-
-    /// As the scale changes we need to re-solve the right padding
-    /// Don't think there's an analytical single solution for this
-    /// so we do it in steps approaching the correct answer.
-    for (int i = 0; i < 20; i++) {
-      double scale = computeScale(_start, _end);
-      double padTop = (devicePadding.top + ViewportPaddingTop) / scale;
-      double padBottom = (devicePadding.bottom + ViewportPaddingBottom) / scale;
-      if (fixStart) {
-        _start = _timeMin - padTop;
-      }
-      if (fixEnd) {
-        _end = _timeMax + padBottom;
-      }
-    }
-    if (_end < _start) {
-      _end = _start + _width / scale;
-    }
-
-    /// Be sure to reschedule a new frame.
-    if (!_isFrameScheduled) {
-      _isFrameScheduled = true;
-      _lastFrameTime = 0.0;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
-    }
   }
 
   /// This method bounds the current viewport depending on the current start and end positions.
@@ -299,6 +265,8 @@ class Timeline {
       double velocity = double.maxFinite,
       double topOffset = double.maxFinite,
       bool animate = false}) {
+    print("timeline setViewport in");
+
     /// Calculate the current height.
     if (width != double.maxFinite) {
       if (_width == 0.0 &&
@@ -306,9 +274,18 @@ class Timeline {
           timelineData.series != null &&
           timelineData.series.length > 0) {
         double scale = width / (_end - _start);
-        _start = _start - padding.top / scale;
-        _end = _end + padding.bottom / scale;
+        _start = _start - padding.left / scale;
+        _end = _end + padding.right / scale;
       }
+      _needRecalMinUnit = _end - _start != _zoom || _width != width;
+      if (onViewPortChanged != null &&
+          (start != double.maxFinite && _start != start ||
+              end != double.maxFinite && _end != end ||
+              width != _width)) {
+        onViewPortChanged(start, end, width);
+        print("timeline onViewPortChanged setViewport $start, $end, $width");
+      }
+      _zoom = _end - _start;
       _width = width;
     }
     if (topOffset != double.maxFinite) {
@@ -329,22 +306,25 @@ class Timeline {
     /// If a value for start&end has been provided, evaluate the top/bottom position
     /// for the current viewport accordingly.
     /// Otherwise build the values separately.
-    if (start != double.maxFinite && end != double.maxFinite) {
+    if (start != double.maxFinite &&
+        end != double.maxFinite &&
+        start != null &&
+        end != null) {
       _start = start;
       _end = end;
       if (pad && _width != 0.0) {
         double scale = _width / (_end - _start);
-        _start = _start - padding.top / scale;
-        _end = _end + padding.bottom / scale;
+        _start = _start - padding.left / scale;
+        _end = _end + padding.right / scale;
       }
     } else {
       if (start != double.maxFinite) {
         double scale = width / (_end - _start);
-        _start = pad ? start - padding.top / scale : start;
+        _start = pad ? start - padding.left / scale : start;
       }
       if (end != double.maxFinite) {
         double scale = width / (_end - _start);
-        _end = pad ? end + padding.bottom / scale : end;
+        _end = pad ? end + padding.right / scale : end;
       }
     }
 
@@ -378,6 +358,7 @@ class Timeline {
       _scrollSimulation =
           _scrollPhysics.createBallisticSimulation(_scrollMetrics, velocity);
     }
+
     if (!animate) {
       _renderStart = start;
       _renderEnd = end;
@@ -414,6 +395,7 @@ class Timeline {
   /// Make sure that all the visible assets are being rendered and advanced
   /// according to the current state of the timeline.
   void beginFrame(Duration timeStamp) {
+    print("beginFrame in");
     _isFrameScheduled = false;
     final double t =
         timeStamp.inMicroseconds / Duration.microsecondsPerMillisecond / 1000.0;
@@ -475,7 +457,10 @@ class Timeline {
 
     /// The current scale based on the rendering area.
     double scale = _width / (_renderEnd - _renderStart);
-    _minUnit = getMinUnit(_renderEnd - _renderStart, _width, defaultTimeSteps);
+    if (_needRecalMinUnit) {
+      _minUnit = getMinUnit(end - start, _width, defaultTimeSteps);
+      _needRecalMinUnit = false;
+    }
 
     bool doneRendering = true;
     bool stillScaling = true;
@@ -491,6 +476,11 @@ class Timeline {
       double displace = velocity * elapsed / scale;
       _start -= displace;
       _end -= displace;
+
+      if (onViewPortChanged != null) {
+        onViewPortChanged(_start, _end, _width);
+        print("timeline onViewPortChanged advance $_start, $_end, $_width");
+      }
 
       /// If scrolling has terminated, clean up the resources.
       if (_scrollSimulation.isDone(_simulationTime)) {
@@ -845,6 +835,29 @@ class Timeline {
     this._timelineData = timelineData;
   }
 
+  void reloadData(Map<String, TimelineSeriesData> series) {
+    this._timelineData.series.forEach((key, value) {
+      value.entries.clear();
+      value.entries.addAll(series[key].entries);
+    });
+    print("timeline reloadData in");
+
+    if (!_isFrameScheduled) {
+      print("timeline reloadData and scheduleFrameCallback");
+      _isFrameScheduled = true;
+      _lastFrameTime = 0.0;
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+    }
+  }
+
+  void loadMoreData([Map<String, TimelineSeriesData> series]) {
+    this._timelineData.series.forEach((key, value) {
+      value.entries.last.next = series[key].entries.first;
+      series[key].entries.first.previous = value.entries.last.next;
+      value.entries.addAll(series[key].entries);
+    });
+  }
+
   /// 确定所有timeline entry 位置
   bool _advanceItems(double scale, double elapsed, bool animate) {
     bool stillAnimating = false;
@@ -857,7 +870,7 @@ class Timeline {
       final entries = seriesData.entries;
       seriesData.y = leftHeight - seriesData.height - _topOffset - 10 * j;
       print(
-          "timeline --- leftHeight: $leftHeight, seriesData.height:${seriesData.height}");
+          "timeline ${series.entries.elementAt(j).key} length: ${entries.length}");
       for (int i = 0; i < entries.length; i++) {
         TimelineEntry item = entries[i];
         double start = item.start - _renderStart;
@@ -880,6 +893,7 @@ class Timeline {
       leftHeight -= seriesData.height;
     }
 
+    print("_advanceItems end  stillAnimating:$stillAnimating");
     return stillAnimating;
   }
 }

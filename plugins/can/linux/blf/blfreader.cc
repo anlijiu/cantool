@@ -31,16 +31,19 @@
 #include "libwecan.h"
 #include "log.h"
 
-struct message {
-    uint32_t id;
-    list_t * signal_ids = NULL;
-};
+typedef void (* msgRxCb_t)(canMessage_t *message, void *cbData);
+typedef void (* headerCb_t)(SYSTEMTIME *startTime, SYSTEMTIME *endTime, uint32_t, void *cbData);
+typedef void (* endCb_t)(void *cbData);
+static int sequence = 0;
 
-typedef HASHMAP(uint32_t, struct message) FilterRepoMap;
+void blfReader_processFile(FILE *fp, int verbose_level, headerCb_t headerCb,
+                           msgRxCb_t msgRxCb, endCb_t endCb, void *cbData);
 
 typedef struct CBData {
-    FilterRepoMap *filterMap;
+    filter_repo_map *filter;
+    can_trace_cb cb;
     FlValue * result;
+    FlValue * data;
 } CBData;
 
 
@@ -104,20 +107,20 @@ blfVBLCANMessageParseTime(const VBLObjectHeader* header, time_t *sec,
   }
 }
 
-void testprint(canMessage_t *message, void *cbData) {
+void msg_cb(canMessage_t *message, void *cbData) {
     CBData* cbd = (CBData*)cbData;
-    FilterRepoMap * filterMap = cbd->filterMap;
+    filter_repo_map * filter = cbd->filter;
     FlValue* result = cbd->result;
-    FlValue* data = fl_value_lookup_string(result, "data");
+    FlValue* data = cbd->data;
+    can_trace_cb cb = cbd->cb;
 
-    struct message* m = hashmap_get(filterMap, &(message->id));
+    struct message* m = hashmap_get(filter, &(message->id));
     if(m == NULL) return;
 
     list_iterator_t *it = list_iterator_new(m->signal_ids, LIST_HEAD);
     list_node_t *nt = NULL;
     while((nt = list_iterator_next(it)) != NULL ) { 
         struct signal_meta * s_meta = get_signal_meta_by_id((const char *)nt->val);
-        // debug_info("processcontent s_meta name is %s\n ", s_meta->name);
         if(s_meta == NULL) continue;
         FlValue *signal_list = fl_value_lookup_string(data, (const char *)nt->val);
         if(signal_list == NULL) {
@@ -134,14 +137,30 @@ void testprint(canMessage_t *message, void *cbData) {
         fl_value_append_take(signal_list, fv_signal);
     }   
     list_iterator_destroy(it);
+
+    static int times = 0;
+    times++;
+    if(times > 1000) {
+        times = 0;
+        cb(result);
+
+        cbd->result = fl_value_new_map();
+        cbd->data = fl_value_new_map();
+        sequence++;
+        fl_value_set_string_take(cbd->result, "name", fl_value_new_string("data"));
+        fl_value_set_string_take(cbd->result, "sequence", fl_value_new_int(sequence));
+        fl_value_set_string_take(cbd->result, "data", cbd->data);
+    }
 }
 
-void testtime(SYSTEMTIME *s, SYSTEMTIME *e, void *cbData) {
-
+void header_cb(SYSTEMTIME *s, SYSTEMTIME *e, uint32_t objCount, void *cbData) {
+    debug_info("%s in", __FUNCTION__);
     CBData* cbd = (CBData*)cbData;
-    FlValue* result = cbd->result;
+    can_trace_cb cb = cbd->cb;
+    debug_info("%s in, %p", __FUNCTION__, cb);
 
-    FlValue* summary = fl_value_lookup_string(result, "summary");
+    FlValue* summary = fl_value_new_map();
+    fl_value_set_string_take(summary, "name", fl_value_new_string("summary"));
 
     FlValue* datetime = fl_value_new_map();
     fl_value_set_string_take(datetime, "year", fl_value_new_int(s->wYear));
@@ -152,46 +171,57 @@ void testtime(SYSTEMTIME *s, SYSTEMTIME *e, void *cbData) {
     fl_value_set_string_take(datetime, "second", fl_value_new_int(s->wSecond));
     fl_value_set_string_take(datetime, "millisecond", fl_value_new_int(s->wMilliseconds));
     fl_value_set_string_take(summary, "date", datetime);
-}
-static void init_filter_map(FilterRepoMap * filterMap, FlValue * filter) {
-    hashmap_init(filterMap, hashmap_hash_integer, hash_integer_compare);
-    size_t m_length = fl_value_get_length(filter);
-    for (size_t i = 0; i < m_length; ++i) {
-        FlValue* mv = fl_value_get_list_value(filter, i);
-        struct message* msg = (struct message*)malloc(sizeof(struct message));
-        msg->signal_ids = list_new();
-        msg->id = fl_value_get_int(fl_value_lookup_string(mv, "id"));
-        FlValue* ss = fl_value_lookup_string(mv, "signals");
-        size_t s_length = fl_value_get_length(ss);
-        for (size_t j = 0; j < s_length; ++j) {
-            FlValue* skey = fl_value_get_map_key(ss, j);
-            const char* sid = fl_value_get_string(skey);
-            debug_info("parse_blf sid is %s\n", sid);
-            list_node_t *s_node = list_node_new((void*)sid);
-            list_rpush(msg->signal_ids, s_node);
-        }
-        hashmap_put(filterMap, &msg->id, msg);
-    }
+    cb(summary);
 }
 
-bool parse_blf(const char *path, FlValue* filter, FlValue* result) {
+void end_cb(void *cbData) {
+    debug_info("%s in", __FUNCTION__);
+    CBData* cbd = (CBData*)cbData;
+    FlValue* result = cbd->result;
+    fl_value_set_string_take(result, "isEnd", fl_value_new_bool(true));
+    can_trace_cb cb = cbd->cb;
+    cb(result);
+}
+
+// bool parse_blf(const char *path, FlValue* filter, FlValue* result) {
+//     debug_info("parse_blf in");
+// 
+//     FilterRepoMap filterMap;
+//     init_filter_map(&filterMap, filter);
+// 
+//     CBData cbData {
+//         .filterMap = &filterMap,
+//         .result = result
+//     };
+// 
+//     FlValue* summary = fl_value_new_map();
+//     fl_value_set_string_take(result, "summary", summary);
+//     FlValue* data = fl_value_new_map();
+//     fl_value_set_string_take(result, "data", data);
+// 
+//     FILE *fp = fopen(path, "rb");
+//     blfReader_processFile(fp, 1, testtime, testprint, &cbData);
+//     return true;
+// }
+bool parse_blf(const char *path, filter_repo_map* filter, can_trace_cb cb) {
     debug_info("parse_blf in");
 
-    FilterRepoMap filterMap;
-    init_filter_map(&filterMap, filter);
+    FlValue* result = fl_value_new_map();
+    FlValue* data = fl_value_new_map();
+    fl_value_set_string_take(result, "name", fl_value_new_string("data"));
+    fl_value_set_string_take(result, "data", data);
+    sequence = 0;
+    fl_value_set_string_take(result, "sequence", fl_value_new_int(sequence));
 
     CBData cbData {
-        .filterMap = &filterMap,
-        .result = result
+        .filter = filter,
+        .cb = cb,
+        .result = result,
+        .data = data,
     };
 
-    FlValue* summary = fl_value_new_map();
-    fl_value_set_string_take(result, "summary", summary);
-    FlValue* data = fl_value_new_map();
-    fl_value_set_string_take(result, "data", data);
-
     FILE *fp = fopen(path, "rb");
-    blfReader_processFile(fp, 1, testtime, testprint, &cbData);
+    blfReader_processFile(fp, 1, header_cb, msg_cb, end_cb, &cbData);
     return true;
 }
 
@@ -203,8 +233,8 @@ bool parse_blf(const char *path, FlValue* filter, FlValue* result) {
  * msgRxCb  callback function for received messages
  * cbData   pointer to opaque callback data
  */
-void blfReader_processFile(FILE *fp, int verbose_level, timeCb_t timeCb,
-                           msgRxCb_t msgRxCb, void *cbData)
+void blfReader_processFile(FILE *fp, int verbose_level, headerCb_t headerCb,
+                           msgRxCb_t msgRxCb, endCb_t endCb, void *cbData)
 {
 
   debug_info("blfReader_processFile in");
@@ -224,7 +254,6 @@ void blfReader_processFile(FILE *fp, int verbose_level, timeCb_t timeCb,
   statistics.mStatisticsSize = sizeof(statistics);
   blfGetFileStatisticsEx(h, &statistics);
 
-  timeCb(&statistics.mMeasurementStartTime, &statistics.mLastObjectTime, cbData);
   /* print some file statistics */
   if(verbose_level >= 1) {
     debug_info("BLF Start  : ");
@@ -233,6 +262,7 @@ void blfReader_processFile(FILE *fp, int verbose_level, timeCb_t timeCb,
     blfSystemTimePrint(&statistics.mLastObjectTime);
     debug_info("\nObject Count: %u\n", statistics.mObjectCount);
   }
+  headerCb(&statistics.mMeasurementStartTime, &statistics.mLastObjectTime, statistics.mObjectCount, cbData);
 
   success = 1;
   while(success && blfPeekObject(h, &base)) {
@@ -365,6 +395,7 @@ void blfReader_processFile(FILE *fp, int verbose_level, timeCb_t timeCb,
       break;
     }
   }
+  endCb(cbData);
   blfCloseHandle(h);
   return;
 

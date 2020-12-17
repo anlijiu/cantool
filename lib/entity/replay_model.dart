@@ -2,7 +2,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:intl/intl.dart';
 
-part 'models.g.dart';
+part 'replay_model.g.dart';
 
 class CustomDateTimeConverter
     implements JsonConverter<DateTime, Map<dynamic, dynamic>> {
@@ -14,6 +14,7 @@ class CustomDateTimeConverter
 
   @override
   DateTime fromJson(Map<dynamic, dynamic> json) {
+    print("CustomDateTimeConverter fromJson  $json");
     DateTime t = DateTime(json["year"], json["month"], json["day"],
         json["hour"], json["minute"], json["second"], json["millisecond"]);
     print(" CustomDateTimeConverter   datetime is ${t.toIso8601String()}");
@@ -44,9 +45,34 @@ enum Numbase {
 }
 
 @JsonSerializable()
+class ReplayDataChunk {
+  final int sequence;
+  final Map<String, List<ReplayEntry>> data;
+
+  ReplayDataChunk(this.sequence, this.data);
+
+  factory ReplayDataChunk.fromJson(Map<String, dynamic> json) {
+    json['data'] = Map<String, dynamic>.from(
+        (json['data'] as Map<dynamic, dynamic>)?.map((k, e) => MapEntry(
+            k,
+            (e as List)
+                ?.map((e) => e == null ? null : Map<String, dynamic>.from(e))
+                ?.toList())));
+    return _$ReplayDataChunkFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$ReplayDataChunkToJson(this);
+
+  String toString() {
+    return 'ReplayDataChunk sequence:$sequence data.length:${data.length} data:$data';
+  }
+}
+
+@JsonSerializable()
 class ReplayResult {
   final ReplaySummary summary;
   final Map<String, List<ReplayEntry>> data;
+  double start, end;
   ReplayResult(this.summary, this.data);
 
   factory ReplayResult.fromJson(Map<String, dynamic> json) {
@@ -62,6 +88,10 @@ class ReplayResult {
   }
 
   Map<String, dynamic> toJson() => _$ReplayResultToJson(this);
+
+  String toString() {
+    return 'ReplayResult summary: $summary, data:$data';
+  }
 }
 
 @JsonSerializable()
@@ -96,7 +126,7 @@ class ReplayEntry {
   Map<String, dynamic> toJson() => _$ReplayEntryToJson(this);
 
   String toString() {
-    return "value: $value, time: $time";
+    return "<value: $value, time: $time>";
   }
 }
 
@@ -122,4 +152,16 @@ class Message {
       _$MessageFromJson(json);
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
+}
+
+@JsonSerializable()
+class FilteredMessageMap {
+  Map<int, Message> messages;
+  String maxLengthStr;
+  FilteredMessageMap(this.messages, this.maxLengthStr);
+
+  factory FilteredMessageMap.fromJson(Map<String, dynamic> json) =>
+      _$FilteredMessageMapFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FilteredMessageMapToJson(this);
 }

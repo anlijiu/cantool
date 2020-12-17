@@ -51,8 +51,9 @@ class SignalTile extends HookWidget {
     final filteredMsgState = useProvider(filterMsgSignalProvider);
     final filteredMsg = filteredMsgState.state;
     final viewController = useProvider(viewControllerProvider);
-    final checked =
-        filteredMsg[signal.mid]?.signals?.keys?.contains(signal.name) == true;
+    final checked = filteredMsg.messages[signal.mid]?.signals?.keys
+            ?.contains(signal.name) ==
+        true;
     return Material(
       child: ListTile(
           title: RichText(textScaleFactor: 2, text: signalVisualItem.title),

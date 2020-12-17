@@ -17,7 +17,7 @@
 #include "libwecan.h"
 #include "log.h"
 
-#define buffer_size 3072L //3*1024
+#define buffer_size 1048576L //1M=1024*1024
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -28,13 +28,6 @@ typedef enum {
   decimal = 10,
   hexadecimal = 16
 } numBase_t;
-
-struct message {
-    uint32_t id;
-    list_t * signal_ids = NULL;
-};
-
-typedef HASHMAP(uint32_t, struct message) filter_repo_map;
 
 static numBase_t numbase = unset;
 static bool in_asc_header = true;
@@ -70,7 +63,7 @@ char* printtm(struct tm tm)
   return buf;
 }
 
-static void processheaderline(char *str, FlValue *result) {
+static void processheaderline(char *str, FlValue *result, can_trace_cb cb) {
     char *tail = split(str, " ");   /* get first token */
     char *cp;
 
@@ -140,6 +133,10 @@ static void processheaderline(char *str, FlValue *result) {
             debug_info("processheader: version:%s\n", version);
         }
         in_asc_header = false;
+    }
+
+    if(!in_asc_header) {
+        cb(result);
     }
 
     debug_info("processheader: end\n");
@@ -244,40 +241,114 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     // debug_info(" %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 }
 
-bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
+// bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
+//     init_static_variables();
+//     filter_repo_map filter_repo;
+//     hashmap_init(&filter_repo, hashmap_hash_integer, hash_integer_compare);
+// 
+//     FlValue* summary = fl_value_new_map();
+//     fl_value_set_string_take(result, "summary", summary);
+//     FlValue* data = fl_value_new_map();
+//     fl_value_set_string_take(result, "data", data);
+// 
+//     size_t m_length = fl_value_get_length(filter);
+//     for (size_t i = 0; i < m_length; ++i) {
+//         FlValue* mv = fl_value_get_list_value(filter, i);
+//         struct message* msg = (struct message*)malloc(sizeof(struct message));
+//         msg->signal_ids = list_new();
+//         msg->id = fl_value_get_int(fl_value_lookup_string(mv, "id"));
+//         FlValue* ss = fl_value_lookup_string(mv, "signals");
+//         size_t s_length = fl_value_get_length(ss);
+//         for (size_t j = 0; j < s_length; ++j) {
+//             FlValue* skey = fl_value_get_map_key(ss, j);
+//             const char* sid = fl_value_get_string(skey);
+//             printf("parse_asc sid is %s\n", sid);
+//             list_node_t *s_node = list_node_new((void*)sid);
+//             list_rpush(msg->signal_ids, s_node);
+//         }
+//         hashmap_put(&filter_repo, &msg->id, msg);
+//     }
+// 
+//     const uint32_t* key;
+//     struct message * value;
+// 
+//     hashmap_foreach(key, value, &filter_repo) {
+//         printf("filter id: %d\n", *key);
+//     }
+// 
+//     int fd = open( path, O_RDONLY|O_BINARY);
+//     long size = filesize(fd);
+//     long chunks = size / (buffer_size);
+//     printf ( "size = %ld, chunks is %ld\n" , size, chunks);
+// 
+//     fl_value_set_string_take(summary, "size", fl_value_new_int(size));
+//     fl_value_set_string_take(summary, "chunks", fl_value_new_int(chunks));
+// 
+//     char* buffer = (char*)malloc((buffer_size+1) * sizeof(char));
+//     
+//     memset( buffer, 0, sizeof(char)*(buffer_size+1));
+//     size_t readsize = 0;
+//     // char lastline[65] = "\0";
+//     size_t line_size = 1024;
+//     char currline[line_size];
+//     memset( currline, 0, sizeof(char)*line_size);
+//     bool half_enter = false;
+//     while((readsize = read(fd, buffer, buffer_size)) != 0) {
+//         buffer[ readsize ] = '\0';
+// 
+//         char * p = currline + strlen(currline);
+//         char * q = buffer;
+//         while(*q != '\0') {
+//             if(*q == '\r') {
+//                 half_enter = true;
+//                 *p++ = '\0';
+//                 if(in_asc_header) {
+//                     processheaderline(currline, summary);
+//                 } else {
+//                     processline(currline, &filter_repo, data);
+//                 }
+//                 memset( currline, 0, sizeof(char)*line_size );
+//                 p = currline;
+//             } else if(*q == '\n') {
+//                 if(half_enter) {
+//                     half_enter = false;
+//                 } else {
+//                     *p++ = '\0';
+//                     if(in_asc_header) {
+//                         processheaderline(currline, summary);
+//                     } else {
+//                         processline(currline, &filter_repo, data);
+//                     }
+//                     memset( currline, 0, sizeof(char)*line_size );
+//                     p = currline;
+//                 }
+//             } else {
+//                 *p = *q;
+//                 p++;
+//             }
+//             q++;
+//         }
+// 
+//         memset( buffer, 0, sizeof(char)*(buffer_size+1));
+//     }
+//     
+//     struct message * mptr;
+//     hashmap_foreach_data(mptr, &filter_repo) {
+//         list_destroy(mptr->signal_ids);
+//         free(mptr);
+//     }
+//     hashmap_cleanup(&filter_repo);
+//     free(buffer);
+// 
+//     return true;
+// }
+
+bool parse_asc(const char *path, filter_repo_map* filter, can_trace_cb cb) {
+
     init_static_variables();
-    filter_repo_map filter_repo;
-    hashmap_init(&filter_repo, hashmap_hash_integer, hash_integer_compare);
 
     FlValue* summary = fl_value_new_map();
-    fl_value_set_string_take(result, "summary", summary);
-    FlValue* data = fl_value_new_map();
-    fl_value_set_string_take(result, "data", data);
-
-    size_t m_length = fl_value_get_length(filter);
-    for (size_t i = 0; i < m_length; ++i) {
-        FlValue* mv = fl_value_get_list_value(filter, i);
-        struct message* msg = (struct message*)malloc(sizeof(struct message));
-        msg->signal_ids = list_new();
-        msg->id = fl_value_get_int(fl_value_lookup_string(mv, "id"));
-        FlValue* ss = fl_value_lookup_string(mv, "signals");
-        size_t s_length = fl_value_get_length(ss);
-        for (size_t j = 0; j < s_length; ++j) {
-            FlValue* skey = fl_value_get_map_key(ss, j);
-            const char* sid = fl_value_get_string(skey);
-            printf("parse_asc sid is %s\n", sid);
-            list_node_t *s_node = list_node_new((void*)sid);
-            list_rpush(msg->signal_ids, s_node);
-        }
-        hashmap_put(&filter_repo, &msg->id, msg);
-    }
-
-    const uint32_t* key;
-    struct message * value;
-
-    hashmap_foreach(key, value, &filter_repo) {
-        printf("filter id: %d\n", *key);
-    }
+    fl_value_set_string_take(summary, "name", fl_value_new_string("summary"));
 
     int fd = open( path, O_RDONLY|O_BINARY);
     long size = filesize(fd);
@@ -296,8 +367,20 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
     char currline[line_size];
     memset( currline, 0, sizeof(char)*line_size);
     bool half_enter = false;
+    int sequence = 0;
     while((readsize = read(fd, buffer, buffer_size)) != 0) {
         buffer[ readsize ] = '\0';
+
+        FlValue* result = fl_value_new_map();
+        FlValue* data = fl_value_new_map();
+        fl_value_set_string_take(result, "name", fl_value_new_string("data"));
+        fl_value_set_string_take(result, "sequence", fl_value_new_int(sequence));
+        fl_value_set_string_take(result, "data", data);
+        if(readsize < buffer_size) {
+            fl_value_set_string_take(result, "isEnd", fl_value_new_bool(true));
+        }
+
+        sequence++;
 
         char * p = currline + strlen(currline);
         char * q = buffer;
@@ -306,9 +389,9 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                 half_enter = true;
                 *p++ = '\0';
                 if(in_asc_header) {
-                    processheaderline(currline, summary);
+                    processheaderline(currline, summary, cb);
                 } else {
-                    processline(currline, &filter_repo, data);
+                    processline(currline, filter, data);
                 }
                 memset( currline, 0, sizeof(char)*line_size );
                 p = currline;
@@ -318,9 +401,9 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
                 } else {
                     *p++ = '\0';
                     if(in_asc_header) {
-                        processheaderline(currline, summary);
+                        processheaderline(currline, summary, cb);
                     } else {
-                        processline(currline, &filter_repo, data);
+                        processline(currline, filter, data);
                     }
                     memset( currline, 0, sizeof(char)*line_size );
                     p = currline;
@@ -332,16 +415,12 @@ bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
             q++;
         }
 
+        cb(result);
         memset( buffer, 0, sizeof(char)*(buffer_size+1));
     }
     
-    struct message * mptr;
-    hashmap_foreach_data(mptr, &filter_repo) {
-        list_destroy(mptr->signal_ids);
-        free(mptr);
-    }
-    hashmap_cleanup(&filter_repo);
     free(buffer);
 
     return true;
 }
+

@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/repository/can_repository.dart';
 import 'package:can/can.dart' as can;
 import 'dart:convert';
-import 'models.dart';
+import 'package:cantool/entity/replay_model.dart';
 import 'providers.dart';
 
 class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
@@ -33,6 +33,8 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
+    final replay = useProvider(replayRepoProvider).state;
+
     final needRefresh = useState(false);
     return Container(
         height: 50,
@@ -56,7 +58,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
             provider: replayFileProvider.state,
             onChange: (context, value) {
               print("replayFileProvider  changed ");
-              filterMsgSignal.state = {};
+              filterMsgSignal.state = FilteredMessageMap({}, "");
               result.state = null;
             },
             child: FlatButton.icon(
@@ -79,18 +81,19 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                   onPressed: needRefresh.value
                       ? () async {
                           needRefresh.value = false;
-                          var j = json
-                              .encode(filterMsgSignal.state.values.toList());
+                          var j = json.encode(
+                              filterMsgSignal.state.messages.values.toList());
                           print('j is ' + j);
                           var filter = json.decode(j);
 
                           ///filterMsgSignal.state.values.toList();
 
-                          var sss = await can.replayFiltedSignals(filter);
-                          result.state = ReplayResult.fromJson(sss);
-                          print('sss summary is ' +
-                              result.state.summary.toString());
-                          print('sss data is ' + result.state.data.toString());
+                          var sss = await can.replayParseFiltedSignals(filter);
+                          print('sss is ' + sss.toString());
+                          // result.state = ReplayResult.fromJson(sss);
+                          // print('sss summary is ' +
+                          // result.state.summary.toString());
+                          // print('sss data is ' + result.state.data.toString());
                         }
                       : null,
                   color: needRefresh.value ? Colors.blue : Colors.white,
