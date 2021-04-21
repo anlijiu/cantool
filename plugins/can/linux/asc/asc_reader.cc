@@ -133,18 +133,20 @@ static void processheaderline(char *str, FlValue *result, can_trace_cb cb) {
             debug_info("processheader: version:%s\n", version);
         }
         in_asc_header = false;
+    } else if(str[0] >=48 && str[0] <=57) {
+        in_asc_header = false;
     }
 
     if(!in_asc_header) {
         cb(result);
     }
 
-    debug_info("processheader: end\n");
+    debug_info("processheader: end in_asc_header:%s\n", in_asc_header ? "true":"false");
 }
 
 static void processline(char *str, filter_repo_map* filter, FlValue* result) {
 
-    // debug_info("processline: processline start %s\n", str);
+    debug_info("processline: processline start %s\n", str);
     char *cp, *buffer_lasts;
 
     if(numbase == unset) {
@@ -153,11 +155,14 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
 
     // printf("len: %ld, processline :%s    -\n", strlen(str), str);
 
-    cp = strtok_r (str," ", &buffer_lasts);   /* get first token */
+    cp = strtok_r (str,"\t", &buffer_lasts);   /* get first token */
 
     if(!cp) return;
 
-    double t = strtod(cp, NULL);
+
+    debug_info("processline: processline time: %s\n", cp);
+
+    double t = strtod(cp, NULL) * 1000; //换算成ms
 
     // char *tp;                                                                   
     // char *time_lasts;
@@ -180,19 +185,19 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     // t += nt;
     // printf("processcontent  t: %f\n", t);
 
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL || !isdigit((int)*cp)) return;//正常的数据帧这个应该是bus通道
-    // int bus = atoi(cp);
-    // printf("processcontent  bus is %d\n", bus);
+    cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL || !isdigit((int)*cp)) return;//正常的数据帧这个应该是bus通道
+    int bus = atoi(cp);
+    printf("processcontent cp is: %s, bus is %d\n", cp, bus);
 
       /* get message identifier */
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
+    cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
     uint32_t id = 0;
     if(numbase == hexadecimal) {
         id = strtol(cp, NULL, 16);
     } else {
         id = atoi(cp);
     }
-    // debug_info("processcontent  id is %d %ld\n", id, hashmap_size(filter));
+    debug_info("processcontent  id is %d %ld\n", id, hashmap_size(filter));
 
     struct message* m = hashmap_get(filter, &id);
     if(m == NULL) {
@@ -200,15 +205,15 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
         return;
     }
 
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
+    cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
 
     if((cp[0] != 'R') || (cp[1] != 'x')) return;
 
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
-    cp = strtok_r(NULL, " ", &buffer_lasts); if(cp == NULL) return;
+    cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
+    cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
 
     int dlc = atoi(cp);
-    // debug_info("processcontent  dlc is %d\n", dlc);
+    debug_info("processcontent  dlc is %d\n", dlc);
 
     uint8_t data[8];
     for(int i = 0; i < dlc; i++) {
@@ -238,7 +243,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     }   
     list_iterator_destroy(it);
 
-    // debug_info(" %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    debug_info("processline data: %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 }
 
 // bool parse_asc(const char *path, FlValue* filter, FlValue* result) {

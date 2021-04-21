@@ -41,13 +41,17 @@ ReplayResult _$ReplayResultFromJson(Map<String, dynamic> json) {
                   : ReplayEntry.fromJson(e as Map<String, dynamic>))
               ?.toList()),
     ),
-  );
+  )
+    ..start = (json['start'] as num)?.toDouble()
+    ..end = (json['end'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$ReplayResultToJson(ReplayResult instance) =>
     <String, dynamic>{
       'summary': instance.summary,
       'data': instance.data,
+      'start': instance.start,
+      'end': instance.end,
     };
 
 ReplaySummary _$ReplaySummaryFromJson(Map<String, dynamic> json) {
