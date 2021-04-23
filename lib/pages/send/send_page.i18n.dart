@@ -17,5 +17,5 @@ extension Localization on String {
 
   String version(Object modifier) => localizeVersion(modifier, this, t);
 
-  Map<String, String> allVersions() => localizeAllVersions(this, t);
+  Map<String?, String> allVersions() => localizeAllVersions(this, t);
 }

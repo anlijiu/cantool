@@ -25,16 +25,16 @@ class SignalTile extends HookWidget {
 
     final signalMeta = signalMetas[strategy.name];
 
-    textController.text = strategy?.value?.toString();
+    textController.text = strategy.value.toString();
     print("SignalTile, signal: " + signalMeta.toString());
     print("SignalTile, strategy: " + strategy.toString());
     print("SignalTile, strategies: " + strategies.toString());
     String options = "";
-    if (signalMeta.options != null) {
-      options = signalMeta.options.entries.fold(
+    if (signalMeta?.options != null) {
+      options = signalMeta!.options!.entries!.fold(
           "", (previousValue, e) => "$previousValue\n${e.key}: ${e.value}");
     }
-    String tooltipMsg = "${signalMeta.comment}\n $options";
+    String tooltipMsg = "${signalMeta?.comment}\n $options";
     return Tooltip(
         message: tooltipMsg,
         textStyle: TextStyle(fontSize: 20, color: Colors.white70),
@@ -45,7 +45,7 @@ class SignalTile extends HookWidget {
                 children: <Widget>[
                   Expanded(
                       child: Text(
-                    signalMeta.name,
+                    signalMeta!.name,
                     overflow: TextOverflow.ellipsis,
                   )),
                   IconButton(
@@ -88,7 +88,7 @@ class SignalListView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Strategy> strategyList = useProvider(strategies).state;
+    final List<Strategy>? strategyList = useProvider(strategies).state;
 
     print("SignalListView, signalIds: " + strategyList.toString());
     if (strategyList == null) {

@@ -10,34 +10,34 @@ enum TimelineEntryType { Era, Incident }
 ///
 /// They are all initialized at startup time by the [BlocProvider] constructor.
 class TimelineEntry {
-  TimelineEntryType type;
+  TimelineEntryType? type;
 
   /// Used to calculate how many lines to draw for the bubble in the timeline.
   int lineCount = 1;
 
   ///
-  String _label;
-  String articleFilename;
-  String id;
+  String? _label;
+  String? articleFilename;
+  String? id;
 
-  Color accent;
+  Color? accent;
 
-  Map<String, int> yAxisLabels;
+  Map<String, int>? yAxisLabels;
 
   /// Each entry constitues an element of a tree:
   /// eras are grouped into spanning eras and events are placed into the eras they belong to.
-  TimelineEntry parent;
-  List<TimelineEntry> children;
+  TimelineEntry? parent;
+  List<TimelineEntry>? children;
 
   /// All the timeline entries are also linked together to easily access the next/previous event.
   /// After a couple of seconds of inactivity on the timeline, a previous/next entry button will appear
   /// to allow the user to navigate faster between adjacent events.
-  TimelineEntry next;
-  TimelineEntry previous;
+  TimelineEntry? next;
+  TimelineEntry? previous;
 
   /// All these parameters are used by the [Timeline] object to properly position the current entry.
-  double start;
-  double end;
+  double start = 0.0;
+  double end = 0.0;
   double x = 0.0;
   double y = 0.0;
   double endX = 0.0;
@@ -53,20 +53,26 @@ class TimelineEntry {
   double labelVelocity = 0.0;
   double value = 0.0;
 
+  TimelineEntry();
+  TimelineEntry.fromStartValue(double start, double value) {
+    this.start = start;
+    this.value = value;
+  }
+
   bool get isVisible {
     return opacity > 0.0;
   }
 
-  String get label => _label;
+  String? get label => _label;
 
   /// Some labels already have newline characters to adjust their alignment.
   /// Detect the occurrence and add information regarding the line-count.
-  set label(String value) {
+  set label(String? value) {
     _label = value;
     int start = 0;
     lineCount = 1;
     while (true) {
-      start = _label.indexOf("\n", start);
+      start = _label!.indexOf("\n", start);
       if (start == -1) {
         break;
       }

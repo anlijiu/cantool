@@ -22,20 +22,20 @@ final filteredMessageProvider =
   final signalMetas = ref.watch(signalMetasProvider).state;
   final List<MessageItem> msgs = ref
       .watch(messages)
-      .state
+      .state!
       .where((m) =>
           m.meta.name.contains(search.toLowerCase()) ||
           "0x${m.meta.id.toRadixString(16)}".contains(search.toLowerCase()) ||
           m.meta.signalIds.firstWhereOrNull((sid) =>
                   sid.toLowerCase().contains(search.toLowerCase()) ||
-                  signalMetas[sid].comment.contains(search.toLowerCase())) !=
+                  signalMetas[sid]!.comment.contains(search.toLowerCase())) !=
               null)
       .toList();
   return msgs;
 });
 
 class SendPage extends HookWidget {
-  const SendPage({Key key}) : super(key: key);
+  const SendPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

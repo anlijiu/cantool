@@ -35,7 +35,7 @@ class Message {
   List<Signal> signals;
   String name;
   int id;
-  Message(this.signals, {this.name, this.id});
+  Message(this.signals, {required this.name, required this.id});
   String toString() {
     return "messages 0x${id.toRadixString(16)} $name ";
   }
@@ -76,7 +76,7 @@ class CanRepositoryImpl implements CanRepository {
 
     for (var data in list) {
       if (receivedSignalMap.containsKey(data.name)) {
-        if (receivedSignalMap[data.name].value != data.value) {
+        if (receivedSignalMap[data.name]!.value != data.value) {
           receivedSignalMap[data.name] = data;
           needNotify = true;
         }
@@ -100,23 +100,23 @@ class CanRepositoryImpl implements CanRepository {
     receivedSignalMap.values.forEach((element) {
       final signalMeta = signalMetaMap[element.name];
       if (result.containsKey(element.mid)) {
-        final index = result[element.mid]
+        final index = result[element.mid]!
             .signals
             .indexWhere((s) => s.name == element.name);
         if (index == -1) {
-          result[element.mid].signals.add(Signal(element.name, element.value,
-              signalMeta.comment, signalMeta.options));
+          result[element.mid]!.signals.add(Signal(element.name, element.value,
+              signalMeta!.comment, signalMeta.options!));
         } else {
-          result[element.mid].signals.replaceRange(index, index + 1, [
-            Signal(element.name, element.value, signalMeta.comment,
-                signalMeta.options)
+          result[element.mid]!.signals.replaceRange(index, index + 1, [
+            Signal(element.name, element.value, signalMeta!.comment,
+                signalMeta.options!)
           ]);
         }
       } else {
         result[element.mid] = Message([
-          Signal(element.name, element.value, signalMeta.comment,
-              signalMeta.options)
-        ], name: msgMetaMap[element.mid].name, id: element.mid);
+          Signal(element.name, element.value, signalMeta!.comment,
+              signalMeta.options!)
+        ], name: msgMetaMap[element.mid]!.name, id: element.mid);
       }
     });
 

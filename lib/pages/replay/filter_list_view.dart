@@ -40,7 +40,7 @@ class SignalTile extends HookWidget {
 }
 
 class FilterListView extends HookWidget {
-  const FilterListView({Key key}) : super(key: key);
+  const FilterListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

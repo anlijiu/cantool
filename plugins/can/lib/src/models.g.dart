@@ -9,7 +9,7 @@ part of 'models.dart';
 _$_CanSignalData _$_$_CanSignalDataFromJson(Map<String, dynamic> json) {
   return _$_CanSignalData(
     json['name'] as String,
-    (json['value'] as num)?.toDouble(),
+    (json['value'] as num).toDouble(),
     json['mid'] as int,
   );
 }

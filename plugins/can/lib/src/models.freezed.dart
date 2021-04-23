@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'models.dart';
 
@@ -8,6 +8,10 @@ part of 'models.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 CanSignalData _$CanSignalDataFromJson(Map<String, dynamic> json) {
   return _CanSignalData.fromJson(json);
 }
@@ -16,7 +20,6 @@ CanSignalData _$CanSignalDataFromJson(Map<String, dynamic> json) {
 class _$CanSignalDataTearOff {
   const _$CanSignalDataTearOff();
 
-// ignore: unused_element
   _CanSignalData call(String name, double value, int mid) {
     return _CanSignalData(
       name,
@@ -25,24 +28,24 @@ class _$CanSignalDataTearOff {
     );
   }
 
-// ignore: unused_element
   CanSignalData fromJson(Map<String, Object> json) {
     return CanSignalData.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $CanSignalData = _$CanSignalDataTearOff();
 
 /// @nodoc
 mixin _$CanSignalData {
-  String get name;
-  double get value;
-  int get mid;
+  String get name => throw _privateConstructorUsedError;
+  double get value => throw _privateConstructorUsedError;
+  int get mid => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $CanSignalDataCopyWith<CanSignalData> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $CanSignalDataCopyWith<CanSignalData> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -64,14 +67,23 @@ class _$CanSignalDataCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object name = freezed,
-    Object value = freezed,
-    Object mid = freezed,
+    Object? name = freezed,
+    Object? value = freezed,
+    Object? mid = freezed,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed ? _value.name : name as String,
-      value: value == freezed ? _value.value : value as double,
-      mid: mid == freezed ? _value.mid : mid as int,
+      name: name == freezed
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      value: value == freezed
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+      mid: mid == freezed
+          ? _value.mid
+          : mid // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -99,14 +111,23 @@ class __$CanSignalDataCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object name = freezed,
-    Object value = freezed,
-    Object mid = freezed,
+    Object? name = freezed,
+    Object? value = freezed,
+    Object? mid = freezed,
   }) {
     return _then(_CanSignalData(
-      name == freezed ? _value.name : name as String,
-      value == freezed ? _value.value : value as double,
-      mid == freezed ? _value.mid : mid as int,
+      name == freezed
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      value == freezed
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as double,
+      mid == freezed
+          ? _value.mid
+          : mid // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -115,10 +136,7 @@ class __$CanSignalDataCopyWithImpl<$Res>
 
 /// @nodoc
 class _$_CanSignalData implements _CanSignalData {
-  const _$_CanSignalData(this.name, this.value, this.mid)
-      : assert(name != null),
-        assert(value != null),
-        assert(mid != null);
+  const _$_CanSignalData(this.name, this.value, this.mid);
 
   factory _$_CanSignalData.fromJson(Map<String, dynamic> json) =>
       _$_$_CanSignalDataFromJson(json);
@@ -154,6 +172,7 @@ class _$_CanSignalData implements _CanSignalData {
       const DeepCollectionEquality().hash(value) ^
       const DeepCollectionEquality().hash(mid);
 
+  @JsonKey(ignore: true)
   @override
   _$CanSignalDataCopyWith<_CanSignalData> get copyWith =>
       __$CanSignalDataCopyWithImpl<_CanSignalData>(this, _$identity);
@@ -172,11 +191,13 @@ abstract class _CanSignalData implements CanSignalData {
       _$_CanSignalData.fromJson;
 
   @override
-  String get name;
+  String get name => throw _privateConstructorUsedError;
   @override
-  double get value;
+  double get value => throw _privateConstructorUsedError;
   @override
-  int get mid;
+  int get mid => throw _privateConstructorUsedError;
   @override
-  _$CanSignalDataCopyWith<_CanSignalData> get copyWith;
+  @JsonKey(ignore: true)
+  _$CanSignalDataCopyWith<_CanSignalData> get copyWith =>
+      throw _privateConstructorUsedError;
 }

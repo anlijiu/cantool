@@ -8,7 +8,7 @@ part of 'replay_file_entity.dart';
 
 _$_ReplayFileEntity _$_$_ReplayFileEntityFromJson(Map<String, dynamic> json) {
   return _$_ReplayFileEntity(
-    path: json['path'] as String,
+    path: json['path'] as String?,
   );
 }
 

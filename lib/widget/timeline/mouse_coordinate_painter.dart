@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MouseCoordinatePainter extends CustomPainter {
-  Paint _paint;
+  late Paint _paint;
   Offset _mouseHoverPosition;
 
   MouseCoordinatePainter(this._mouseHoverPosition) {

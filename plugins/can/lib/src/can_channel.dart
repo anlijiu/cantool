@@ -39,7 +39,6 @@ class CanChannel {
 
   static const EventChannel _eventChannel =
       const EventChannel(_canTraceChannelName);
-  static StreamSubscription _streamSubscription;
 
   // final BasicMessageChannel<dynamic> _eventChannel =
   //     BasicMessageChannel<dynamic>(
@@ -81,14 +80,14 @@ class CanChannel {
   }
 
   /// Returns a list of screens.
-  Future<String> syncMetaDatas(Map<String, dynamic> dbc) async {
+  Future<bool> syncMetaDatas(Map<String, dynamic> dbc) async {
     try {
       final response = await _platformChannel.invokeMethod(_syncMetaDatas, dbc);
-      return response;
+      if (response == null) return true;
     } on PlatformException catch (e) {
       print('Platform exception syncMetaDatas: ${e.message}');
     }
-    return null;
+    return false;
   }
 
   void openDevice(String dtype, int did, int dport) {
@@ -100,7 +99,7 @@ class CanChannel {
     return;
   }
 
-  Future<Map<String, dynamic>> parseDbc(String path) {
+  Future<Map<String, dynamic>?> parseDbc(String path) {
     try {
       final response = _platformChannel.invokeMapMethod<String, dynamic>(
           _parseDbcFileMethod, path);
@@ -108,6 +107,7 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('closeDevice Platform exception fire : ${e.message}');
     }
+    return Future.value(new Map());
   }
 
   void closeDevice(String dtype, int did, int dport) {
@@ -162,10 +162,9 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('Platform exception set const strategy : ${e.message}');
     }
-    return;
   }
 
-  Future<Map<String, dynamic>> setReplayFile(String path) {
+  Future<Map<String, dynamic>?> setReplayFile(String path) {
     try {
       final response = _platformChannel.invokeMapMethod<String, dynamic>(
           _replaySetFile, path);
@@ -173,10 +172,11 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('closeDevice Platform exception fire : ${e.message}');
     }
+    return Future.value(new Map());
   }
 
   @deprecated
-  Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
+  Future<Map<String, dynamic>?> replayFiltedSignals(List<dynamic> filter) {
     try {
       final response = _platformChannel.invokeMapMethod<String, dynamic>(
           _replayGetFiltedSignals, filter);
@@ -184,9 +184,10 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('replayFiltedSignals Platform exception fire : ${e.message}');
     }
+    return Future.value(new Map());
   }
 
-  Future<Map<String, dynamic>> replayParseFiltedSignals(List<dynamic> filter) {
+  Future<Map<String, dynamic>?> replayParseFiltedSignals(List<dynamic> filter) {
     try {
       final response = _platformChannel.invokeMapMethod<String, dynamic>(
           _replayParseFiltedSignals, filter);
@@ -194,6 +195,7 @@ class CanChannel {
     } on PlatformException catch (e) {
       print('replayFiltedSignals Platform exception fire : ${e.message}');
     }
+    return Future.value(new Map());
   }
 
   StreamSubscription createReplayStreamByFiltedSignals(List<dynamic> filter,

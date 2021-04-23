@@ -10,14 +10,14 @@ import './strategy_item.dart';
 /**
  * view 中的message list
  */
-final messages = StateProvider.autoDispose<List<MessageItem>>((ref) {
+final messages = StateProvider.autoDispose<List<MessageItem>?>((ref) {
   final msgMetas = ref.watch(messageMetasProvider).state;
   return msgMetas?.values?.map((m) => MessageItem(m, false))?.toList();
 });
 
 final selectedMsgId = StateProvider.autoDispose((ref) => 0);
 // final strategies = StateProvider.family.autoDispose
-final strategies = StateProvider.autoDispose<List<Strategy>>((ref) => null);
+final strategies = StateProvider.autoDispose<List<Strategy>?>((ref) => null);
 final strategyMap = StateProvider<Map<String, Strategy>>((ref) => {});
 final viewController =
     Provider.autoDispose((ref) => SendPageController(ref.read));
@@ -31,15 +31,15 @@ class SendPageController {
     final strategymap = read(strategyMap).state;
     if (strategymap.containsKey(m.meta.signalIds[0])) {
       read(strategies).state =
-          m.meta.signalIds.map((e) => strategymap[e]).toList();
+          m.meta.signalIds.map((e) => strategymap[e]).cast<Strategy>().toList();
     } else {
       final signals = read(signalMetasProvider).state;
       final focusStrategies = m.meta.signalIds
           .map((e) => Strategy(
-              name: signals[e].name,
-              max: signals[e].maximum,
-              min: signals[e].minimum,
-              value: signals[e].minimum,
+              name: signals[e]!.name,
+              max: signals[e]!.maximum,
+              min: signals[e]!.minimum,
+              value: signals[e]!.minimum,
               type: StrategyType.constant))
           .toList();
       read(strategyMap).state = {
@@ -52,7 +52,7 @@ class SendPageController {
 
   void toggleStatus(MessageItem m) async {
     final msgs = read(messages).state;
-    final idx = msgs.indexWhere((elem) => m.meta.id == elem.meta.id);
+    final idx = msgs!.indexWhere((elem) => m.meta.id == elem.meta.id);
     if (idx < 0) {
       return;
     }
@@ -72,7 +72,7 @@ class SendPageController {
     read(strategyMap).state = new Map<String, Strategy>.from(strategymap)
       ..addAll({
         name: Strategy(
-            name: strategy.name,
+            name: strategy!.name,
             max: strategy.max,
             min: strategy.min,
             value: value,
@@ -80,9 +80,10 @@ class SendPageController {
       });
     final msgId = read(selectedMsgId).state;
     final msgMetas = read(messageMetasProvider).state;
-    read(strategies).state = msgMetas[msgId]
+    read(strategies).state = msgMetas[msgId]!
         .signalIds
         .map((e) => read(strategyMap).state[e])
+        .cast<Strategy>()
         .toList();
 
     read(canRepository).setConstStrategyValue(name, value);

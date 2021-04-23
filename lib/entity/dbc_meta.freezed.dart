@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'dbc_meta.dart';
 
@@ -8,6 +8,10 @@ part of 'dbc_meta.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 DbcMeta _$DbcMetaFromJson(Map<String, dynamic> json) {
   return _DbcMeta.fromJson(json);
 }
@@ -16,12 +20,11 @@ DbcMeta _$DbcMetaFromJson(Map<String, dynamic> json) {
 class _$DbcMetaTearOff {
   const _$DbcMetaTearOff();
 
-// ignore: unused_element
   _DbcMeta call(
-      {@required String filename,
+      {required String filename,
       String version = "",
-      @required Map<int, MessageMeta> messages,
-      @required Map<String, SignalMeta> signals}) {
+      required Map<int, MessageMeta> messages,
+      @JsonKey(name: 'signals') required Map<String, SignalMeta> signals}) {
     return _DbcMeta(
       filename: filename,
       version: version,
@@ -30,25 +33,25 @@ class _$DbcMetaTearOff {
     );
   }
 
-// ignore: unused_element
   DbcMeta fromJson(Map<String, Object> json) {
     return DbcMeta.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $DbcMeta = _$DbcMetaTearOff();
 
 /// @nodoc
 mixin _$DbcMeta {
-  String get filename;
-  String get version;
-  Map<int, MessageMeta> get messages;
-  Map<String, SignalMeta> get signals;
+  String get filename => throw _privateConstructorUsedError;
+  String get version => throw _privateConstructorUsedError;
+  Map<int, MessageMeta> get messages => throw _privateConstructorUsedError;
+  @JsonKey(name: 'signals')
+  Map<String, SignalMeta> get signals => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $DbcMetaCopyWith<DbcMeta> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $DbcMetaCopyWith<DbcMeta> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -59,7 +62,7 @@ abstract class $DbcMetaCopyWith<$Res> {
       {String filename,
       String version,
       Map<int, MessageMeta> messages,
-      Map<String, SignalMeta> signals});
+      @JsonKey(name: 'signals') Map<String, SignalMeta> signals});
 }
 
 /// @nodoc
@@ -72,20 +75,28 @@ class _$DbcMetaCopyWithImpl<$Res> implements $DbcMetaCopyWith<$Res> {
 
   @override
   $Res call({
-    Object filename = freezed,
-    Object version = freezed,
-    Object messages = freezed,
-    Object signals = freezed,
+    Object? filename = freezed,
+    Object? version = freezed,
+    Object? messages = freezed,
+    Object? signals = freezed,
   }) {
     return _then(_value.copyWith(
-      filename: filename == freezed ? _value.filename : filename as String,
-      version: version == freezed ? _value.version : version as String,
+      filename: filename == freezed
+          ? _value.filename
+          : filename // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: version == freezed
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
       messages: messages == freezed
           ? _value.messages
-          : messages as Map<int, MessageMeta>,
+          : messages // ignore: cast_nullable_to_non_nullable
+              as Map<int, MessageMeta>,
       signals: signals == freezed
           ? _value.signals
-          : signals as Map<String, SignalMeta>,
+          : signals // ignore: cast_nullable_to_non_nullable
+              as Map<String, SignalMeta>,
     ));
   }
 }
@@ -99,7 +110,7 @@ abstract class _$DbcMetaCopyWith<$Res> implements $DbcMetaCopyWith<$Res> {
       {String filename,
       String version,
       Map<int, MessageMeta> messages,
-      Map<String, SignalMeta> signals});
+      @JsonKey(name: 'signals') Map<String, SignalMeta> signals});
 }
 
 /// @nodoc
@@ -113,37 +124,42 @@ class __$DbcMetaCopyWithImpl<$Res> extends _$DbcMetaCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object filename = freezed,
-    Object version = freezed,
-    Object messages = freezed,
-    Object signals = freezed,
+    Object? filename = freezed,
+    Object? version = freezed,
+    Object? messages = freezed,
+    Object? signals = freezed,
   }) {
     return _then(_DbcMeta(
-      filename: filename == freezed ? _value.filename : filename as String,
-      version: version == freezed ? _value.version : version as String,
+      filename: filename == freezed
+          ? _value.filename
+          : filename // ignore: cast_nullable_to_non_nullable
+              as String,
+      version: version == freezed
+          ? _value.version
+          : version // ignore: cast_nullable_to_non_nullable
+              as String,
       messages: messages == freezed
           ? _value.messages
-          : messages as Map<int, MessageMeta>,
+          : messages // ignore: cast_nullable_to_non_nullable
+              as Map<int, MessageMeta>,
       signals: signals == freezed
           ? _value.signals
-          : signals as Map<String, SignalMeta>,
+          : signals // ignore: cast_nullable_to_non_nullable
+              as Map<String, SignalMeta>,
     ));
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(
+    fieldRename: FieldRename.snake, createToJson: true, anyMap: true)
 
 /// @nodoc
 class _$_DbcMeta implements _DbcMeta {
   _$_DbcMeta(
-      {@required this.filename,
+      {required this.filename,
       this.version = "",
-      @required this.messages,
-      @required this.signals})
-      : assert(filename != null),
-        assert(version != null),
-        assert(messages != null),
-        assert(signals != null);
+      required this.messages,
+      @JsonKey(name: 'signals') required this.signals});
 
   factory _$_DbcMeta.fromJson(Map<String, dynamic> json) =>
       _$_$_DbcMetaFromJson(json);
@@ -156,6 +172,7 @@ class _$_DbcMeta implements _DbcMeta {
   @override
   final Map<int, MessageMeta> messages;
   @override
+  @JsonKey(name: 'signals')
   final Map<String, SignalMeta> signals;
 
   @override
@@ -188,6 +205,7 @@ class _$_DbcMeta implements _DbcMeta {
       const DeepCollectionEquality().hash(messages) ^
       const DeepCollectionEquality().hash(signals);
 
+  @JsonKey(ignore: true)
   @override
   _$DbcMetaCopyWith<_DbcMeta> get copyWith =>
       __$DbcMetaCopyWithImpl<_DbcMeta>(this, _$identity);
@@ -200,21 +218,25 @@ class _$_DbcMeta implements _DbcMeta {
 
 abstract class _DbcMeta implements DbcMeta {
   factory _DbcMeta(
-      {@required String filename,
-      String version,
-      @required Map<int, MessageMeta> messages,
-      @required Map<String, SignalMeta> signals}) = _$_DbcMeta;
+          {required String filename,
+          String version,
+          required Map<int, MessageMeta> messages,
+          @JsonKey(name: 'signals') required Map<String, SignalMeta> signals}) =
+      _$_DbcMeta;
 
   factory _DbcMeta.fromJson(Map<String, dynamic> json) = _$_DbcMeta.fromJson;
 
   @override
-  String get filename;
+  String get filename => throw _privateConstructorUsedError;
   @override
-  String get version;
+  String get version => throw _privateConstructorUsedError;
   @override
-  Map<int, MessageMeta> get messages;
+  Map<int, MessageMeta> get messages => throw _privateConstructorUsedError;
   @override
-  Map<String, SignalMeta> get signals;
+  @JsonKey(name: 'signals')
+  Map<String, SignalMeta> get signals => throw _privateConstructorUsedError;
   @override
-  _$DbcMetaCopyWith<_DbcMeta> get copyWith;
+  @JsonKey(ignore: true)
+  _$DbcMetaCopyWith<_DbcMeta> get copyWith =>
+      throw _privateConstructorUsedError;
 }

@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'message_item.dart';
 
@@ -8,6 +8,10 @@ part of 'message_item.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 MessageItem _$MessageItemFromJson(Map<String, dynamic> json) {
   return _MessageItem.fromJson(json);
 }
@@ -16,7 +20,6 @@ MessageItem _$MessageItemFromJson(Map<String, dynamic> json) {
 class _$MessageItemTearOff {
   const _$MessageItemTearOff();
 
-// ignore: unused_element
   _MessageItem call(MessageMeta meta, bool selected) {
     return _MessageItem(
       meta,
@@ -24,23 +27,23 @@ class _$MessageItemTearOff {
     );
   }
 
-// ignore: unused_element
   MessageItem fromJson(Map<String, Object> json) {
     return MessageItem.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $MessageItem = _$MessageItemTearOff();
 
 /// @nodoc
 mixin _$MessageItem {
-  MessageMeta get meta;
-  bool get selected;
+  MessageMeta get meta => throw _privateConstructorUsedError;
+  bool get selected => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $MessageItemCopyWith<MessageItem> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $MessageItemCopyWith<MessageItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -63,20 +66,23 @@ class _$MessageItemCopyWithImpl<$Res> implements $MessageItemCopyWith<$Res> {
 
   @override
   $Res call({
-    Object meta = freezed,
-    Object selected = freezed,
+    Object? meta = freezed,
+    Object? selected = freezed,
   }) {
     return _then(_value.copyWith(
-      meta: meta == freezed ? _value.meta : meta as MessageMeta,
-      selected: selected == freezed ? _value.selected : selected as bool,
+      meta: meta == freezed
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as MessageMeta,
+      selected: selected == freezed
+          ? _value.selected
+          : selected // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 
   @override
   $MessageMetaCopyWith<$Res> get meta {
-    if (_value.meta == null) {
-      return null;
-    }
     return $MessageMetaCopyWith<$Res>(_value.meta, (value) {
       return _then(_value.copyWith(meta: value));
     });
@@ -108,12 +114,18 @@ class __$MessageItemCopyWithImpl<$Res> extends _$MessageItemCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object meta = freezed,
-    Object selected = freezed,
+    Object? meta = freezed,
+    Object? selected = freezed,
   }) {
     return _then(_MessageItem(
-      meta == freezed ? _value.meta : meta as MessageMeta,
-      selected == freezed ? _value.selected : selected as bool,
+      meta == freezed
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as MessageMeta,
+      selected == freezed
+          ? _value.selected
+          : selected // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -122,9 +134,7 @@ class __$MessageItemCopyWithImpl<$Res> extends _$MessageItemCopyWithImpl<$Res>
 
 /// @nodoc
 class _$_MessageItem implements _MessageItem {
-  const _$_MessageItem(this.meta, this.selected)
-      : assert(meta != null),
-        assert(selected != null);
+  const _$_MessageItem(this.meta, this.selected);
 
   factory _$_MessageItem.fromJson(Map<String, dynamic> json) =>
       _$_$_MessageItemFromJson(json);
@@ -156,6 +166,7 @@ class _$_MessageItem implements _MessageItem {
       const DeepCollectionEquality().hash(meta) ^
       const DeepCollectionEquality().hash(selected);
 
+  @JsonKey(ignore: true)
   @override
   _$MessageItemCopyWith<_MessageItem> get copyWith =>
       __$MessageItemCopyWithImpl<_MessageItem>(this, _$identity);
@@ -173,9 +184,11 @@ abstract class _MessageItem implements MessageItem {
       _$_MessageItem.fromJson;
 
   @override
-  MessageMeta get meta;
+  MessageMeta get meta => throw _privateConstructorUsedError;
   @override
-  bool get selected;
+  bool get selected => throw _privateConstructorUsedError;
   @override
-  _$MessageItemCopyWith<_MessageItem> get copyWith;
+  @JsonKey(ignore: true)
+  _$MessageItemCopyWith<_MessageItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }

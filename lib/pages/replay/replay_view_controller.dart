@@ -14,7 +14,7 @@ class ReplayPageController {
     final msgsState = read(filterMsgSignalProvider);
     final filter = msgsState.state;
     final msgs = filter.messages;
-    msgs[s.mid].signals[s.name] = Signal(s.name, s.selected, mid: s.mid);
+    msgs[s.mid]?.signals[s.name] = Signal(s.name, s.selected, s.mid);
 
     String maxLengthStr = _widestStr(msgs.values);
     filter.maxLengthStr = maxLengthStr;
@@ -28,7 +28,7 @@ class ReplayPageController {
     final msgs = filter.messages;
 
     msgs[s.mid] ??= Message({}, id: s.mid);
-    msgs[s.mid].signals.remove(s.name);
+    msgs[s.mid]?.signals.remove(s.name);
 
     String maxLengthStr = _widestStr(msgs.values);
     filter.messages = msgs;
@@ -42,7 +42,7 @@ class ReplayPageController {
     final msgs = filter.messages;
 
     msgs[sm.mid] ??= Message({}, id: sm.mid);
-    msgs[sm.mid].signals[sm.name] ??= Signal(sm.name, true, mid: sm.mid);
+    msgs[sm.mid]?.signals[sm.name] ??= Signal(sm.name, true, sm.mid);
 
     String maxLengthStr = _widestStr(msgs.values);
     print("addSignalByMeta   maxLengthStr: $maxLengthStr");
@@ -57,7 +57,7 @@ class ReplayPageController {
     final msgs = filter.messages;
 
     msgs[sm.mid] ??= Message({}, id: sm.mid);
-    msgs[sm.mid].signals.remove(sm.name);
+    msgs[sm.mid]?.signals.remove(sm.name);
 
     String maxLengthStr = _widestStr(msgs.values);
     filter.messages = msgs;
@@ -71,8 +71,8 @@ class ReplayPageController {
     final msgs = filter.messages;
     ss.forEach((element) {
       msgs[element.mid] ??= Message({}, id: element.mid);
-      msgs[element.mid].signals[element.name] ??=
-          Signal(element.name, true, mid: element.mid);
+      msgs[element.mid]?.signals[element.name] ??=
+          Signal(element.name, true, element.mid);
     });
     String maxLengthStr = _widestStr(msgs.values);
     filter.messages = msgs;
@@ -82,7 +82,7 @@ class ReplayPageController {
 
   String _widestStr(Iterable<Message> messages) {
     final signalMetas = read(signalMetasProvider).state;
-    final metas = messages.fold<List<SignalMeta>>(
+    final metas = messages.fold<List<SignalMeta?>>(
         [],
         (previousValue, element) => [
               ...previousValue,
@@ -91,13 +91,13 @@ class ReplayPageController {
     return _widestOption(metas);
   }
 
-  String _widestOption(List<SignalMeta> signalMetas) {
+  String _widestOption(List<SignalMeta?> signalMetas) {
     int charactersWidth = 0;
     String widest = "";
 
     ///从options中找到显示最宽的字符串 决定y轴宽度
     signalMetas.forEach((meta) {
-      meta.options?.entries?.forEach((entry) {
+      meta?.options?.entries?.forEach((entry) {
         int w = 0;
         String option = "${entry.key.toRadixString(16)} (${entry.value})";
         option.codeUnits.forEach((c) {

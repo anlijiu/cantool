@@ -6,17 +6,16 @@ part of 'replay_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ReplayDataChunk _$ReplayDataChunkFromJson(Map<String, dynamic> json) {
+ReplayDataChunk _$ReplayDataChunkFromJson(Map json) {
   return ReplayDataChunk(
     json['sequence'] as int,
-    (json['data'] as Map<String, dynamic>)?.map(
+    (json['data'] as Map).map(
       (k, e) => MapEntry(
-          k,
-          (e as List)
-              ?.map((e) => e == null
-                  ? null
-                  : ReplayEntry.fromJson(e as Map<String, dynamic>))
-              ?.toList()),
+          k as String,
+          (e as List<dynamic>)
+              .map((e) =>
+                  ReplayEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList()),
     ),
   );
 }
@@ -27,23 +26,20 @@ Map<String, dynamic> _$ReplayDataChunkToJson(ReplayDataChunk instance) =>
       'data': instance.data,
     };
 
-ReplayResult _$ReplayResultFromJson(Map<String, dynamic> json) {
+ReplayResult _$ReplayResultFromJson(Map json) {
   return ReplayResult(
-    json['summary'] == null
-        ? null
-        : ReplaySummary.fromJson(json['summary'] as Map<String, dynamic>),
-    (json['data'] as Map<String, dynamic>)?.map(
+    ReplaySummary.fromJson(Map<String, dynamic>.from(json['summary'] as Map)),
+    (json['data'] as Map).map(
       (k, e) => MapEntry(
-          k,
-          (e as List)
-              ?.map((e) => e == null
-                  ? null
-                  : ReplayEntry.fromJson(e as Map<String, dynamic>))
-              ?.toList()),
+          k as String,
+          (e as List<dynamic>)
+              .map((e) =>
+                  ReplayEntry.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList()),
     ),
   )
-    ..start = (json['start'] as num)?.toDouble()
-    ..end = (json['end'] as num)?.toDouble();
+    ..start = (json['start'] as num).toDouble()
+    ..end = (json['end'] as num).toDouble();
 }
 
 Map<String, dynamic> _$ReplayResultToJson(ReplayResult instance) =>
@@ -57,7 +53,7 @@ Map<String, dynamic> _$ReplayResultToJson(ReplayResult instance) =>
 ReplaySummary _$ReplaySummaryFromJson(Map<String, dynamic> json) {
   return ReplaySummary(
     const CustomDateTimeConverter().fromJson(json['date'] as Map),
-    _$enumDecodeNullable(_$NumbaseEnumMap, json['numbase']),
+    _$enumDecode(_$NumbaseEnumMap, json['numbase']),
     json['size'] as int,
     json['chunks'] as int,
   );
@@ -71,36 +67,30 @@ Map<String, dynamic> _$ReplaySummaryToJson(ReplaySummary instance) =>
       'chunks': instance.chunks,
     };
 
-T _$enumDecode<T>(
-  Map<T, dynamic> enumValues,
-  dynamic source, {
-  T unknownValue,
+K _$enumDecode<K, V>(
+  Map<K, V> enumValues,
+  Object? source, {
+  K? unknownValue,
 }) {
   if (source == null) {
-    throw ArgumentError('A value must be provided. Supported values: '
-        '${enumValues.values.join(', ')}');
+    throw ArgumentError(
+      'A value must be provided. Supported values: '
+      '${enumValues.values.join(', ')}',
+    );
   }
 
-  final value = enumValues.entries
-      .singleWhere((e) => e.value == source, orElse: () => null)
-      ?.key;
-
-  if (value == null && unknownValue == null) {
-    throw ArgumentError('`$source` is not one of the supported values: '
-        '${enumValues.values.join(', ')}');
-  }
-  return value ?? unknownValue;
-}
-
-T _$enumDecodeNullable<T>(
-  Map<T, dynamic> enumValues,
-  dynamic source, {
-  T unknownValue,
-}) {
-  if (source == null) {
-    return null;
-  }
-  return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
+  return enumValues.entries.singleWhere(
+    (e) => e.value == source,
+    orElse: () {
+      if (unknownValue == null) {
+        throw ArgumentError(
+          '`$source` is not one of the supported values: '
+          '${enumValues.values.join(', ')}',
+        );
+      }
+      return MapEntry(unknownValue, enumValues.values.first);
+    },
+  ).key;
 }
 
 const _$NumbaseEnumMap = {
@@ -111,8 +101,8 @@ const _$NumbaseEnumMap = {
 
 ReplayEntry _$ReplayEntryFromJson(Map<String, dynamic> json) {
   return ReplayEntry(
-    (json['value'] as num)?.toDouble(),
-    (json['time'] as num)?.toDouble(),
+    (json['value'] as num).toDouble(),
+    (json['time'] as num).toDouble(),
   );
 }
 
@@ -126,7 +116,7 @@ Signal _$SignalFromJson(Map<String, dynamic> json) {
   return Signal(
     json['name'] as String,
     json['selected'] as bool,
-    mid: json['mid'] as int,
+    json['mid'] as int,
   );
 }
 
@@ -136,13 +126,13 @@ Map<String, dynamic> _$SignalToJson(Signal instance) => <String, dynamic>{
       'mid': instance.mid,
     };
 
-Message _$MessageFromJson(Map<String, dynamic> json) {
+Message _$MessageFromJson(Map json) {
   return Message(
-    (json['signals'] as Map<String, dynamic>)?.map(
+    (json['signals'] as Map).map(
       (k, e) => MapEntry(
-          k, e == null ? null : Signal.fromJson(e as Map<String, dynamic>)),
+          k as String, Signal.fromJson(Map<String, dynamic>.from(e as Map))),
     ),
-    id: json['id'] as int,
+    id: json['id'] as int?,
   );
 }
 
@@ -151,11 +141,11 @@ Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'id': instance.id,
     };
 
-FilteredMessageMap _$FilteredMessageMapFromJson(Map<String, dynamic> json) {
+FilteredMessageMap _$FilteredMessageMapFromJson(Map json) {
   return FilteredMessageMap(
-    (json['messages'] as Map<String, dynamic>)?.map(
-      (k, e) => MapEntry(int.parse(k),
-          e == null ? null : Message.fromJson(e as Map<String, dynamic>)),
+    (json['messages'] as Map).map(
+      (k, e) => MapEntry(int.parse(k as String),
+          Message.fromJson(Map<String, dynamic>.from(e as Map))),
     ),
     json['maxLengthStr'] as String,
   );
@@ -163,6 +153,6 @@ FilteredMessageMap _$FilteredMessageMapFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$FilteredMessageMapToJson(FilteredMessageMap instance) =>
     <String, dynamic>{
-      'messages': instance.messages?.map((k, e) => MapEntry(k.toString(), e)),
+      'messages': instance.messages.map((k, e) => MapEntry(k.toString(), e)),
       'maxLengthStr': instance.maxLengthStr,
     };

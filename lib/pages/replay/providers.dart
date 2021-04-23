@@ -9,4 +9,4 @@ final viewControllerProvider =
 
 final replaySignalsProvider = StateProvider<Map<int, Signal>>((ref) => {});
 
-final replayResultProvider = StateProvider<ReplayResult>((ref) => null);
+final replayResultProvider = StateProvider<ReplayResult?>((ref) => null);

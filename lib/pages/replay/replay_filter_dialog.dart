@@ -11,9 +11,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers.dart';
 
 class SignalMetaVisualItem {
-  SignalMeta meta;
-  TextSpan title;
-  TextSpan tail;
+  late SignalMeta meta;
+  late TextSpan title;
+  late TextSpan tail;
 }
 
 final _currentSignalMeta = ScopedProvider<SignalMetaVisualItem>(null);
@@ -51,9 +51,9 @@ class SignalTile extends HookWidget {
     final filteredMsgState = useProvider(filterMsgSignalProvider);
     final filteredMsg = filteredMsgState.state;
     final viewController = useProvider(viewControllerProvider);
-    final checked = filteredMsg.messages[signal.mid]?.signals?.keys
-            ?.contains(signal.name) ==
-        true;
+    final checked =
+        filteredMsg.messages[signal.mid]?.signals.keys.contains(signal.name) ==
+            true;
     return Material(
       child: ListTile(
           title: RichText(textScaleFactor: 2, text: signalVisualItem.title),
@@ -82,7 +82,7 @@ class SignalTile extends HookWidget {
 }
 
 class ReplayFilterDialog extends HookWidget {
-  const ReplayFilterDialog({Key key}) : super(key: key);
+  const ReplayFilterDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

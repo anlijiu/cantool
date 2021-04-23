@@ -8,11 +8,11 @@ import 'providers.dart';
 import 'replay_chart_view.dart';
 
 final replayFileExistProvider = Provider<bool>((ref) {
-  return ref.watch(replayFileProvider.state) == null;
+  return ref.watch(replayFileProvider) == null;
 });
 
 class ReplayPage extends HookWidget {
-  const ReplayPage({Key key}) : super(key: key);
+  const ReplayPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class ReplayPage extends HookWidget {
 class ReplayFilePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final replayFile = useProvider(replayFileProvider);
+    final replayFile = useProvider(replayFileProvider.notifier);
     return Center(
       child: FlatButton(
           child: const Text('open'),
@@ -49,8 +49,6 @@ class ReplayFilePage extends HookWidget {
 class ReplayDetailPage extends HookWidget {
   @override
   Widget build(Object context) {
-    final replayFile = useProvider(replayFileProvider).state;
-    final filterMsgSignal = useProvider(filterMsgSignalProvider);
     return SplitView(
         viewMode: SplitViewMode.Horizontal,
         initialWeight: 0.2,

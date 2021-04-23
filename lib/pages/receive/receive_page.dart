@@ -111,7 +111,7 @@ class MessageTile extends HookWidget {
 
 class ReceiveListPage extends HookWidget {
   String search;
-  ReceiveListPage(this.search, {Key key}) : super(key: key);
+  ReceiveListPage(this.search, {Key? key}) : super(key: key);
 
   @override
   Widget build(Object context) {
@@ -144,7 +144,7 @@ class ReceiveListPage extends HookWidget {
 }
 
 class ReceivePage extends HookWidget {
-  const ReceivePage({Key key}) : super(key: key);
+  const ReceivePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

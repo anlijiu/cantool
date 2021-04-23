@@ -9,27 +9,16 @@ part 'dbc_meta.freezed.dart';
 part 'dbc_meta.g.dart';
 
 @freezed
-abstract class DbcMeta with _$DbcMeta {
+class DbcMeta with _$DbcMeta {
+  @JsonSerializable(
+      fieldRename: FieldRename.snake, createToJson: true, anyMap: true)
   factory DbcMeta({
-    @required String filename,
+    required String filename,
     @Default("") String version,
-    @required Map<int, MessageMeta> messages,
-    @required Map<String, SignalMeta> signals,
+    required Map<int, MessageMeta> messages,
+    @JsonKey(name: 'signals') required Map<String, SignalMeta> signals,
   }) = _DbcMeta;
 
-  factory DbcMeta.fromJson(Map<String, dynamic> json) => _fromJson(json);
-}
-
-DbcMeta _fromJson(Map<String, dynamic> json) {
-  var messages = Map<String, dynamic>.from(json['messages']).map((key, value) =>
-      MapEntry<String, Map<String, dynamic>>(
-          key, Map<String, dynamic>.from(value)));
-  var signals = Map<String, dynamic>.from(json['signals']).map((key, value) =>
-      MapEntry<String, Map<String, dynamic>>(
-          key, Map<String, dynamic>.from(value)));
-
-  json['messages'] = messages;
-  json['signals'] = signals;
-
-  return _$DbcMetaFromJson(json);
+  factory DbcMeta.fromJson(Map<String, dynamic> json) =>
+      _$DbcMetaFromJson(json);
 }

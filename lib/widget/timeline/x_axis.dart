@@ -28,23 +28,23 @@ class XAxis {
     double height = size.height;
 
     String primaryUnit = timeline.minUnit;
-    String secondUnit = nextUnits[primaryUnit];
+    String secondUnit = nextUnits[primaryUnit]!;
 
     DateTime tickTime = startOf(
-        timeline.timelineData.baseTime
+        timeline.timelineData!.baseTime!
             .add(Duration(milliseconds: timeline.renderStart.ceil())),
         primaryUnit);
     DateTime secondStartTickTime = startOf(
-        timeline.timelineData.baseTime
+        timeline.timelineData!.baseTime!
             .add(Duration(milliseconds: timeline.renderStart.ceil())),
         secondUnit);
     DateTime secondEndTickTime = startOf(
-        timeline.timelineData.baseTime
+        timeline.timelineData!.baseTime!
             .add(Duration(milliseconds: timeline.renderEnd.ceil())),
         secondUnit);
 
     int tickTimestamp = tickTime.millisecondsSinceEpoch -
-        timeline.timelineData.baseTime.millisecondsSinceEpoch;
+        timeline.timelineData!.baseTime!.millisecondsSinceEpoch;
     double distance = 0;
     final addFunc = addFucByUnit[primaryUnit];
     final TextPainter _textPainter = TextPainter(
@@ -71,8 +71,8 @@ class XAxis {
       _textPainter.paint(canvas,
           Offset(offset.dx + distance - textSize.width / 2, height + TickSize));
 
-      if (tickTime.millisecondsSinceEpoch % timeDistance[secondUnit] == 0) {
-        String formatStr = timeFormatByUnit[secondUnit];
+      if (tickTime.millisecondsSinceEpoch % timeDistance[secondUnit]! == 0) {
+        String formatStr = timeFormatByUnit[secondUnit]!;
         DateFormat format = DateFormat(formatStr);
 
         TextSpan text = TextSpan(
@@ -89,13 +89,13 @@ class XAxis {
             Offset(offset.dx + distance - textSize.width / 2,
                 height + TickSize + textSize.height));
       }
-      tickTime = addFunc(tickTime, 1);
+      tickTime = addFunc!(tickTime, 1);
       tickTimestamp = tickTime.millisecondsSinceEpoch -
-          timeline.timelineData.baseTime.millisecondsSinceEpoch;
+          timeline.timelineData!.baseTime!.millisecondsSinceEpoch;
     }
 
     if (secondStartTickTime == secondEndTickTime) {
-      String formatStr = timeFormatByUnit[secondUnit];
+      String formatStr = timeFormatByUnit[secondUnit]!;
       DateFormat format = DateFormat(formatStr, languageCode);
 
       ;

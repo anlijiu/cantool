@@ -52,13 +52,13 @@ String getMinUnit(double zoom, double width, Map<String, int> timeSteps) {
   double nextTimeSpanInUnitContext = zoom;
   timeDividers.keys.any((unit) {
     print("getMinUnit:  loop timeDividers unit:$unit");
-    nextTimeSpanInUnitContext = nextTimeSpanInUnitContext / timeDividers[unit];
+    nextTimeSpanInUnitContext = nextTimeSpanInUnitContext / timeDividers[unit]!;
     print(
         "getMinUnit:  nextTimeSpanInUnitContext:$nextTimeSpanInUnitContext timeSteps[unit]: ${timeSteps[unit]}");
     /* 当前单位屏幕上总的cell数 */
     final cellsToBeRenderedForCurrentUnit =
-        nextTimeSpanInUnitContext / timeSteps[unit];
-    final cellWidthToUse = timeSteps[unit] != null && timeSteps[unit] > 1
+        nextTimeSpanInUnitContext / timeSteps[unit]!;
+    final cellWidthToUse = timeSteps[unit] != null && timeSteps[unit]! > 1
         ? 3 * minCellWidth
         : minCellWidth;
 

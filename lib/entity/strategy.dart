@@ -11,12 +11,12 @@ enum StrategyType {
 }
 
 @freezed
-abstract class Strategy with _$Strategy {
+class Strategy with _$Strategy {
   factory Strategy(
-      {@required String name,
-      @required double value,
-      @required double min,
-      @required double max,
+      {required String name,
+      required double value,
+      required double min,
+      required double max,
       @Default(StrategyType.constant) StrategyType type}) = _Strategy;
 
   factory Strategy.fromJson(Map<String, dynamic> json) =>

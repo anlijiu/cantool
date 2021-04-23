@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'strategy_item.dart';
 
@@ -8,6 +8,10 @@ part of 'strategy_item.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 StrategyItem _$StrategyItemFromJson(Map<String, dynamic> json) {
   return _StrategyItem.fromJson(json);
 }
@@ -16,7 +20,6 @@ StrategyItem _$StrategyItemFromJson(Map<String, dynamic> json) {
 class _$StrategyItemTearOff {
   const _$StrategyItemTearOff();
 
-// ignore: unused_element
   _StrategyItem call(SignalMeta meta, Strategy strategy) {
     return _StrategyItem(
       meta,
@@ -24,23 +27,23 @@ class _$StrategyItemTearOff {
     );
   }
 
-// ignore: unused_element
   StrategyItem fromJson(Map<String, Object> json) {
     return StrategyItem.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $StrategyItem = _$StrategyItemTearOff();
 
 /// @nodoc
 mixin _$StrategyItem {
-  SignalMeta get meta;
-  Strategy get strategy;
+  SignalMeta get meta => throw _privateConstructorUsedError;
+  Strategy get strategy => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $StrategyItemCopyWith<StrategyItem> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $StrategyItemCopyWith<StrategyItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -64,20 +67,23 @@ class _$StrategyItemCopyWithImpl<$Res> implements $StrategyItemCopyWith<$Res> {
 
   @override
   $Res call({
-    Object meta = freezed,
-    Object strategy = freezed,
+    Object? meta = freezed,
+    Object? strategy = freezed,
   }) {
     return _then(_value.copyWith(
-      meta: meta == freezed ? _value.meta : meta as SignalMeta,
-      strategy: strategy == freezed ? _value.strategy : strategy as Strategy,
+      meta: meta == freezed
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as SignalMeta,
+      strategy: strategy == freezed
+          ? _value.strategy
+          : strategy // ignore: cast_nullable_to_non_nullable
+              as Strategy,
     ));
   }
 
   @override
   $SignalMetaCopyWith<$Res> get meta {
-    if (_value.meta == null) {
-      return null;
-    }
     return $SignalMetaCopyWith<$Res>(_value.meta, (value) {
       return _then(_value.copyWith(meta: value));
     });
@@ -85,9 +91,6 @@ class _$StrategyItemCopyWithImpl<$Res> implements $StrategyItemCopyWith<$Res> {
 
   @override
   $StrategyCopyWith<$Res> get strategy {
-    if (_value.strategy == null) {
-      return null;
-    }
     return $StrategyCopyWith<$Res>(_value.strategy, (value) {
       return _then(_value.copyWith(strategy: value));
     });
@@ -121,12 +124,18 @@ class __$StrategyItemCopyWithImpl<$Res> extends _$StrategyItemCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object meta = freezed,
-    Object strategy = freezed,
+    Object? meta = freezed,
+    Object? strategy = freezed,
   }) {
     return _then(_StrategyItem(
-      meta == freezed ? _value.meta : meta as SignalMeta,
-      strategy == freezed ? _value.strategy : strategy as Strategy,
+      meta == freezed
+          ? _value.meta
+          : meta // ignore: cast_nullable_to_non_nullable
+              as SignalMeta,
+      strategy == freezed
+          ? _value.strategy
+          : strategy // ignore: cast_nullable_to_non_nullable
+              as Strategy,
     ));
   }
 }
@@ -135,9 +144,7 @@ class __$StrategyItemCopyWithImpl<$Res> extends _$StrategyItemCopyWithImpl<$Res>
 
 /// @nodoc
 class _$_StrategyItem implements _StrategyItem {
-  const _$_StrategyItem(this.meta, this.strategy)
-      : assert(meta != null),
-        assert(strategy != null);
+  const _$_StrategyItem(this.meta, this.strategy);
 
   factory _$_StrategyItem.fromJson(Map<String, dynamic> json) =>
       _$_$_StrategyItemFromJson(json);
@@ -169,6 +176,7 @@ class _$_StrategyItem implements _StrategyItem {
       const DeepCollectionEquality().hash(meta) ^
       const DeepCollectionEquality().hash(strategy);
 
+  @JsonKey(ignore: true)
   @override
   _$StrategyItemCopyWith<_StrategyItem> get copyWith =>
       __$StrategyItemCopyWithImpl<_StrategyItem>(this, _$identity);
@@ -187,9 +195,11 @@ abstract class _StrategyItem implements StrategyItem {
       _$_StrategyItem.fromJson;
 
   @override
-  SignalMeta get meta;
+  SignalMeta get meta => throw _privateConstructorUsedError;
   @override
-  Strategy get strategy;
+  Strategy get strategy => throw _privateConstructorUsedError;
   @override
-  _$StrategyItemCopyWith<_StrategyItem> get copyWith;
+  @JsonKey(ignore: true)
+  _$StrategyItemCopyWith<_StrategyItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }

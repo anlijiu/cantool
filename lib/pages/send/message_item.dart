@@ -5,7 +5,7 @@ part 'message_item.freezed.dart';
 part 'message_item.g.dart';
 
 @freezed
-abstract class MessageItem with _$MessageItem {
+class MessageItem with _$MessageItem {
   const factory MessageItem(MessageMeta meta, bool selected) = _MessageItem;
   factory MessageItem.fromJson(Map<String, dynamic> json) =>
       _$MessageItemFromJson(json);

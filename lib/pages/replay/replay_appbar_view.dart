@@ -15,7 +15,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   final double height;
 
   ReplayAppbarView({
-    Key key,
+    Key? key,
     this.height: 46.0,
   }) : super(key: key);
 
@@ -27,13 +27,13 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final filterMsgSignal = useProvider(filterMsgSignalProvider);
     final result = useProvider(replayResultProvider);
-    final replayFile = useProvider(replayFileProvider);
-    final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
+    final replayFile = useProvider(replayFileProvider.notifier);
+    final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
-    final replay = useProvider(replayRepoProvider).state;
+    final replay = useProvider(replayRepoProvider);
 
     final needRefresh = useState(false);
     return Container(
@@ -55,7 +55,7 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                   },
                 ),
           ProviderListener(
-            provider: replayFileProvider.state,
+            provider: replayFileProvider,
             onChange: (context, value) {
               print("replayFileProvider  changed ");
               filterMsgSignal.state = FilteredMessageMap({}, "");

@@ -8,9 +8,7 @@ part of 'message_item.dart';
 
 _$_MessageItem _$_$_MessageItemFromJson(Map<String, dynamic> json) {
   return _$_MessageItem(
-    json['meta'] == null
-        ? null
-        : MessageMeta.fromJson(json['meta'] as Map<String, dynamic>),
+    MessageMeta.fromJson(json['meta'] as Map<String, dynamic>),
     json['selected'] as bool,
   );
 }

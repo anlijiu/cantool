@@ -21,7 +21,7 @@ typedef SelectItemCallback(TimelineEntry item);
 /// focus on when it's created.
 class TimelineWidget extends StatefulWidget {
   final Timeline timeline;
-  TimelineWidget(this.timeline, {Key key}) : super(key: key);
+  TimelineWidget(this.timeline, {Key? key}) : super(key: key);
 
   @override
   _TimelineWidgetState createState() => _TimelineWidgetState();
@@ -34,31 +34,31 @@ class _TimelineWidgetState extends State<TimelineWidget> {
 
   /// These variables are used to calculate the correct viewport for the timeline
   /// when performing a scaling operation as in [_scaleStart], [_scaleUpdate], [_scaleEnd].
-  Offset _lastFocalPoint;
+  late Offset _lastFocalPoint;
   double _scaleStartYearStart = -100.0;
   double _scaleStartYearEnd = 100.0;
   double _scaleTopOffset = 0.0;
 
-  Offset _lastTapDownPoint;
+  late Offset _lastTapDownPoint;
   double _chipStartYearStart = -10.0;
   double _chipStartYearEnd = 10.0;
 
-  Offset _mouseHoverPoint;
+  Offset _mouseHoverPoint = Offset(0, 0);
 
   /// When touching a bubble on the [Timeline] keep track of which
   /// element has been touched in order to move to the [article_widget].
-  TapTarget _touchedBubble;
-  TimelineEntry _touchedEntry;
+  TapTarget? _touchedBubble;
+  TimelineEntry? _touchedEntry;
 
   /// Which era the Timeline is currently focused on.
   /// Defaults to [DefaultEraName].
-  String _eraName;
+  late String _eraName;
 
   /// Syntactic-sugar-getter.
   Timeline get timeline => widget.timeline;
 
-  Color _headerTextColor;
-  Color _headerBackgroundColor;
+  Color? _headerTextColor;
+  Color? _headerBackgroundColor;
 
   /// This state variable toggles the rendering of the left sidebar
   /// showing the favorite elements already on the timeline.
@@ -87,7 +87,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
 
     double changeScale = details.scale;
     double scale =
-        (_scaleStartYearEnd - _scaleStartYearStart) / context.size.width;
+        (_scaleStartYearEnd - _scaleStartYearStart) / context.size!.width;
 
     double focus = _scaleStartYearStart + details.focalPoint.dx * scale;
     double topOffset =
@@ -97,7 +97,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     timeline.setViewport(
         start: focus + (_scaleStartYearStart - focus) / changeScale + focalDiff,
         end: focus + (_scaleStartYearEnd - focus) / changeScale + focalDiff,
-        width: context.size.width,
+        width: context.size!.width,
         topOffset: topOffset,
         animate: true);
   }
@@ -128,20 +128,20 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     double start = timeline.start + distance / 2;
     double end = timeline.end - distance / 2;
     timeline.setViewport(
-        start: start, end: end, width: context.size.width, animate: true);
+        start: start, end: end, width: context.size!.width, animate: true);
   }
 
-  void _zoomVertical({double delta = 20, Offset hover}) {
+  void _zoomVertical({double delta = 20, required Offset hover}) {
     timeline.zoomVertical(delta: delta, hover: hover);
   }
 
   /// The following two callbacks are passed down to the [TimelineRenderWidget] so
   /// that it can pass the information back to this widget.
-  onTouchBubble(TapTarget bubble) {
+  onTouchBubble(TapTarget? bubble) {
     _touchedBubble = bubble;
   }
 
-  onTouchEntry(TimelineEntry entry) {
+  onTouchEntry(TimelineEntry? entry) {
     _touchedEntry = entry;
   }
 
@@ -159,7 +159,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
   void _tapUp(TapUpDetails details) {
     EdgeInsets devicePadding = MediaQuery.of(context).padding;
     if (_touchedBubble != null) {
-      if (_touchedBubble.zoom) {
+      if (_touchedBubble!.zoom) {
         // timeline.setViewport(
         //     start: target.start, end: target.end, animate: true, pad: true);
       } else {
@@ -178,9 +178,9 @@ class _TimelineWidgetState extends State<TimelineWidget> {
     super.initState();
     if (timeline != null) {
       widget.timeline.isActive = true;
-      _eraName = timeline.currentEra != null
-          ? timeline.currentEra.label
-          : DefaultEraName;
+      _eraName = (timeline.currentEra != null
+          ? timeline.currentEra!.label
+          : DefaultEraName)!;
       timeline.onHeaderColorsChanged = (Color background, Color text) {
         setState(() {
           _headerTextColor = text;
@@ -191,7 +191,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
       /// Update the label for the [Timeline] object.
       timeline.onEraChanged = (TimelineEntry entry) {
         setState(() {
-          _eraName = entry != null ? entry.label : DefaultEraName;
+          _eraName = (entry != null ? entry.label : DefaultEraName)!;
         });
       };
 
@@ -220,12 +220,15 @@ class _TimelineWidgetState extends State<TimelineWidget> {
       };
       timeline.onEraChanged = (TimelineEntry entry) {
         setState(() {
-          _eraName = entry != null ? entry.label : DefaultEraName;
+          _eraName = (entry != null ? entry.label : DefaultEraName)!;
         });
       };
       setState(() {
         _eraName =
-            timeline.currentEra != null ? timeline.currentEra : DefaultEraName;
+            // ignore: unnecessary_null_comparison
+            timeline.currentEra != null
+                ? timeline.currentEra.toString()
+                : DefaultEraName;
         _showFavorites = timeline.showFavorites;
       });
     }
@@ -279,20 +282,20 @@ class _TimelineWidgetState extends State<TimelineWidget> {
       case RawKeyEventDataMacOs:
         final data = event.data as RawKeyEventDataMacOs;
         keyCode = data.keyCode;
-        logicalKey = data.logicalKey.debugName;
-        physicalKey = data.physicalKey.debugName;
+        logicalKey = data.logicalKey.debugName!;
+        physicalKey = data.physicalKey.debugName!;
         break;
       case RawKeyEventDataLinux:
         final data = event.data as RawKeyEventDataLinux;
         keyCode = data.keyCode;
-        logicalKey = data.logicalKey.debugName;
-        physicalKey = data.physicalKey.debugName;
+        logicalKey = data.logicalKey.debugName!;
+        physicalKey = data.physicalKey.debugName!;
         break;
       case RawKeyEventDataWindows:
         final data = event.data as RawKeyEventDataWindows;
         keyCode = data.keyCode;
-        logicalKey = data.logicalKey.debugName;
-        physicalKey = data.physicalKey.debugName;
+        logicalKey = data.logicalKey.debugName!;
+        physicalKey = data.physicalKey.debugName!;
         break;
       default:
         throw new Exception('Unsupported platform ${event.data.runtimeType}');
@@ -324,7 +327,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
               onPointerUp: (pointerUpEvent) {
                 if (isShiftPressed) {
                   double scale = (_chipStartYearEnd - _chipStartYearStart) /
-                      context.size.width;
+                      context.size!.width;
                   final start =
                       _chipStartYearStart + _lastTapDownPoint.dx * scale;
                   final end = _chipStartYearStart +
@@ -332,7 +335,7 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                   timeline.setViewport(
                       start: start,
                       end: end,
-                      width: context.size.width,
+                      width: context.size!.width,
                       animate: true);
                 }
               },
@@ -378,10 +381,12 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                                 painter:
                                     MouseCoordinatePainter(_mouseHoverPoint)))),
                     TimelineRenderWidget(
-                        timeline: timeline,
-                        topOverlap: TopOverlap + devicePadding.top,
-                        touchBubble: onTouchBubble,
-                        touchEntry: onTouchEntry),
+                      timeline: timeline,
+                      topOverlap: TopOverlap + devicePadding.top,
+                      touchBubble: onTouchBubble,
+                      touchEntry: onTouchEntry,
+                      favorites: [],
+                    ),
                     Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -411,7 +416,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                                         _zoom(delta: 20.0);
                                         // widget.timeline.isActive = false;
                                         // Navigator.of(context).pop();
-                                        return true;
                                       },
                                     ),
                                     IconButton(
@@ -426,7 +430,6 @@ class _TimelineWidgetState extends State<TimelineWidget> {
                                         _zoom(delta: -20.0);
                                         // widget.timeline.isActive = false;
                                         // Navigator.of(context).pop();
-                                        return true;
                                       },
                                     ),
                                   ]))

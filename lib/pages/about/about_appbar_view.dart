@@ -6,7 +6,7 @@ import 'package:cantool/repository/can_repository.dart';
 class AboutAppbarView extends HookWidget implements PreferredSizeWidget {
   final double height;
   AboutAppbarView({
-    Key key,
+    Key? key,
     this.height: 46.0,
   }) : super(key: key);
 
@@ -15,7 +15,7 @@ class AboutAppbarView extends HookWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
+    final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;

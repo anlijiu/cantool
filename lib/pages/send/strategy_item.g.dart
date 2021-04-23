@@ -8,12 +8,8 @@ part of 'strategy_item.dart';
 
 _$_StrategyItem _$_$_StrategyItemFromJson(Map<String, dynamic> json) {
   return _$_StrategyItem(
-    json['meta'] == null
-        ? null
-        : SignalMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    json['strategy'] == null
-        ? null
-        : Strategy.fromJson(json['strategy'] as Map<String, dynamic>),
+    SignalMeta.fromJson(json['meta'] as Map<String, dynamic>),
+    Strategy.fromJson(json['strategy'] as Map<String, dynamic>),
   );
 }
 

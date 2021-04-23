@@ -7,11 +7,11 @@ import 'can_channel.dart';
 import 'models.dart';
 export 'models.dart';
 
-Future<String> syncMetaDatas(Map<String, dynamic> dbc) async {
+Future<bool> syncMetaDatas(Map<String, dynamic> dbc) async {
   return await CanChannel.instance.syncMetaDatas(dbc);
 }
 
-Future<Map<String, dynamic>> parseDbc(String path) {
+Future<Map<String, dynamic>?> parseDbc(String path) {
   return CanChannel.instance.parseDbc(path);
 }
 
@@ -51,16 +51,16 @@ void removeCanDataListener(ValueChanged<List<CanSignalData>> listener) {
   CanChannel.instance.removeCanDataListener(listener);
 }
 
-Future<Map<String, dynamic>> setReplayFile(String path) {
+Future<Map<String, dynamic>?> setReplayFile(String path) {
   return CanChannel.instance.setReplayFile(path);
 }
 
 @deprecated
-Future<Map<String, dynamic>> replayFiltedSignals(List<dynamic> filter) {
+Future<Map<String, dynamic>?> replayFiltedSignals(List<dynamic> filter) {
   return CanChannel.instance.replayFiltedSignals(filter);
 }
 
-Future<Map<String, dynamic>> replayParseFiltedSignals(List<dynamic> filter) {
+Future<Map<String, dynamic>?> replayParseFiltedSignals(List<dynamic> filter) {
   return CanChannel.instance.replayParseFiltedSignals(filter);
 }
 

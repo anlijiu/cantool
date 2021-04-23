@@ -21,7 +21,7 @@ import '../providers.dart';
 import 'home/home_appbar_view.dart';
 
 class AppPage extends HookWidget {
-  const AppPage({Key key}) : super(key: key);
+  const AppPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +33,8 @@ class AppPage extends HookWidget {
       appBar = ReplayAppbarView();
     } else if (currentTab == 2) {
       appBar = AboutAppbarView();
+    } else {
+      appBar = HomeAppbarView();
     }
 
     return Scaffold(

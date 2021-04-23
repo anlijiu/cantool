@@ -15,14 +15,15 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final currentTab = useProvider(currentTabInDrawerProvider).state;
-    final dbcMetaRepository = useProvider(dbcMetaProvider);
-    final dbcMeta = useProvider(dbcMetaProvider.state);
+    final dbcMetaRepository = useProvider(dbcMetaProvider.notifier);
+    final dbcMeta = useProvider(dbcMetaProvider);
 
     if (dbcMeta == null) {
       return Center(
           child: FlatButton.icon(
               onPressed: () {
-                dbcMetaRepository.loadDbcFile();
+                print(" dbcMetaRepository is " + dbcMetaRepository.toString());
+                // dbcMetaRepository.loadDbcFile(context);
               },
               icon: Icon(Icons.folder_open),
               label: Text('Load dbc file')));

@@ -18,31 +18,38 @@ import 'providers.dart';
 TimelineData mapReplayResultToTimelineData(ReplayResult result,
     FilteredMessageMap filterMessage, Map<String, SignalMeta> signalMetas) {
   final timelineData = new TimelineData();
-  timelineData.baseTime = result?.summary?.date;
-  String widest = filterMessage.maxLengthStr ?? "nothing";
-  timelineData.series = result?.data?.map((key, value) {
+  timelineData.baseTime = result.summary.date;
+  String widest = filterMessage.maxLengthStr; // ?? "nothing";
+  timelineData.series = result.data.map((key, value) {
         final series = new TimelineSeriesData();
         series.meta = signalMetas[key];
-        series.isStep = series.meta.options != null;
+        series.isStep = series.meta!.options != null;
         series.scope =
-            (math.pow(2, series.meta.length) * series.meta.scaling).ceil();
+            (math.pow(2, series.meta!.length) * series.meta!.scaling).ceil();
         int length = value.length;
-        series.entries =
-            value.fold<List<TimelineEntry>>([], (previousValue, element) {
-          length--;
+        List<TimelineEntry> initialValue = [
+          TimelineEntry.fromStartValue(value.first.time, value.first.value)
+        ];
+        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx initialValue:" +
+            initialValue.toString());
+        series.entries = value.fold<List<TimelineEntry>>(initialValue,
+            (previousValue, element) {
           // 过滤掉和前一个值一样的点
-          // if (element.value == previousValue.lastOrNull?.value && length > 0) {
-          //   print(
-          //       "hahahahlength: ${length}  value: ${element.value} ${previousValue.lastOrNull?.value}");
-          //   return previousValue;
-          // }
+          if (element.value == previousValue.lastOrNull?.value && length > 0) {
+            // print(
+            //     "hahahahlength: ${length}  value: ${element.value} ${previousValue.lastOrNull?.value}");
+            return previousValue;
+          }
           final TimelineEntry entry = TimelineEntry();
           entry.start = element.time; // + baseTime;
           entry.value = element.value;
           entry.previous = previousValue.lastOrNull;
           previousValue.lastOrNull?.next ??= entry;
+          length--;
           return [...previousValue, entry];
         });
+        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
+            series.entries.toString());
         return MapEntry(key, series);
       }) ??
       new Map();
@@ -58,14 +65,14 @@ TimelineData mapReplayResultToTimelineData(ReplayResult result,
       ? tickParagraph.longestLine + 10
       : widestWidth;
   timelineData.yAxisTextWidth = widestWidth;
-  print("timelineData: " + timelineData.toString() + " widest : $widest");
+  // print("timelineData: " + timelineData.toString() + " widest : $widest");
   return timelineData;
 }
 
 final timelineProvider = Provider<Timeline>((ref) {
   final timeline = Timeline(TargetPlatform.linux);
-  final replayRepo = ref.watch(replayRepoProvider);
-  final result = ref.watch(replayRepoProvider.state);
+  final replayRepo = ref.watch(replayRepoProvider.notifier);
+  final result = ref.watch(replayRepoProvider);
   final signalMetas = ref.watch(signalMetasProvider).state;
   // final result = ref.watch(replayResultProvider).state;
   final filterMessage = ref.watch(filterMsgSignalProvider).state;
@@ -78,14 +85,16 @@ final timelineProvider = Provider<Timeline>((ref) {
     timeline.reloadData(timelineData.series);
   };
 
-  final timelineData =
-      mapReplayResultToTimelineData(result, filterMessage, signalMetas);
-  if (timelineData.series.isNotEmpty) {
-    timeline.loadData(timelineData);
-    timeline.setViewport(start: result.start, end: result.end, animate: true);
+  if (result != null) {
+    final timelineData =
+        mapReplayResultToTimelineData(result, filterMessage, signalMetas);
+    if (timelineData.series!.isNotEmpty) {
+      timeline.loadData(timelineData);
+      timeline.setViewport(start: result.start, end: result.end, animate: true);
 
-    /// Advance the timeline to its starting position.
-    timeline.advance(0.0, true);
+      /// Advance the timeline to its starting position.
+      timeline.advance(0.0, true);
+    }
   }
 
   // final baseTime = result?.summary?.date?.millisecondsSinceEpoch ?? 0;
@@ -116,7 +125,7 @@ final timelineProvider = Provider<Timeline>((ref) {
 });
 
 class ReplayChartView extends HookWidget {
-  const ReplayChartView({Key key}) : super(key: key);
+  const ReplayChartView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +133,7 @@ class ReplayChartView extends HookWidget {
     final timeline = useProvider(timelineProvider);
     final signals = filterMsgSignal.state.messages.values.fold<List<Signal>>(
         [], (value, element) => [...value, ...element.signals.values]);
-    final result = useProvider(replayRepoProvider.state);
+    final result = useProvider(replayRepoProvider.notifier).state;
     if (result == null)
       return Center(child: Text("Add filter signals"));
     else if (result.data.isEmpty)

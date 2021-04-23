@@ -6,7 +6,7 @@ part 'strategy_item.freezed.dart';
 part 'strategy_item.g.dart';
 
 @freezed
-abstract class StrategyItem with _$StrategyItem {
+class StrategyItem with _$StrategyItem {
   const factory StrategyItem(SignalMeta meta, Strategy strategy) =
       _StrategyItem;
   factory StrategyItem.fromJson(Map<String, dynamic> json) =>

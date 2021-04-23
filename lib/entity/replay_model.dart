@@ -44,7 +44,7 @@ enum Numbase {
   Unset,
 }
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true)
 class ReplayDataChunk {
   final int sequence;
   final Map<String, List<ReplayEntry>> data;
@@ -52,12 +52,6 @@ class ReplayDataChunk {
   ReplayDataChunk(this.sequence, this.data);
 
   factory ReplayDataChunk.fromJson(Map<String, dynamic> json) {
-    json['data'] = Map<String, dynamic>.from(
-        (json['data'] as Map<dynamic, dynamic>)?.map((k, e) => MapEntry(
-            k,
-            (e as List)
-                ?.map((e) => e == null ? null : Map<String, dynamic>.from(e))
-                ?.toList())));
     return _$ReplayDataChunkFromJson(json);
   }
 
@@ -68,22 +62,15 @@ class ReplayDataChunk {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true)
 class ReplayResult {
   final ReplaySummary summary;
+  //key 是信号名字  value是该信号所有的点
   final Map<String, List<ReplayEntry>> data;
-  double start, end;
+  late double start, end;
   ReplayResult(this.summary, this.data);
 
   factory ReplayResult.fromJson(Map<String, dynamic> json) {
-    json['summary'] = Map<String, dynamic>.from(json['summary']);
-
-    json['data'] = Map<String, dynamic>.from(
-        (json['data'] as Map<dynamic, dynamic>)?.map((k, e) => MapEntry(
-            k,
-            (e as List)
-                ?.map((e) => e == null ? null : Map<String, dynamic>.from(e))
-                ?.toList())));
     return _$ReplayResultFromJson(json);
   }
 
@@ -117,6 +104,7 @@ class ReplaySummary {
 @JsonSerializable()
 class ReplayEntry {
   double value;
+  //单位为毫秒
   double time;
   ReplayEntry(this.value, this.time);
 
@@ -135,17 +123,17 @@ class Signal {
   String name;
   bool selected;
   int mid;
-  Signal(this.name, this.selected, {this.mid});
+  Signal(this.name, this.selected, this.mid);
 
   factory Signal.fromJson(Map<String, dynamic> json) => _$SignalFromJson(json);
 
   Map<String, dynamic> toJson() => _$SignalToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true)
 class Message {
   Map<String, Signal> signals;
-  int id;
+  int? id;
   Message(this.signals, {this.id});
 
   factory Message.fromJson(Map<String, dynamic> json) =>
@@ -154,7 +142,7 @@ class Message {
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(anyMap: true)
 class FilteredMessageMap {
   Map<int, Message> messages;
   String maxLengthStr;

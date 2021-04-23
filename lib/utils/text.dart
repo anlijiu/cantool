@@ -63,7 +63,7 @@ TextSpan searchMatch(
 String useDecouncedSearch(TextEditingController textEditingController) {
   final search = useState(textEditingController.text);
   useEffect(() {
-    Timer timer;
+    Timer? timer;
     void listener() {
       timer?.cancel();
       timer = Timer(

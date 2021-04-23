@@ -9,7 +9,6 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'ticks.dart';
 import 'timeline.dart';
 import 'timeline_data.dart';
 import 'timeline_entry.dart';
@@ -23,8 +22,8 @@ const Color favoritesGutterAccent = Color.fromRGBO(229, 55, 108, 1.0);
 
 /// These two callbacks are used to detect if a bubble or an entry have been tapped.
 /// If that's the case, [ArticlePage] will be pushed onto the [Navigator] stack.
-typedef TouchBubbleCallback(TapTarget bubble);
-typedef TouchEntryCallback(TimelineEntry entry);
+typedef TouchBubbleCallback(TapTarget? bubble);
+typedef TouchEntryCallback(TimelineEntry? entry);
 
 /// This couples with [TimelineRenderObject].
 ///
@@ -38,12 +37,12 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
   final TouchEntryCallback touchEntry;
 
   TimelineRenderWidget(
-      {Key key,
-      this.touchBubble,
-      this.touchEntry,
-      this.topOverlap,
-      this.timeline,
-      this.favorites})
+      {Key? key,
+      required this.touchBubble,
+      required this.touchEntry,
+      required this.topOverlap,
+      required this.timeline,
+      required this.favorites})
       : super(key: key);
 
   @override
@@ -71,7 +70,7 @@ class TimelineRenderWidget extends LeafRenderObjectWidget {
 
   @override
   didUnmountRenderObject(covariant TimelineRenderObject renderObject) {
-    renderObject.timeline.isActive = false;
+    renderObject.timeline?.isActive = false;
   }
 }
 
@@ -90,21 +89,20 @@ class TimelineRenderObject extends RenderBox {
   ];
 
   double _topOverlap = 0.0;
-  Ticks _ticks = Ticks();
   XAxis _xAxis = XAxis();
   YAxis _yAxis = YAxis();
-  Timeline _timeline;
-  List<TapTarget> _tapTargets = List<TapTarget>();
-  List<TimelineEntry> _favorites;
-  TouchBubbleCallback touchBubble;
-  TouchEntryCallback touchEntry;
-  String languageCode;
+  Timeline? _timeline;
+  List<TapTarget> _tapTargets = [];
+  List<TimelineEntry>? _favorites;
+  TouchBubbleCallback? touchBubble;
+  TouchEntryCallback? touchEntry;
+  String languageCode = "";
   @override
   bool get sizedByParent => true;
 
   double get topOverlap => _topOverlap;
-  Timeline get timeline => _timeline;
-  List<TimelineEntry> get favorites => _favorites;
+  Timeline? get timeline => _timeline;
+  List<TimelineEntry>? get favorites => _favorites;
 
   set topOverlap(double value) {
     if (_topOverlap == value) {
@@ -115,17 +113,17 @@ class TimelineRenderObject extends RenderBox {
     markNeedsLayout();
   }
 
-  set timeline(Timeline value) {
+  set timeline(Timeline? value) {
     if (_timeline == value) {
       return;
     }
     _timeline = value;
-    _timeline.onNeedPaint = markNeedsPaint;
+    _timeline?.onNeedPaint = markNeedsPaint;
     markNeedsPaint();
     markNeedsLayout();
   }
 
-  set favorites(List<TimelineEntry> value) {
+  set favorites(List<TimelineEntry>? value) {
     if (_favorites == value) {
       return;
     }
@@ -137,16 +135,16 @@ class TimelineRenderObject extends RenderBox {
   /// Check if the current tap on the screen has hit a bubble.
   @override
   bool hitTestSelf(Offset screenOffset) {
-    touchEntry(null);
+    touchEntry!(null);
     for (TapTarget bubble in _tapTargets.reversed) {
-      if (bubble.rect.contains(screenOffset)) {
+      if (bubble.rect!.contains(screenOffset)) {
         if (touchBubble != null) {
-          touchBubble(bubble);
+          touchBubble!(bubble);
         }
         return true;
       }
     }
-    touchBubble(null);
+    touchBubble!(null);
 
     return true;
   }
@@ -160,7 +158,7 @@ class TimelineRenderObject extends RenderBox {
   @override
   void performLayout() {
     if (_timeline != null) {
-      _timeline.setViewport(
+      _timeline!.setViewport(
           width: size.width,
           height: size.height - 3 * topOverlap,
           animate: true);
@@ -175,21 +173,23 @@ class TimelineRenderObject extends RenderBox {
     }
 
     /// Fetch the background colors from the [Timeline] and compute the fill.
-    List<TimelineBackgroundColor> backgroundColors = timeline.backgroundColors;
+    List<TimelineBackgroundColor>? backgroundColors =
+        timeline!.backgroundColors;
     ui.Paint backgroundPaint;
     if (backgroundColors != null && backgroundColors.length > 0) {
-      double rangeStart = backgroundColors.first.start;
-      double range = backgroundColors.last.start - backgroundColors.first.start;
+      double rangeStart = backgroundColors.first.start ?? 0;
+      double rangeEnd = backgroundColors.last.start ?? 0;
+      double range = rangeEnd - rangeStart;
       List<ui.Color> colors = <ui.Color>[];
       List<double> stops = <double>[];
       for (TimelineBackgroundColor bg in backgroundColors) {
-        colors.add(bg.color);
-        stops.add((bg.start - rangeStart) / range);
+        colors.add(bg.color!);
+        stops.add((bg.start! - rangeStart) / range);
       }
       double s =
-          timeline.computeScale(timeline.renderStart, timeline.renderEnd);
-      double y1 = (backgroundColors.first.start - timeline.renderStart) * s;
-      double y2 = (backgroundColors.last.start - timeline.renderStart) * s;
+          timeline!.computeScale(timeline!.renderStart, timeline!.renderEnd);
+      double y1 = (backgroundColors.first.start! - timeline!.renderStart) * s;
+      double y2 = (backgroundColors.last.start! - timeline!.renderStart) * s;
 
       /// Fill Background.
       backgroundPaint = ui.Paint()
@@ -201,7 +201,7 @@ class TimelineRenderObject extends RenderBox {
         canvas.drawRect(
             Rect.fromLTWH(
                 offset.dx, offset.dy, size.width, y1 - offset.dy + 1.0),
-            ui.Paint()..color = backgroundColors.first.color);
+            ui.Paint()..color = backgroundColors.first.color!);
       }
 
       /// Draw the background on the canvas.
@@ -210,8 +210,8 @@ class TimelineRenderObject extends RenderBox {
     }
 
     _tapTargets.clear();
-    double renderStart = _timeline.renderStart;
-    double renderEnd = _timeline.renderEnd;
+    double renderStart = _timeline!.renderStart;
+    double renderEnd = _timeline!.renderEnd;
     double scale = size.width / (renderEnd - renderStart);
 
     /// Paint the [Ticks] on the left side of the screen.
@@ -221,41 +221,40 @@ class TimelineRenderObject extends RenderBox {
         offset.dx, offset.dy + topOverlap, size.width, size.height));
     // canvas.drawColor(Colors.red, BlendMode.srcOver);
     // canvas.drawRect(Rect.fromLTWH(offset.dx, offset.dy + topOverlap, 200, 200), Paint()..color = Colors.red);
-    // _ticks.paint(context, offset, -renderStart * scale, scale, size, timeline);
 
-    _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline,
+    _xAxis.paint(context, offset, -renderStart * scale, scale, size, timeline!,
         languageCode);
     canvas.restore();
 
     /// And then draw the rest of the timeline.
-    if (_timeline.timelineData != null) {
+    if (_timeline!.timelineData != null) {
       canvas.save();
 
       canvas.clipRect(Rect.fromLTWH(
           offset.dx,
           offset.dy + topOverlap,
-          _timeline.gutterWidth + timeline.timelineData.yAxisTextWidth,
+          _timeline!.gutterWidth + timeline!.timelineData!.yAxisTextWidth!,
           size.height - topOverlap - 46)); //减去本页面bar 再减去appbar 高度
-      drawYaxis(context, offset, _timeline.timelineData);
+      drawYaxis(context, offset, _timeline!.timelineData!);
       canvas.restore();
 
       canvas.save();
       canvas.clipRect(Rect.fromLTWH(
           offset.dx +
-              _timeline.gutterWidth +
-              timeline.timelineData.yAxisTextWidth,
+              _timeline!.gutterWidth +
+              timeline!.timelineData!.yAxisTextWidth!,
           offset.dy + topOverlap,
           size.width -
-              _timeline.gutterWidth -
-              timeline.timelineData.yAxisTextWidth,
+              _timeline!.gutterWidth -
+              timeline!.timelineData!.yAxisTextWidth!,
           size.height - topOverlap - 46));
       drawItems(
           context,
           offset,
-          _timeline.timelineData,
-          _timeline.gutterWidth +
+          _timeline!.timelineData!,
+          _timeline!.gutterWidth +
               Timeline.LineSpacing -
-              Timeline.DepthOffset * _timeline.renderOffsetDepth,
+              Timeline.DepthOffset * _timeline!.renderOffsetDepth,
           scale,
           0);
       canvas.restore();
@@ -276,14 +275,14 @@ class TimelineRenderObject extends RenderBox {
     final Paint painter = Paint()..color = Colors.red;
     int j = 0;
     for (MapEntry<String, TimelineSeriesData> seriesEntry
-        in data.series.entries) {
+        in data.series!.entries) {
       if (seriesEntry.value.y == null) return;
       Color color = cs[j % cs.length];
       j++;
       _yAxis.paint(context, offset, 0, seriesEntry.value.height,
-          data.yAxisTextWidth, seriesEntry.value, color);
+          data.yAxisTextWidth!, seriesEntry.value, color);
       TextSpan text = TextSpan(
-          text: seriesEntry.value.meta.name,
+          text: seriesEntry.value.meta!.name,
           style: TextStyle(fontSize: 11, color: color));
 
       _textPainter.text = text;
@@ -301,7 +300,7 @@ class TimelineRenderObject extends RenderBox {
       //     painter);
       canvas.save();
       canvas.translate(
-          offset.dx + 10, seriesEntry.value.y + 100 + textSize.width / 2);
+          offset.dx + 10, seriesEntry.value.y! + 100 + textSize.width / 2);
       canvas.rotate(3.1415926 * 1.5);
       _textPainter.paint(canvas, Offset(0, 0));
       canvas.restore();
@@ -331,9 +330,9 @@ class TimelineRenderObject extends RenderBox {
 
     int j = 0;
     for (MapEntry<String, TimelineSeriesData> seriesEntry
-        in data.series.entries) {
+        in data.series!.entries) {
       if (seriesEntry.value.y == null) return;
-      Rect t = Offset(offset.dx, seriesEntry.value.y) &
+      Rect t = Offset(offset.dx, seriesEntry.value.y!) &
           Size(size.width, seriesEntry.value.height);
       Paint p = Paint()..color = cs[j % cs.length].withOpacity(0.2);
       canvas.saveLayer(t, p);
@@ -349,7 +348,7 @@ class TimelineRenderObject extends RenderBox {
         ..style = PaintingStyle.stroke;
       j++;
 
-      for (TimelineEntry item in seriesEntry.value.entries) {
+      for (TimelineEntry item in seriesEntry.value.entries!) {
         if (item.x > size.width + Timeline.BubbleWidth ||
             item.x < -Timeline.BubbleWidth) {
           /// Don't paint this item.
@@ -360,10 +359,10 @@ class TimelineRenderObject extends RenderBox {
         if (item.next != null) {
           path.reset();
           path.moveTo(item.x + offset.dx, item.y);
-          if (item.value != item.next.value) {
-            path.lineTo(item.next.x + offset.dx, item.y);
+          if (item.value != item.next!.value) {
+            path.lineTo(item.next!.x + offset.dx, item.y);
           }
-          path.lineTo(item.next.x + offset.dx, item.next.y);
+          path.lineTo(item.next!.x + offset.dx, item.next!.y);
           canvas.drawPath(path, p2);
         }
       }

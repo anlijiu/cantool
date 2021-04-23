@@ -2,9 +2,9 @@ import 'package:cantool/entity/signal_meta.dart';
 import 'timeline_entry.dart';
 
 class TimelineData {
-  DateTime baseTime;
-  Map<String, TimelineSeriesData> series;
-  double yAxisTextWidth;
+  DateTime? baseTime;
+  Map<String, TimelineSeriesData>? series;
+  double? yAxisTextWidth;
   TimelineData();
   TimelineData.x(this.baseTime, this.series);
   String toString() {
@@ -13,12 +13,12 @@ class TimelineData {
 }
 
 class TimelineSeriesData {
-  SignalMeta meta;
-  bool isStep;
-  int scope;
-  double y;
+  SignalMeta? meta;
+  bool? isStep;
+  int? scope;
+  double? y;
   double height = 0.0;
-  List<TimelineEntry> entries;
+  List<TimelineEntry>? entries;
   TimelineSeriesData();
   String toString() {
     return "meta:$meta, entries:$entries, isStep:$isStep, scope:$scope";

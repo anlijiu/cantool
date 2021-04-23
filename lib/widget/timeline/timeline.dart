@@ -55,8 +55,8 @@ class Timeline {
   double _start = 0.0;
   double _end = 0.0;
   double _topOffset = 0.0;
-  double _renderStart;
-  double _renderEnd;
+  double _renderStart = 0.0;
+  double _renderEnd = 0.0;
   double _lastFrameTime = 0.0;
   double _width = 0.0;
   double _height = 0.0;
@@ -86,60 +86,60 @@ class Timeline {
   bool _isSteady = false;
   bool _needRecalMinUnit = true;
 
-  HeaderColors _currentHeaderColors;
+  HeaderColors? _currentHeaderColors;
 
-  Color _headerTextColor;
-  Color _headerBackgroundColor;
+  Color? _headerTextColor;
+  Color? _headerBackgroundColor;
 
   /// Depending on the current [Platform], different values are initialized
   /// so that they behave properly on iOS&Android.
-  ScrollPhysics _scrollPhysics;
+  ScrollPhysics? _scrollPhysics;
 
   /// [_scrollPhysics] needs a [ScrollMetrics] value to function.
-  ScrollMetrics _scrollMetrics;
-  Simulation _scrollSimulation;
+  ScrollMetrics? _scrollMetrics;
+  Simulation? _scrollSimulation;
 
   EdgeInsets padding = EdgeInsets.zero;
   EdgeInsets devicePadding = EdgeInsets.zero;
 
-  Timer _steadyTimer;
+  Timer? _steadyTimer;
 
   /// Through these two references, the Timeline can access the era and update
   /// the top label accordingly.
-  TimelineEntry _currentEra;
-  TimelineEntry _lastEra;
+  TimelineEntry? _currentEra;
+  TimelineEntry? _lastEra;
 
   /// These references allow to maintain a reference to the next and previous elements
   /// of the Timeline, depending on which elements are currently in focus.
   /// When there's enough space on the top/bottom, the Timeline will render a round button
   /// with an arrow to link to the next/previous element.
-  TimelineEntry _nextEntry;
-  TimelineEntry _renderNextEntry;
-  TimelineEntry _prevEntry;
-  TimelineEntry _renderPrevEntry;
+  TimelineEntry? _nextEntry;
+  TimelineEntry? _renderNextEntry;
+  TimelineEntry? _prevEntry;
+  TimelineEntry? _renderPrevEntry;
 
   /// A gradient is shown on the background, depending on the [_currentEra] we're in.
-  List<TimelineBackgroundColor> _backgroundColors;
+  List<TimelineBackgroundColor>? _backgroundColors;
 
   /// [Ticks] also have custom colors so that they are always visible with the changing background.
-  List<TickColors> _tickColors;
-  List<HeaderColors> _headerColors;
+  List<TickColors>? _tickColors;
+  List<HeaderColors>? _headerColors;
 
-  TimelineData _timelineData;
+  TimelineData? _timelineData;
 
   /// All the [TimelineEntry]s that are loaded from disk at boot (in [loadFromBundle()]).
-  List<TimelineEntry> _entries;
+  List<TimelineEntry> _entries = [];
 
   /// Callback set by [TimelineRenderWidget] when adding a reference to this object.
   /// It'll trigger [RenderBox.markNeedsPaint()].
-  PaintCallback onNeedPaint;
+  PaintCallback? onNeedPaint;
 
-  ViewPortCallback onViewPortChanged;
+  ViewPortCallback? onViewPortChanged;
 
   /// These next two callbacks are bound to set the state of the [TimelineWidget]
   /// so it can change the appeareance of the top AppBar.
-  ChangeEraCallback onEraChanged;
-  ChangeHeaderColorCallback onHeaderColorsChanged;
+  ChangeEraCallback? onEraChanged;
+  ChangeHeaderColorCallback? onHeaderColorsChanged;
   String _minUnit = 'millisecond';
 
   Timeline(this._platform) {
@@ -159,16 +159,16 @@ class Timeline {
   bool get isInteracting => _isInteracting;
   bool get showFavorites => _showFavorites;
   bool get isActive => _isActive;
-  Color get headerTextColor => _headerTextColor;
-  Color get headerBackgroundColor => _headerBackgroundColor;
-  HeaderColors get currentHeaderColors => _currentHeaderColors;
-  TimelineEntry get currentEra => _currentEra;
-  TimelineEntry get nextEntry => _renderNextEntry;
-  TimelineEntry get prevEntry => _renderPrevEntry;
+  Color? get headerTextColor => _headerTextColor;
+  Color? get headerBackgroundColor => _headerBackgroundColor;
+  HeaderColors? get currentHeaderColors => _currentHeaderColors;
+  TimelineEntry? get currentEra => _currentEra;
+  TimelineEntry? get nextEntry => _renderNextEntry;
+  TimelineEntry? get prevEntry => _renderPrevEntry;
   List<TimelineEntry> get entries => _entries;
-  TimelineData get timelineData => _timelineData;
-  List<TimelineBackgroundColor> get backgroundColors => _backgroundColors;
-  List<TickColors> get tickColors => _tickColors;
+  TimelineData? get timelineData => _timelineData;
+  List<TimelineBackgroundColor>? get backgroundColors => _backgroundColors;
+  List<TickColors>? get tickColors => _tickColors;
   String get minUnit => _minUnit;
 
   /// Setter for toggling the gutter on the left side of the timeline with
@@ -214,7 +214,7 @@ class Timeline {
 
     /// If a timer is currently active, dispose it.
     if (_steadyTimer != null) {
-      _steadyTimer.cancel();
+      _steadyTimer!.cancel();
       _steadyTimer = null;
     }
 
@@ -237,7 +237,7 @@ class Timeline {
     if (!_isFrameScheduled) {
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
     }
   }
 
@@ -271,8 +271,8 @@ class Timeline {
     if (width != double.maxFinite) {
       if (_width == 0.0 &&
           _timelineData != null &&
-          timelineData.series != null &&
-          timelineData.series.length > 0) {
+          timelineData!.series != null &&
+          timelineData!.series!.length > 0) {
         double scale = width / (_end - _start);
         _start = _start - padding.left / scale;
         _end = _end + padding.right / scale;
@@ -282,7 +282,7 @@ class Timeline {
           (start != double.maxFinite && _start != start ||
               end != double.maxFinite && _end != end ||
               width != _width)) {
-        onViewPortChanged(start, end, width);
+        onViewPortChanged!(start, end, width);
         print("timeline onViewPortChanged setViewport $start, $end, $width");
       }
       _zoom = _end - _start;
@@ -295,9 +295,9 @@ class Timeline {
     if (height != double.maxFinite && height != _height) {
       print("timeline --- setViewport   height: $height");
       _height = height;
-      var seriesHeight = (_height - 10) / _timelineData.series.length;
+      var seriesHeight = (_height - 10) / _timelineData!.series!.length;
       if (seriesHeight < 200) seriesHeight = 200;
-      _timelineData.series.values.forEach((element) {
+      _timelineData!.series!.values.forEach((element) {
         print("timeline --- setViewport   seriesHeight: $seriesHeight");
         element.height = seriesHeight;
       });
@@ -356,7 +356,7 @@ class Timeline {
           axisDirection: AxisDirection.down);
 
       _scrollSimulation =
-          _scrollPhysics.createBallisticSimulation(_scrollMetrics, velocity);
+          _scrollPhysics!.createBallisticSimulation(_scrollMetrics!, velocity)!;
     }
 
     if (!animate) {
@@ -364,19 +364,19 @@ class Timeline {
       _renderEnd = end;
       advance(0.0, false);
       if (onNeedPaint != null) {
-        onNeedPaint();
+        onNeedPaint!();
       }
     } else if (!_isFrameScheduled) {
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
     }
   }
 
-  void zoomVertical({double delta = 20, Offset hover}) {
-    timelineData.series.entries.forEach((element) {
-      if (element.value.y < hover.dy &&
-          hover.dy < element.value.y + element.value.height) {
+  void zoomVertical({double delta = 20, required Offset hover}) {
+    timelineData!.series!.entries.forEach((element) {
+      if (element.value.y! < hover.dy &&
+          hover.dy < element.value.y! + element.value.height) {
         final height = element.value.height + delta;
         print(" zoomVertical   height: $height");
         if (height >= 200 && height < 2 * _height) {
@@ -385,7 +385,7 @@ class Timeline {
           if (!_isFrameScheduled) {
             _isFrameScheduled = true;
             _lastFrameTime = 0.0;
-            SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+            SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
           }
         }
       }
@@ -402,7 +402,7 @@ class Timeline {
     if (_lastFrameTime == 0.0) {
       _lastFrameTime = t;
       _isFrameScheduled = true;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
       return;
     }
 
@@ -411,42 +411,27 @@ class Timeline {
 
     if (!advance(elapsed, true) && !_isFrameScheduled) {
       _isFrameScheduled = true;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
     }
 
     if (onNeedPaint != null) {
-      onNeedPaint();
+      onNeedPaint!();
     }
   }
 
-  TickColors findTickColors(double screen) {
-    if (_tickColors == null) {
-      return null;
-    }
-    for (TickColors color in _tickColors.reversed) {
-      if (screen >= color.screenY) {
-        return color;
-      }
-    }
-
-    return screen < _tickColors.first.screenY
-        ? _tickColors.first
-        : _tickColors.last;
-  }
-
-  HeaderColors _findHeaderColors(double screen) {
+  HeaderColors? _findHeaderColors(double screen) {
     if (_headerColors == null) {
       return null;
     }
-    for (HeaderColors color in _headerColors.reversed) {
-      if (screen >= color.screenY) {
+    for (HeaderColors color in _headerColors!.reversed) {
+      if (screen >= color.screenY!) {
         return color;
       }
     }
 
-    return screen < _headerColors.first.screenY
-        ? _headerColors.first
-        : _headerColors.last;
+    return screen < _headerColors!.first.screenY!
+        ? _headerColors!.first
+        : _headerColors!.last;
   }
 
   bool advance(double elapsed, bool animate) {
@@ -471,19 +456,19 @@ class Timeline {
       doneRendering = false;
       _simulationTime += elapsed;
       double scale = _width / (_end - _start);
-      double velocity = _scrollSimulation.dx(_simulationTime);
+      double velocity = _scrollSimulation!.dx(_simulationTime);
 
       double displace = velocity * elapsed / scale;
       _start -= displace;
       _end -= displace;
 
       if (onViewPortChanged != null) {
-        onViewPortChanged(_start, _end, _width);
+        onViewPortChanged!(_start, _end, _width);
         print("timeline onViewPortChanged advance $_start, $_end, $_width");
       }
 
       /// If scrolling has terminated, clean up the resources.
-      if (_scrollSimulation.isDone(_simulationTime)) {
+      if (_scrollSimulation!.isDone(_simulationTime)) {
         _scrollMetrics = null;
         _scrollPhysics = null;
         _scrollSimulation = null;
@@ -523,22 +508,22 @@ class Timeline {
     scale = _width / (_renderEnd - _renderStart);
 
     /// Update color screen positions.
-    if (_tickColors != null && _tickColors.length > 0) {
-      double lastStart = _tickColors.first.start;
-      for (TickColors color in _tickColors) {
+    if (_tickColors != null && _tickColors!.length > 0) {
+      double lastStart = _tickColors!.first.start!;
+      for (TickColors color in _tickColors!) {
         color.screenY =
-            (lastStart + (color.start - lastStart / 2.0) - _renderStart) *
+            (lastStart + (color.start! - lastStart / 2.0) - _renderStart) *
                 scale;
-        lastStart = color.start;
+        lastStart = color.start!;
       }
     }
-    if (_headerColors != null && _headerColors.length > 0) {
-      double lastStart = _headerColors.first.start;
-      for (HeaderColors color in _headerColors) {
+    if (_headerColors != null && _headerColors!.length > 0) {
+      double lastStart = _headerColors!.first.start!;
+      for (HeaderColors color in _headerColors!) {
         color.screenY =
-            (lastStart + (color.start - lastStart / 2.0) - _renderStart) *
+            (lastStart + (color.start! - lastStart / 2.0) - _renderStart) *
                 scale;
-        lastStart = color.start;
+        lastStart = color.start!;
       }
     }
 
@@ -546,20 +531,20 @@ class Timeline {
 
     if (_currentHeaderColors != null) {
       if (_headerTextColor == null) {
-        _headerTextColor = _currentHeaderColors.text;
-        _headerBackgroundColor = _currentHeaderColors.background;
+        _headerTextColor = _currentHeaderColors?.text;
+        _headerBackgroundColor = _currentHeaderColors?.background;
       } else {
         bool stillColoring = false;
         Color headerTextColor = interpolateColor(
-            _headerTextColor, _currentHeaderColors.text, elapsed);
+            _headerTextColor!, _currentHeaderColors!.text!, elapsed);
 
         if (headerTextColor != _headerTextColor) {
           _headerTextColor = headerTextColor;
           stillColoring = true;
           doneRendering = false;
         }
-        Color headerBackgroundColor = interpolateColor(
-            _headerBackgroundColor, _currentHeaderColors.background, elapsed);
+        Color headerBackgroundColor = interpolateColor(_headerBackgroundColor!,
+            _currentHeaderColors!.background!, elapsed);
         if (headerBackgroundColor != _headerBackgroundColor) {
           _headerBackgroundColor = headerBackgroundColor;
           stillColoring = true;
@@ -567,7 +552,7 @@ class Timeline {
         }
         if (stillColoring) {
           if (onHeaderColorsChanged != null) {
-            onHeaderColorsChanged(_headerBackgroundColor, _headerTextColor);
+            onHeaderColorsChanged!(_headerBackgroundColor!, _headerTextColor!);
           }
         }
       }
@@ -648,7 +633,7 @@ class Timeline {
     if (_currentEra != _lastEra) {
       _lastEra = _currentEra;
       if (onEraChanged != null) {
-        onEraChanged(_currentEra);
+        onEraChanged!(_currentEra!);
       }
     }
 
@@ -835,10 +820,10 @@ class Timeline {
     this._timelineData = timelineData;
   }
 
-  void reloadData(Map<String, TimelineSeriesData> series) {
-    this._timelineData.series.forEach((key, value) {
-      value.entries.clear();
-      value.entries.addAll(series[key].entries);
+  void reloadData(Map<String, TimelineSeriesData>? series) {
+    this._timelineData?.series!.forEach((key, value) {
+      value.entries!.clear();
+      value.entries!.addAll(series![key]!.entries ?? []);
     });
     print("timeline reloadData in");
 
@@ -846,15 +831,15 @@ class Timeline {
       print("timeline reloadData and scheduleFrameCallback");
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
     }
   }
 
-  void loadMoreData([Map<String, TimelineSeriesData> series]) {
-    this._timelineData.series.forEach((key, value) {
-      value.entries.last.next = series[key].entries.first;
-      series[key].entries.first.previous = value.entries.last.next;
-      value.entries.addAll(series[key].entries);
+  void loadMoreData(Map<String, TimelineSeriesData> series) {
+    this._timelineData?.series!.forEach((key, value) {
+      value.entries!.last.next = series[key]!.entries!.first;
+      series[key]!.entries!.first.previous = value.entries!.last.next;
+      value.entries!.addAll(series[key]!.entries ?? []);
     });
   }
 
@@ -862,16 +847,16 @@ class Timeline {
   bool _advanceItems(double scale, double elapsed, bool animate) {
     bool stillAnimating = false;
 
-    final series = _timelineData.series;
+    final series = _timelineData?.series;
     var leftHeight = _height + 160;
 
-    for (int j = 0; j < series.length; ++j) {
+    for (int j = 0; j < series!.length; ++j) {
       final seriesData = series.entries.elementAt(j).value;
       final entries = seriesData.entries;
       seriesData.y = leftHeight - seriesData.height - _topOffset - 10 * j;
       print(
-          "timeline ${series.entries.elementAt(j).key} length: ${entries.length}");
-      for (int i = 0; i < entries.length; i++) {
+          "timeline ${series.entries.elementAt(j).key} length: ${entries?.length}");
+      for (int i = 0; i < entries!.length; i++) {
         TimelineEntry item = entries[i];
         double start = item.start - _renderStart;
 
@@ -879,14 +864,14 @@ class Timeline {
         item.x = x;
 
         double step = 1.0;
-        double max = item.value > seriesData.meta.maximum
+        double max = item.value > seriesData.meta!.maximum
             ? item.value
-            : seriesData.meta.maximum;
+            : seriesData.meta!.maximum;
 
-        step = seriesData.height / (seriesData.scope - 1);
+        step = seriesData.height / (seriesData.scope! - 1);
         item.y = leftHeight -
             _topOffset -
-            (item.value - seriesData.meta.minimum) * step -
+            (item.value - seriesData.meta!.minimum) * step -
             10 * j;
       }
 

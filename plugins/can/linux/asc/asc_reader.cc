@@ -135,6 +135,7 @@ static void processheaderline(char *str, FlValue *result, can_trace_cb cb) {
         in_asc_header = false;
     } else if(str[0] >=48 && str[0] <=57) {
         in_asc_header = false;
+        debug_info("processheader: str:%s\n", str);
     }
 
     if(!in_asc_header) {
@@ -146,7 +147,7 @@ static void processheaderline(char *str, FlValue *result, can_trace_cb cb) {
 
 static void processline(char *str, filter_repo_map* filter, FlValue* result) {
 
-    debug_info("processline: processline start %s\n", str);
+    // debug_info("processline: processline start %s\n", str);
     char *cp, *buffer_lasts;
 
     if(numbase == unset) {
@@ -160,7 +161,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     if(!cp) return;
 
 
-    debug_info("processline: processline time: %s\n", cp);
+    // debug_info("processline: processline time: %s\n", cp);
 
     double t = strtod(cp, NULL) * 1000; //换算成ms
 
@@ -186,8 +187,8 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     // printf("processcontent  t: %f\n", t);
 
     cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL || !isdigit((int)*cp)) return;//正常的数据帧这个应该是bus通道
-    int bus = atoi(cp);
-    printf("processcontent cp is: %s, bus is %d\n", cp, bus);
+    // int bus = atoi(cp);
+    // debug_info("processcontent cp is: %s, bus is %d\n", cp, bus);
 
       /* get message identifier */
     cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
@@ -197,7 +198,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     } else {
         id = atoi(cp);
     }
-    debug_info("processcontent  id is %d %ld\n", id, hashmap_size(filter));
+    // debug_info("processcontent  id is %d %ld\n", id, hashmap_size(filter));
 
     struct message* m = hashmap_get(filter, &id);
     if(m == NULL) {
@@ -213,7 +214,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     cp = strtok_r(NULL, "\t", &buffer_lasts); if(cp == NULL) return;
 
     int dlc = atoi(cp);
-    debug_info("processcontent  dlc is %d\n", dlc);
+    // debug_info("processcontent  dlc is %d\n", dlc);
 
     uint8_t data[8];
     for(int i = 0; i < dlc; i++) {
@@ -243,7 +244,7 @@ static void processline(char *str, filter_repo_map* filter, FlValue* result) {
     }   
     list_iterator_destroy(it);
 
-    debug_info("processline data: %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    // debug_info("processline data: %d %d %d %d %d %d %d %d\n", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 }
 
 // bool parse_asc(const char *path, FlValue* filter, FlValue* result) {
@@ -373,17 +374,18 @@ bool parse_asc(const char *path, filter_repo_map* filter, can_trace_cb cb) {
     memset( currline, 0, sizeof(char)*line_size);
     bool half_enter = false;
     int sequence = 0;
+
+    FlValue* result = fl_value_new_map();
+    FlValue* data = fl_value_new_map();
+    fl_value_set_string_take(result, "name", fl_value_new_string("data"));
+    fl_value_set_string_take(result, "sequence", fl_value_new_int(sequence));
+    fl_value_set_string_take(result, "data", data);
+
     while((readsize = read(fd, buffer, buffer_size)) != 0) {
         buffer[ readsize ] = '\0';
-
-        FlValue* result = fl_value_new_map();
-        FlValue* data = fl_value_new_map();
-        fl_value_set_string_take(result, "name", fl_value_new_string("data"));
-        fl_value_set_string_take(result, "sequence", fl_value_new_int(sequence));
-        fl_value_set_string_take(result, "data", data);
-        if(readsize < buffer_size) {
-            fl_value_set_string_take(result, "isEnd", fl_value_new_bool(true));
-        }
+        // if(readsize < buffer_size) {
+        //     fl_value_set_string_take(result, "isEnd", fl_value_new_bool(true));
+        // }
 
         sequence++;
 
@@ -420,10 +422,10 @@ bool parse_asc(const char *path, filter_repo_map* filter, can_trace_cb cb) {
             q++;
         }
 
-        cb(result);
         memset( buffer, 0, sizeof(char)*(buffer_size+1));
     }
     
+    cb(result);
     free(buffer);
 
     return true;

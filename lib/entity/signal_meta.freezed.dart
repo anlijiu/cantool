@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'signal_meta.dart';
 
@@ -8,6 +8,10 @@ part of 'signal_meta.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 SignalMeta _$SignalMetaFromJson(Map<String, dynamic> json) {
   return _SignalMeta.fromJson(json);
 }
@@ -16,23 +20,22 @@ SignalMeta _$SignalMetaFromJson(Map<String, dynamic> json) {
 class _$SignalMetaTearOff {
   const _$SignalMetaTearOff();
 
-// ignore: unused_element
   _SignalMeta call(
-      {@required String name,
-      @required int start_bit,
-      @required int length,
-      @required int little_endian,
-      @required int is_signed,
-      @required String value_type,
-      @required double scaling,
-      @required double offset,
-      @required double minimum,
-      @required double maximum,
-      @required @nullable String unit,
-      @required String comment,
-      @required int mid,
-      Map<int, String> options,
-      Map<String, dynamic> attributes}) {
+      {required String name,
+      required int start_bit,
+      required int length,
+      required int little_endian,
+      required int is_signed,
+      required String value_type,
+      required double scaling,
+      required double offset,
+      required double minimum,
+      required double maximum,
+      String? unit,
+      required String comment,
+      required int mid,
+      Map<int, String>? options,
+      Map<String, dynamic>? attributes}) {
     return _SignalMeta(
       name: name,
       start_bit: start_bit,
@@ -52,37 +55,36 @@ class _$SignalMetaTearOff {
     );
   }
 
-// ignore: unused_element
   SignalMeta fromJson(Map<String, Object> json) {
     return SignalMeta.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $SignalMeta = _$SignalMetaTearOff();
 
 /// @nodoc
 mixin _$SignalMeta {
-  String get name;
-  int get start_bit;
-  int get length;
-  int get little_endian;
-  int get is_signed;
-  String get value_type;
-  double get scaling;
-  double get offset;
-  double get minimum;
-  double get maximum;
-  @nullable
-  String get unit;
-  String get comment;
-  int get mid;
-  Map<int, String> get options;
-  Map<String, dynamic> get attributes;
+  String get name => throw _privateConstructorUsedError;
+  int get start_bit => throw _privateConstructorUsedError;
+  int get length => throw _privateConstructorUsedError;
+  int get little_endian => throw _privateConstructorUsedError;
+  int get is_signed => throw _privateConstructorUsedError;
+  String get value_type => throw _privateConstructorUsedError;
+  double get scaling => throw _privateConstructorUsedError;
+  double get offset => throw _privateConstructorUsedError;
+  double get minimum => throw _privateConstructorUsedError;
+  double get maximum => throw _privateConstructorUsedError;
+  String? get unit => throw _privateConstructorUsedError;
+  String get comment => throw _privateConstructorUsedError;
+  int get mid => throw _privateConstructorUsedError;
+  Map<int, String>? get options => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get attributes => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $SignalMetaCopyWith<SignalMeta> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $SignalMetaCopyWith<SignalMeta> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -101,11 +103,11 @@ abstract class $SignalMetaCopyWith<$Res> {
       double offset,
       double minimum,
       double maximum,
-      @nullable String unit,
+      String? unit,
       String comment,
       int mid,
-      Map<int, String> options,
-      Map<String, dynamic> attributes});
+      Map<int, String>? options,
+      Map<String, dynamic>? attributes});
 }
 
 /// @nodoc
@@ -118,44 +120,83 @@ class _$SignalMetaCopyWithImpl<$Res> implements $SignalMetaCopyWith<$Res> {
 
   @override
   $Res call({
-    Object name = freezed,
-    Object start_bit = freezed,
-    Object length = freezed,
-    Object little_endian = freezed,
-    Object is_signed = freezed,
-    Object value_type = freezed,
-    Object scaling = freezed,
-    Object offset = freezed,
-    Object minimum = freezed,
-    Object maximum = freezed,
-    Object unit = freezed,
-    Object comment = freezed,
-    Object mid = freezed,
-    Object options = freezed,
-    Object attributes = freezed,
+    Object? name = freezed,
+    Object? start_bit = freezed,
+    Object? length = freezed,
+    Object? little_endian = freezed,
+    Object? is_signed = freezed,
+    Object? value_type = freezed,
+    Object? scaling = freezed,
+    Object? offset = freezed,
+    Object? minimum = freezed,
+    Object? maximum = freezed,
+    Object? unit = freezed,
+    Object? comment = freezed,
+    Object? mid = freezed,
+    Object? options = freezed,
+    Object? attributes = freezed,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed ? _value.name : name as String,
-      start_bit: start_bit == freezed ? _value.start_bit : start_bit as int,
-      length: length == freezed ? _value.length : length as int,
+      name: name == freezed
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      start_bit: start_bit == freezed
+          ? _value.start_bit
+          : start_bit // ignore: cast_nullable_to_non_nullable
+              as int,
+      length: length == freezed
+          ? _value.length
+          : length // ignore: cast_nullable_to_non_nullable
+              as int,
       little_endian: little_endian == freezed
           ? _value.little_endian
-          : little_endian as int,
-      is_signed: is_signed == freezed ? _value.is_signed : is_signed as int,
-      value_type:
-          value_type == freezed ? _value.value_type : value_type as String,
-      scaling: scaling == freezed ? _value.scaling : scaling as double,
-      offset: offset == freezed ? _value.offset : offset as double,
-      minimum: minimum == freezed ? _value.minimum : minimum as double,
-      maximum: maximum == freezed ? _value.maximum : maximum as double,
-      unit: unit == freezed ? _value.unit : unit as String,
-      comment: comment == freezed ? _value.comment : comment as String,
-      mid: mid == freezed ? _value.mid : mid as int,
-      options:
-          options == freezed ? _value.options : options as Map<int, String>,
+          : little_endian // ignore: cast_nullable_to_non_nullable
+              as int,
+      is_signed: is_signed == freezed
+          ? _value.is_signed
+          : is_signed // ignore: cast_nullable_to_non_nullable
+              as int,
+      value_type: value_type == freezed
+          ? _value.value_type
+          : value_type // ignore: cast_nullable_to_non_nullable
+              as String,
+      scaling: scaling == freezed
+          ? _value.scaling
+          : scaling // ignore: cast_nullable_to_non_nullable
+              as double,
+      offset: offset == freezed
+          ? _value.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as double,
+      minimum: minimum == freezed
+          ? _value.minimum
+          : minimum // ignore: cast_nullable_to_non_nullable
+              as double,
+      maximum: maximum == freezed
+          ? _value.maximum
+          : maximum // ignore: cast_nullable_to_non_nullable
+              as double,
+      unit: unit == freezed
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
+              as String?,
+      comment: comment == freezed
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String,
+      mid: mid == freezed
+          ? _value.mid
+          : mid // ignore: cast_nullable_to_non_nullable
+              as int,
+      options: options == freezed
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as Map<int, String>?,
       attributes: attributes == freezed
           ? _value.attributes
-          : attributes as Map<String, dynamic>,
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -177,11 +218,11 @@ abstract class _$SignalMetaCopyWith<$Res> implements $SignalMetaCopyWith<$Res> {
       double offset,
       double minimum,
       double maximum,
-      @nullable String unit,
+      String? unit,
       String comment,
       int mid,
-      Map<int, String> options,
-      Map<String, dynamic> attributes});
+      Map<int, String>? options,
+      Map<String, dynamic>? attributes});
 }
 
 /// @nodoc
@@ -196,80 +237,111 @@ class __$SignalMetaCopyWithImpl<$Res> extends _$SignalMetaCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object name = freezed,
-    Object start_bit = freezed,
-    Object length = freezed,
-    Object little_endian = freezed,
-    Object is_signed = freezed,
-    Object value_type = freezed,
-    Object scaling = freezed,
-    Object offset = freezed,
-    Object minimum = freezed,
-    Object maximum = freezed,
-    Object unit = freezed,
-    Object comment = freezed,
-    Object mid = freezed,
-    Object options = freezed,
-    Object attributes = freezed,
+    Object? name = freezed,
+    Object? start_bit = freezed,
+    Object? length = freezed,
+    Object? little_endian = freezed,
+    Object? is_signed = freezed,
+    Object? value_type = freezed,
+    Object? scaling = freezed,
+    Object? offset = freezed,
+    Object? minimum = freezed,
+    Object? maximum = freezed,
+    Object? unit = freezed,
+    Object? comment = freezed,
+    Object? mid = freezed,
+    Object? options = freezed,
+    Object? attributes = freezed,
   }) {
     return _then(_SignalMeta(
-      name: name == freezed ? _value.name : name as String,
-      start_bit: start_bit == freezed ? _value.start_bit : start_bit as int,
-      length: length == freezed ? _value.length : length as int,
+      name: name == freezed
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      start_bit: start_bit == freezed
+          ? _value.start_bit
+          : start_bit // ignore: cast_nullable_to_non_nullable
+              as int,
+      length: length == freezed
+          ? _value.length
+          : length // ignore: cast_nullable_to_non_nullable
+              as int,
       little_endian: little_endian == freezed
           ? _value.little_endian
-          : little_endian as int,
-      is_signed: is_signed == freezed ? _value.is_signed : is_signed as int,
-      value_type:
-          value_type == freezed ? _value.value_type : value_type as String,
-      scaling: scaling == freezed ? _value.scaling : scaling as double,
-      offset: offset == freezed ? _value.offset : offset as double,
-      minimum: minimum == freezed ? _value.minimum : minimum as double,
-      maximum: maximum == freezed ? _value.maximum : maximum as double,
-      unit: unit == freezed ? _value.unit : unit as String,
-      comment: comment == freezed ? _value.comment : comment as String,
-      mid: mid == freezed ? _value.mid : mid as int,
-      options:
-          options == freezed ? _value.options : options as Map<int, String>,
+          : little_endian // ignore: cast_nullable_to_non_nullable
+              as int,
+      is_signed: is_signed == freezed
+          ? _value.is_signed
+          : is_signed // ignore: cast_nullable_to_non_nullable
+              as int,
+      value_type: value_type == freezed
+          ? _value.value_type
+          : value_type // ignore: cast_nullable_to_non_nullable
+              as String,
+      scaling: scaling == freezed
+          ? _value.scaling
+          : scaling // ignore: cast_nullable_to_non_nullable
+              as double,
+      offset: offset == freezed
+          ? _value.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as double,
+      minimum: minimum == freezed
+          ? _value.minimum
+          : minimum // ignore: cast_nullable_to_non_nullable
+              as double,
+      maximum: maximum == freezed
+          ? _value.maximum
+          : maximum // ignore: cast_nullable_to_non_nullable
+              as double,
+      unit: unit == freezed
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
+              as String?,
+      comment: comment == freezed
+          ? _value.comment
+          : comment // ignore: cast_nullable_to_non_nullable
+              as String,
+      mid: mid == freezed
+          ? _value.mid
+          : mid // ignore: cast_nullable_to_non_nullable
+              as int,
+      options: options == freezed
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as Map<int, String>?,
       attributes: attributes == freezed
           ? _value.attributes
-          : attributes as Map<String, dynamic>,
+          : attributes // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake, createToJson: true)
+@JsonSerializable(
+    fieldRename: FieldRename.snake,
+    explicitToJson: true,
+    createToJson: true,
+    anyMap: true)
 
 /// @nodoc
 class _$_SignalMeta implements _SignalMeta {
   _$_SignalMeta(
-      {@required this.name,
-      @required this.start_bit,
-      @required this.length,
-      @required this.little_endian,
-      @required this.is_signed,
-      @required this.value_type,
-      @required this.scaling,
-      @required this.offset,
-      @required this.minimum,
-      @required this.maximum,
-      @required @nullable this.unit,
-      @required this.comment,
-      @required this.mid,
+      {required this.name,
+      required this.start_bit,
+      required this.length,
+      required this.little_endian,
+      required this.is_signed,
+      required this.value_type,
+      required this.scaling,
+      required this.offset,
+      required this.minimum,
+      required this.maximum,
+      this.unit,
+      required this.comment,
+      required this.mid,
       this.options,
-      this.attributes})
-      : assert(name != null),
-        assert(start_bit != null),
-        assert(length != null),
-        assert(little_endian != null),
-        assert(is_signed != null),
-        assert(value_type != null),
-        assert(scaling != null),
-        assert(offset != null),
-        assert(minimum != null),
-        assert(maximum != null),
-        assert(comment != null),
-        assert(mid != null);
+      this.attributes});
 
   factory _$_SignalMeta.fromJson(Map<String, dynamic> json) =>
       _$_$_SignalMetaFromJson(json);
@@ -295,16 +367,15 @@ class _$_SignalMeta implements _SignalMeta {
   @override
   final double maximum;
   @override
-  @nullable
-  final String unit;
+  final String? unit;
   @override
   final String comment;
   @override
   final int mid;
   @override
-  final Map<int, String> options;
+  final Map<int, String>? options;
   @override
-  final Map<String, dynamic> attributes;
+  final Map<String, dynamic>? attributes;
 
   @override
   String toString() {
@@ -376,6 +447,7 @@ class _$_SignalMeta implements _SignalMeta {
       const DeepCollectionEquality().hash(options) ^
       const DeepCollectionEquality().hash(attributes);
 
+  @JsonKey(ignore: true)
   @override
   _$SignalMetaCopyWith<_SignalMeta> get copyWith =>
       __$SignalMetaCopyWithImpl<_SignalMeta>(this, _$identity);
@@ -388,56 +460,57 @@ class _$_SignalMeta implements _SignalMeta {
 
 abstract class _SignalMeta implements SignalMeta {
   factory _SignalMeta(
-      {@required String name,
-      @required int start_bit,
-      @required int length,
-      @required int little_endian,
-      @required int is_signed,
-      @required String value_type,
-      @required double scaling,
-      @required double offset,
-      @required double minimum,
-      @required double maximum,
-      @required @nullable String unit,
-      @required String comment,
-      @required int mid,
-      Map<int, String> options,
-      Map<String, dynamic> attributes}) = _$_SignalMeta;
+      {required String name,
+      required int start_bit,
+      required int length,
+      required int little_endian,
+      required int is_signed,
+      required String value_type,
+      required double scaling,
+      required double offset,
+      required double minimum,
+      required double maximum,
+      String? unit,
+      required String comment,
+      required int mid,
+      Map<int, String>? options,
+      Map<String, dynamic>? attributes}) = _$_SignalMeta;
 
   factory _SignalMeta.fromJson(Map<String, dynamic> json) =
       _$_SignalMeta.fromJson;
 
   @override
-  String get name;
+  String get name => throw _privateConstructorUsedError;
   @override
-  int get start_bit;
+  int get start_bit => throw _privateConstructorUsedError;
   @override
-  int get length;
+  int get length => throw _privateConstructorUsedError;
   @override
-  int get little_endian;
+  int get little_endian => throw _privateConstructorUsedError;
   @override
-  int get is_signed;
+  int get is_signed => throw _privateConstructorUsedError;
   @override
-  String get value_type;
+  String get value_type => throw _privateConstructorUsedError;
   @override
-  double get scaling;
+  double get scaling => throw _privateConstructorUsedError;
   @override
-  double get offset;
+  double get offset => throw _privateConstructorUsedError;
   @override
-  double get minimum;
+  double get minimum => throw _privateConstructorUsedError;
   @override
-  double get maximum;
+  double get maximum => throw _privateConstructorUsedError;
   @override
-  @nullable
-  String get unit;
+  String? get unit => throw _privateConstructorUsedError;
   @override
-  String get comment;
+  String get comment => throw _privateConstructorUsedError;
   @override
-  int get mid;
+  int get mid => throw _privateConstructorUsedError;
   @override
-  Map<int, String> get options;
+  Map<int, String>? get options => throw _privateConstructorUsedError;
   @override
-  Map<String, dynamic> get attributes;
+  Map<String, dynamic>? get attributes => throw _privateConstructorUsedError;
   @override
-  _$SignalMetaCopyWith<_SignalMeta> get copyWith;
+  @JsonKey(ignore: true)
+  _$SignalMetaCopyWith<_SignalMeta> get copyWith =>
+      throw _privateConstructorUsedError;
 }

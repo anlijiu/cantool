@@ -27,16 +27,16 @@ class YAxis {
       double height, double width, TimelineSeriesData seriesData, Color color) {
     final Canvas canvas = context.canvas;
 
-    double top = seriesData.y;
+    double top = seriesData.y!;
     double bottom = top + height;
-    int maxNumticks = seriesData.scope;
+    int maxNumticks = seriesData.scope!;
 
-    double minTickDistance = height / (seriesData.scope - 1);
-    double scale = height / (seriesData.scope - 1);
+    double minTickDistance = height / (seriesData.scope! - 1);
+    double scale = height / (seriesData.scope! - 1);
 
     int numTicks = maxNumticks;
 
-    double scaledTickDistance = height / (seriesData.scope - 1);
+    double scaledTickDistance = height / (seriesData.scope! - 1);
     double tickDistance = scaledTickDistance;
     double textTickDistance = scaledTickDistance;
     if (minTickDistance < 10) {
@@ -67,7 +67,7 @@ class YAxis {
     /// Figure out the position of the top bottom corner of the screen
     double tickOffset = 0.0;
     double startingTickMarkValue = 0.0;
-    double y = seriesData.scope.ceilToDouble();
+    double y = seriesData.scope!.ceilToDouble();
     startingTickMarkValue = y - (y % tickDistance);
     tickOffset = -scaledTickDistance;
 
@@ -79,8 +79,8 @@ class YAxis {
       ..start = 0.1
       ..screenY = 0.0;
 
-    double tickValue = seriesData.scope / (numTicks);
-    int value = seriesData.meta.minimum.round();
+    double tickValue = seriesData.scope! / (numTicks);
+    int value = seriesData.meta!.minimum.round();
 
     final TextPainter _textPainter = TextPainter(
       textDirection: ui.TextDirection.ltr,
@@ -109,14 +109,14 @@ class YAxis {
             textAlign: TextAlign.end, fontFamily: "wqy", fontSize: 11.0))
           ..pushStyle(ui.TextStyle(color: color));
 
-        value = (i * tickValue + seriesData.meta.minimum).round();
+        value = (i * tickValue + seriesData.meta!.minimum).round();
 
         /// Format the label nicely depending on how long ago the tick is placed at.
         String label = value.toStringAsFixed(0);
-        if (seriesData.meta.options != null &&
-            seriesData.meta.options[value] != null) {
+        if (seriesData.meta!.options != null &&
+            seriesData.meta!.options![value] != null) {
           label += " (";
-          label += seriesData.meta.options[value];
+          label += seriesData.meta!.options![value]!;
           label += ")";
         }
         // TextSpan text =

@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'replay_file_entity.dart';
 
@@ -8,6 +8,10 @@ part of 'replay_file_entity.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
+
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 ReplayFileEntity _$ReplayFileEntityFromJson(Map<String, dynamic> json) {
   return _ReplayFileEntity.fromJson(json);
 }
@@ -16,30 +20,28 @@ ReplayFileEntity _$ReplayFileEntityFromJson(Map<String, dynamic> json) {
 class _$ReplayFileEntityTearOff {
   const _$ReplayFileEntityTearOff();
 
-// ignore: unused_element
-  _ReplayFileEntity call({@required @nullable String path}) {
+  _ReplayFileEntity call({String? path}) {
     return _ReplayFileEntity(
       path: path,
     );
   }
 
-// ignore: unused_element
   ReplayFileEntity fromJson(Map<String, Object> json) {
     return ReplayFileEntity.fromJson(json);
   }
 }
 
 /// @nodoc
-// ignore: unused_element
 const $ReplayFileEntity = _$ReplayFileEntityTearOff();
 
 /// @nodoc
 mixin _$ReplayFileEntity {
-  @nullable
-  String get path;
+  String? get path => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson();
-  $ReplayFileEntityCopyWith<ReplayFileEntity> get copyWith;
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  $ReplayFileEntityCopyWith<ReplayFileEntity> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -47,7 +49,7 @@ abstract class $ReplayFileEntityCopyWith<$Res> {
   factory $ReplayFileEntityCopyWith(
           ReplayFileEntity value, $Res Function(ReplayFileEntity) then) =
       _$ReplayFileEntityCopyWithImpl<$Res>;
-  $Res call({@nullable String path});
+  $Res call({String? path});
 }
 
 /// @nodoc
@@ -61,10 +63,13 @@ class _$ReplayFileEntityCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object path = freezed,
+    Object? path = freezed,
   }) {
     return _then(_value.copyWith(
-      path: path == freezed ? _value.path : path as String,
+      path: path == freezed
+          ? _value.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -76,7 +81,7 @@ abstract class _$ReplayFileEntityCopyWith<$Res>
           _ReplayFileEntity value, $Res Function(_ReplayFileEntity) then) =
       __$ReplayFileEntityCopyWithImpl<$Res>;
   @override
-  $Res call({@nullable String path});
+  $Res call({String? path});
 }
 
 /// @nodoc
@@ -92,10 +97,13 @@ class __$ReplayFileEntityCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object path = freezed,
+    Object? path = freezed,
   }) {
     return _then(_ReplayFileEntity(
-      path: path == freezed ? _value.path : path as String,
+      path: path == freezed
+          ? _value.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -104,14 +112,13 @@ class __$ReplayFileEntityCopyWithImpl<$Res>
 
 /// @nodoc
 class _$_ReplayFileEntity implements _ReplayFileEntity {
-  _$_ReplayFileEntity({@required @nullable this.path});
+  _$_ReplayFileEntity({this.path});
 
   factory _$_ReplayFileEntity.fromJson(Map<String, dynamic> json) =>
       _$_$_ReplayFileEntityFromJson(json);
 
   @override
-  @nullable
-  final String path;
+  final String? path;
 
   @override
   String toString() {
@@ -130,6 +137,7 @@ class _$_ReplayFileEntity implements _ReplayFileEntity {
   int get hashCode =>
       runtimeType.hashCode ^ const DeepCollectionEquality().hash(path);
 
+  @JsonKey(ignore: true)
   @override
   _$ReplayFileEntityCopyWith<_ReplayFileEntity> get copyWith =>
       __$ReplayFileEntityCopyWithImpl<_ReplayFileEntity>(this, _$identity);
@@ -141,15 +149,15 @@ class _$_ReplayFileEntity implements _ReplayFileEntity {
 }
 
 abstract class _ReplayFileEntity implements ReplayFileEntity {
-  factory _ReplayFileEntity({@required @nullable String path}) =
-      _$_ReplayFileEntity;
+  factory _ReplayFileEntity({String? path}) = _$_ReplayFileEntity;
 
   factory _ReplayFileEntity.fromJson(Map<String, dynamic> json) =
       _$_ReplayFileEntity.fromJson;
 
   @override
-  @nullable
-  String get path;
+  String? get path => throw _privateConstructorUsedError;
   @override
-  _$ReplayFileEntityCopyWith<_ReplayFileEntity> get copyWith;
+  @JsonKey(ignore: true)
+  _$ReplayFileEntityCopyWith<_ReplayFileEntity> get copyWith =>
+      throw _privateConstructorUsedError;
 }

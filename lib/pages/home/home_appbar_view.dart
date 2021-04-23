@@ -9,7 +9,7 @@ final startSending = StateProvider((_) => false);
 class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
   final double height;
   HomeAppbarView({
-    Key key,
+    Key? key,
     this.height: 46.0,
   }) : super(key: key);
 
@@ -18,7 +18,7 @@ class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
+    final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
@@ -46,7 +46,7 @@ class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
           Checkbox(
             value: sending.state,
             activeColor: Colors.blue,
-            onChanged: (bool val) {
+            onChanged: (bool? val) {
               final state = !sending.state;
               context.read(startSending).state = state;
               state ? controller.startSending() : controller.stopSending();

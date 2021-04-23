@@ -11,7 +11,7 @@ final drawerKeyProvider = Provider((ref) => GlobalKey<NavigatorState>());
 class AppDrawer extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = useProvider(dbcMetaProvider);
+    final controller = useProvider(dbcMetaProvider.notifier);
     final drawerKey = useProvider(drawerKeyProvider);
     final currentTab = useProvider(currentTabInDrawerProvider);
     return Drawer(
@@ -39,7 +39,8 @@ class AppDrawer extends HookWidget {
               title: Text("Load DBC".i18n),
               onTap: () {
                 Navigator.pop(context);
-                controller.loadDbcFile();
+                print("app drawer dbc loader is " + controller.toString());
+                controller.loadDbcFile(context);
               }),
           ListTile(
               title: Text("Replay".i18n),

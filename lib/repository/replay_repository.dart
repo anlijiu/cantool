@@ -6,34 +6,30 @@ import 'package:cantool/client/localstorage_client.dart';
 import 'package:cantool/entity/dbc_meta.dart';
 import 'package:cantool/entity/replay_model.dart';
 import 'package:dartz/dartz.dart';
-import 'package:file_chooser/file_chooser.dart' as file_chooser;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:can/can.dart' as can;
 
 typedef ReplayResultCallback(ReplayResult result);
 
-class ReplayRepository extends StateNotifier<ReplayResult> {
+class ReplayRepository extends StateNotifier<ReplayResult?> {
   final Reader read;
   Map<String, List<ReplayEntry>> _entries = new Map();
-  ReplaySummary _summary;
+  late ReplaySummary _summary;
   StreamController _streamController = new StreamController();
 
   //只吐出_canvasStart 到 _canvasEnd之间的items
-  double _canvasStart; //timestamp
-  double _canvasEnd; //timestamp
+  double _canvasStart = double.maxFinite;
+  double _canvasEnd = double.minPositive;
 
-  double _zoom;
+  double _zoom = 0;
 
-  StreamSubscription _streamSubscription;
-  ReplayResultCallback callback;
+  late StreamSubscription _streamSubscription;
+  ReplayResultCallback? callback;
 
-  ReplayRepository(this.read, [ReplayResult meta]) : super(meta ?? null) {
-    registerEventChannel();
-  }
-
-  void registerEventChannel() {
+  ReplayRepository(this.read, [ReplayResult? meta]) : super(meta) {
+    // registerEventChannel();
     _streamSubscription = can.eventChannelStream().listen((event) {
-      print("ReplayRepository   onData in $event");
+      // print("ReplayRepository   onData in $event");
       final m = Map<String, dynamic>.from(event);
       if (m["name"] == "summary") {
         _entries.clear();
@@ -45,10 +41,12 @@ class ReplayRepository extends StateNotifier<ReplayResult> {
     });
   }
 
+  void registerEventChannel() {}
+
   void processReplayDataChunk(ReplayDataChunk chunk) async {
     chunk.data.entries.forEach((element) {
       if (_entries[element.key] != null) {
-        _entries[element.key] = [..._entries[element.key], ...element.value];
+        _entries[element.key] = [..._entries[element.key]!, ...element.value];
       } else {
         _entries[element.key] = element.value;
       }
@@ -123,7 +121,7 @@ class ReplayRepository extends StateNotifier<ReplayResult> {
       s.end = visibleTimeEnd;
       // state = s;
 
-      if (callback != null) callback(s);
+      if (callback != null) callback!(s);
     }
     return canKeepCanvas;
   }
