@@ -262,6 +262,7 @@ static int /*__init*/ tsmaster_driver_init(void)
         snprintf(tdevice->device.uuid, sizeuuid, "%s-%s", TSMASTER_NAME, tdevice->AFSerial);
 
         uint64_t retValue = tscan_connect(tdevice->AFSerial, &tdevice->ADeviceHandle); //Connect the appointted device with serial no string: AFSerial
+        printf("tsmaster connect result: %ld\n", retValue);
                                                                                        //
         if ((retValue == 0) || (retValue == 5))   //0:success; 5: isconnectted
         {
