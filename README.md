@@ -5,7 +5,9 @@ send/receive CAN/CANFD on linux
 ### support device
 
 + usbcanii
-+ tsmaster(目前无法connect)
++ tsmaster
+
+> tsmaster 目前需要 sudo 执行才可以打开设备。 很尴尬。
 
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
