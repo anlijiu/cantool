@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'strategy_item.dart';
 
@@ -10,30 +12,11 @@ part of 'strategy_item.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 StrategyItem _$StrategyItemFromJson(Map<String, dynamic> json) {
   return _StrategyItem.fromJson(json);
 }
-
-/// @nodoc
-class _$StrategyItemTearOff {
-  const _$StrategyItemTearOff();
-
-  _StrategyItem call(SignalMeta meta, Strategy strategy) {
-    return _StrategyItem(
-      meta,
-      strategy,
-    );
-  }
-
-  StrategyItem fromJson(Map<String, Object> json) {
-    return StrategyItem.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $StrategyItem = _$StrategyItemTearOff();
 
 /// @nodoc
 mixin _$StrategyItem {
@@ -50,7 +33,8 @@ mixin _$StrategyItem {
 abstract class $StrategyItemCopyWith<$Res> {
   factory $StrategyItemCopyWith(
           StrategyItem value, $Res Function(StrategyItem) then) =
-      _$StrategyItemCopyWithImpl<$Res>;
+      _$StrategyItemCopyWithImpl<$Res, StrategyItem>;
+  @useResult
   $Res call({SignalMeta meta, Strategy strategy});
 
   $SignalMetaCopyWith<$Res> get meta;
@@ -58,52 +42,58 @@ abstract class $StrategyItemCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$StrategyItemCopyWithImpl<$Res> implements $StrategyItemCopyWith<$Res> {
+class _$StrategyItemCopyWithImpl<$Res, $Val extends StrategyItem>
+    implements $StrategyItemCopyWith<$Res> {
   _$StrategyItemCopyWithImpl(this._value, this._then);
 
-  final StrategyItem _value;
   // ignore: unused_field
-  final $Res Function(StrategyItem) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? meta = freezed,
-    Object? strategy = freezed,
+    Object? meta = null,
+    Object? strategy = null,
   }) {
     return _then(_value.copyWith(
-      meta: meta == freezed
+      meta: null == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
               as SignalMeta,
-      strategy: strategy == freezed
+      strategy: null == strategy
           ? _value.strategy
           : strategy // ignore: cast_nullable_to_non_nullable
               as Strategy,
-    ));
+    ) as $Val);
   }
 
   @override
+  @pragma('vm:prefer-inline')
   $SignalMetaCopyWith<$Res> get meta {
     return $SignalMetaCopyWith<$Res>(_value.meta, (value) {
-      return _then(_value.copyWith(meta: value));
+      return _then(_value.copyWith(meta: value) as $Val);
     });
   }
 
   @override
+  @pragma('vm:prefer-inline')
   $StrategyCopyWith<$Res> get strategy {
     return $StrategyCopyWith<$Res>(_value.strategy, (value) {
-      return _then(_value.copyWith(strategy: value));
+      return _then(_value.copyWith(strategy: value) as $Val);
     });
   }
 }
 
 /// @nodoc
-abstract class _$StrategyItemCopyWith<$Res>
+abstract class _$$_StrategyItemCopyWith<$Res>
     implements $StrategyItemCopyWith<$Res> {
-  factory _$StrategyItemCopyWith(
-          _StrategyItem value, $Res Function(_StrategyItem) then) =
-      __$StrategyItemCopyWithImpl<$Res>;
+  factory _$$_StrategyItemCopyWith(
+          _$_StrategyItem value, $Res Function(_$_StrategyItem) then) =
+      __$$_StrategyItemCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({SignalMeta meta, Strategy strategy});
 
   @override
@@ -113,26 +103,25 @@ abstract class _$StrategyItemCopyWith<$Res>
 }
 
 /// @nodoc
-class __$StrategyItemCopyWithImpl<$Res> extends _$StrategyItemCopyWithImpl<$Res>
-    implements _$StrategyItemCopyWith<$Res> {
-  __$StrategyItemCopyWithImpl(
-      _StrategyItem _value, $Res Function(_StrategyItem) _then)
-      : super(_value, (v) => _then(v as _StrategyItem));
+class __$$_StrategyItemCopyWithImpl<$Res>
+    extends _$StrategyItemCopyWithImpl<$Res, _$_StrategyItem>
+    implements _$$_StrategyItemCopyWith<$Res> {
+  __$$_StrategyItemCopyWithImpl(
+      _$_StrategyItem _value, $Res Function(_$_StrategyItem) _then)
+      : super(_value, _then);
 
-  @override
-  _StrategyItem get _value => super._value as _StrategyItem;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? meta = freezed,
-    Object? strategy = freezed,
+    Object? meta = null,
+    Object? strategy = null,
   }) {
-    return _then(_StrategyItem(
-      meta == freezed
+    return _then(_$_StrategyItem(
+      null == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
               as SignalMeta,
-      strategy == freezed
+      null == strategy
           ? _value.strategy
           : strategy // ignore: cast_nullable_to_non_nullable
               as Strategy,
@@ -140,14 +129,13 @@ class __$StrategyItemCopyWithImpl<$Res> extends _$StrategyItemCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
-
 /// @nodoc
+@JsonSerializable()
 class _$_StrategyItem implements _StrategyItem {
   const _$_StrategyItem(this.meta, this.strategy);
 
   factory _$_StrategyItem.fromJson(Map<String, dynamic> json) =>
-      _$_$_StrategyItemFromJson(json);
+      _$$_StrategyItemFromJson(json);
 
   @override
   final SignalMeta meta;
@@ -162,44 +150,44 @@ class _$_StrategyItem implements _StrategyItem {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _StrategyItem &&
-            (identical(other.meta, meta) ||
-                const DeepCollectionEquality().equals(other.meta, meta)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$_StrategyItem &&
+            (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.strategy, strategy) ||
-                const DeepCollectionEquality()
-                    .equals(other.strategy, strategy)));
+                other.strategy == strategy));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(meta) ^
-      const DeepCollectionEquality().hash(strategy);
 
   @JsonKey(ignore: true)
   @override
-  _$StrategyItemCopyWith<_StrategyItem> get copyWith =>
-      __$StrategyItemCopyWithImpl<_StrategyItem>(this, _$identity);
+  int get hashCode => Object.hash(runtimeType, meta, strategy);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_StrategyItemCopyWith<_$_StrategyItem> get copyWith =>
+      __$$_StrategyItemCopyWithImpl<_$_StrategyItem>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_StrategyItemToJson(this);
+    return _$$_StrategyItemToJson(
+      this,
+    );
   }
 }
 
 abstract class _StrategyItem implements StrategyItem {
-  const factory _StrategyItem(SignalMeta meta, Strategy strategy) =
+  const factory _StrategyItem(final SignalMeta meta, final Strategy strategy) =
       _$_StrategyItem;
 
   factory _StrategyItem.fromJson(Map<String, dynamic> json) =
       _$_StrategyItem.fromJson;
 
   @override
-  SignalMeta get meta => throw _privateConstructorUsedError;
+  SignalMeta get meta;
   @override
-  Strategy get strategy => throw _privateConstructorUsedError;
+  Strategy get strategy;
   @override
   @JsonKey(ignore: true)
-  _$StrategyItemCopyWith<_StrategyItem> get copyWith =>
+  _$$_StrategyItemCopyWith<_$_StrategyItem> get copyWith =>
       throw _privateConstructorUsedError;
 }

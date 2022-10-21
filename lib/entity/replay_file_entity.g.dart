@@ -6,14 +6,12 @@ part of 'replay_file_entity.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_ReplayFileEntity _$_$_ReplayFileEntityFromJson(Map<String, dynamic> json) {
-  return _$_ReplayFileEntity(
-    path: json['path'] as String?,
-  );
-}
+_$_ReplayFileEntity _$$_ReplayFileEntityFromJson(Map<String, dynamic> json) =>
+    _$_ReplayFileEntity(
+      path: json['path'] as String?,
+    );
 
-Map<String, dynamic> _$_$_ReplayFileEntityToJson(
-        _$_ReplayFileEntity instance) =>
+Map<String, dynamic> _$$_ReplayFileEntityToJson(_$_ReplayFileEntity instance) =>
     <String, dynamic>{
       'path': instance.path,
     };

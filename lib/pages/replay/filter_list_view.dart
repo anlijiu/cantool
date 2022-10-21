@@ -4,15 +4,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers.dart';
 import 'package:cantool/entity/replay_model.dart';
 
-final _currentSignal = ScopedProvider<Signal>(null);
+final _currentSignal = Provider<Signal>((ref) => throw UnimplementedError());
 
-class SignalTile extends HookWidget {
-  const SignalTile();
+class SignalItemView extends HookConsumerWidget {
+  const SignalItemView();
 
   @override
-  Widget build(BuildContext context) {
-    final signal = useProvider(_currentSignal);
-    final viewController = useProvider(viewControllerProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final signal = ref.watch(_currentSignal);
+    final filterMsgNotifier = ref.watch(filterMsgSignalProvider.notifier);
     return Material(
       child: ListTile(
           title: Text(signal.name),
@@ -21,31 +21,30 @@ class SignalTile extends HookWidget {
                 ? const Icon(Icons.check_box, color: Colors.green)
                 : const Icon(Icons.check_box_outline_blank),
             onPressed: () {
-              print(" SignalTile check onPressed  " + signal.name);
-              viewController.toggleStatus(signal);
+              print(" SignalItemView check onPressed  ${signal.name}");
+              filterMsgNotifier.toggleStatus(signal);
             },
           ),
           trailing: IconButton(
             icon: const Icon(Icons.clear, color: Colors.green),
             onPressed: () {
-              viewController.removeSignal(signal);
-              print(" SignalTile remove onPressed  ");
+              filterMsgNotifier.removeSignal(signal);
+              print(" SignalItemView remove onPressed  ");
             },
           ),
           onTap: () {
-            // context.read(viewController).focusMessage(message);
           }),
     );
   }
 }
 
-class FilterListView extends HookWidget {
+class FilterListView extends HookConsumerWidget {
   const FilterListView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final filterMsgSignal = useProvider(filterMsgSignalProvider);
-    final signals = filterMsgSignal.state.messages.values.fold<List<Signal>>(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filterMsgSignal = ref.watch(filterMsgSignalProvider);
+    final signals = filterMsgSignal.messages.values.fold<List<Signal>>(
         [], (value, element) => [...value, ...element.signals.values]);
     print('FilterListView  signals :' + signals.toString());
     if (signals.isEmpty) return Text('');
@@ -55,7 +54,7 @@ class FilterListView extends HookWidget {
               overrides: [
                 _currentSignal.overrideWithValue(signals[idx]),
               ],
-              child: const SignalTile(),
+              child: const SignalItemView(),
             ));
   }
 }

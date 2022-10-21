@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'strategy.dart';
 
@@ -10,38 +12,11 @@ part of 'strategy.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 Strategy _$StrategyFromJson(Map<String, dynamic> json) {
   return _Strategy.fromJson(json);
 }
-
-/// @nodoc
-class _$StrategyTearOff {
-  const _$StrategyTearOff();
-
-  _Strategy call(
-      {required String name,
-      required double value,
-      required double min,
-      required double max,
-      StrategyType type = StrategyType.constant}) {
-    return _Strategy(
-      name: name,
-      value: value,
-      min: min,
-      max: max,
-      type: type,
-    );
-  }
-
-  Strategy fromJson(Map<String, Object> json) {
-    return Strategy.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $Strategy = _$StrategyTearOff();
 
 /// @nodoc
 mixin _$Strategy {
@@ -60,96 +35,102 @@ mixin _$Strategy {
 /// @nodoc
 abstract class $StrategyCopyWith<$Res> {
   factory $StrategyCopyWith(Strategy value, $Res Function(Strategy) then) =
-      _$StrategyCopyWithImpl<$Res>;
+      _$StrategyCopyWithImpl<$Res, Strategy>;
+  @useResult
   $Res call(
       {String name, double value, double min, double max, StrategyType type});
 }
 
 /// @nodoc
-class _$StrategyCopyWithImpl<$Res> implements $StrategyCopyWith<$Res> {
+class _$StrategyCopyWithImpl<$Res, $Val extends Strategy>
+    implements $StrategyCopyWith<$Res> {
   _$StrategyCopyWithImpl(this._value, this._then);
 
-  final Strategy _value;
   // ignore: unused_field
-  final $Res Function(Strategy) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? value = freezed,
-    Object? min = freezed,
-    Object? max = freezed,
-    Object? type = freezed,
+    Object? name = null,
+    Object? value = null,
+    Object? min = null,
+    Object? max = null,
+    Object? type = null,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      value: value == freezed
+      value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as double,
-      min: min == freezed
+      min: null == min
           ? _value.min
           : min // ignore: cast_nullable_to_non_nullable
               as double,
-      max: max == freezed
+      max: null == max
           ? _value.max
           : max // ignore: cast_nullable_to_non_nullable
               as double,
-      type: type == freezed
+      type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as StrategyType,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$StrategyCopyWith<$Res> implements $StrategyCopyWith<$Res> {
-  factory _$StrategyCopyWith(_Strategy value, $Res Function(_Strategy) then) =
-      __$StrategyCopyWithImpl<$Res>;
+abstract class _$$_StrategyCopyWith<$Res> implements $StrategyCopyWith<$Res> {
+  factory _$$_StrategyCopyWith(
+          _$_Strategy value, $Res Function(_$_Strategy) then) =
+      __$$_StrategyCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String name, double value, double min, double max, StrategyType type});
 }
 
 /// @nodoc
-class __$StrategyCopyWithImpl<$Res> extends _$StrategyCopyWithImpl<$Res>
-    implements _$StrategyCopyWith<$Res> {
-  __$StrategyCopyWithImpl(_Strategy _value, $Res Function(_Strategy) _then)
-      : super(_value, (v) => _then(v as _Strategy));
+class __$$_StrategyCopyWithImpl<$Res>
+    extends _$StrategyCopyWithImpl<$Res, _$_Strategy>
+    implements _$$_StrategyCopyWith<$Res> {
+  __$$_StrategyCopyWithImpl(
+      _$_Strategy _value, $Res Function(_$_Strategy) _then)
+      : super(_value, _then);
 
-  @override
-  _Strategy get _value => super._value as _Strategy;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? value = freezed,
-    Object? min = freezed,
-    Object? max = freezed,
-    Object? type = freezed,
+    Object? name = null,
+    Object? value = null,
+    Object? min = null,
+    Object? max = null,
+    Object? type = null,
   }) {
-    return _then(_Strategy(
-      name: name == freezed
+    return _then(_$_Strategy(
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      value: value == freezed
+      value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as double,
-      min: min == freezed
+      min: null == min
           ? _value.min
           : min // ignore: cast_nullable_to_non_nullable
               as double,
-      max: max == freezed
+      max: null == max
           ? _value.max
           : max // ignore: cast_nullable_to_non_nullable
               as double,
-      type: type == freezed
+      type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as StrategyType,
@@ -157,9 +138,8 @@ class __$StrategyCopyWithImpl<$Res> extends _$StrategyCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
-
 /// @nodoc
+@JsonSerializable()
 class _$_Strategy implements _Strategy {
   _$_Strategy(
       {required this.name,
@@ -169,7 +149,7 @@ class _$_Strategy implements _Strategy {
       this.type = StrategyType.constant});
 
   factory _$_Strategy.fromJson(Map<String, dynamic> json) =>
-      _$_$_StrategyFromJson(json);
+      _$$_StrategyFromJson(json);
 
   @override
   final String name;
@@ -179,8 +159,8 @@ class _$_Strategy implements _Strategy {
   final double min;
   @override
   final double max;
-  @JsonKey(defaultValue: StrategyType.constant)
   @override
+  @JsonKey()
   final StrategyType type;
 
   @override
@@ -191,61 +171,55 @@ class _$_Strategy implements _Strategy {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _Strategy &&
-            (identical(other.name, name) ||
-                const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.value, value) ||
-                const DeepCollectionEquality().equals(other.value, value)) &&
-            (identical(other.min, min) ||
-                const DeepCollectionEquality().equals(other.min, min)) &&
-            (identical(other.max, max) ||
-                const DeepCollectionEquality().equals(other.max, max)) &&
-            (identical(other.type, type) ||
-                const DeepCollectionEquality().equals(other.type, type)));
+        (other.runtimeType == runtimeType &&
+            other is _$_Strategy &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.value, value) || other.value == value) &&
+            (identical(other.min, min) || other.min == min) &&
+            (identical(other.max, max) || other.max == max) &&
+            (identical(other.type, type) || other.type == type));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(name) ^
-      const DeepCollectionEquality().hash(value) ^
-      const DeepCollectionEquality().hash(min) ^
-      const DeepCollectionEquality().hash(max) ^
-      const DeepCollectionEquality().hash(type);
 
   @JsonKey(ignore: true)
   @override
-  _$StrategyCopyWith<_Strategy> get copyWith =>
-      __$StrategyCopyWithImpl<_Strategy>(this, _$identity);
+  int get hashCode => Object.hash(runtimeType, name, value, min, max, type);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_StrategyCopyWith<_$_Strategy> get copyWith =>
+      __$$_StrategyCopyWithImpl<_$_Strategy>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_StrategyToJson(this);
+    return _$$_StrategyToJson(
+      this,
+    );
   }
 }
 
 abstract class _Strategy implements Strategy {
   factory _Strategy(
-      {required String name,
-      required double value,
-      required double min,
-      required double max,
-      StrategyType type}) = _$_Strategy;
+      {required final String name,
+      required final double value,
+      required final double min,
+      required final double max,
+      final StrategyType type}) = _$_Strategy;
 
   factory _Strategy.fromJson(Map<String, dynamic> json) = _$_Strategy.fromJson;
 
   @override
-  String get name => throw _privateConstructorUsedError;
+  String get name;
   @override
-  double get value => throw _privateConstructorUsedError;
+  double get value;
   @override
-  double get min => throw _privateConstructorUsedError;
+  double get min;
   @override
-  double get max => throw _privateConstructorUsedError;
+  double get max;
   @override
-  StrategyType get type => throw _privateConstructorUsedError;
+  StrategyType get type;
   @override
   @JsonKey(ignore: true)
-  _$StrategyCopyWith<_Strategy> get copyWith =>
+  _$$_StrategyCopyWith<_$_Strategy> get copyWith =>
       throw _privateConstructorUsedError;
 }

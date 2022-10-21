@@ -1,0 +1,74 @@
+add_library(tsmaster MODULE)
+# set_target_properties(tsmaster PROPERTIES LINKER_LANGUAGE C)
+
+set(INSTALL_DRIVER_DIR "${CMAKE_INSTALL_PREFIX}/${DRIVERS_LOCATION}")
+set(INSTALL_DRIVER_LIB_DIR "${INSTALL_DRIVER_DIR}/lib")
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bundle)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bundle)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bundle)
+
+
+set_target_properties(tsmaster PROPERTIES
+    BUILD_WITH_INSTALL_RPATH FALSE
+    INSTALL_RPATH "\$ORIGIN/lib"
+    LINK_FLAGS "-Wl,--disable-new-dtags"
+)
+
+add_library(TSH SHARED IMPORTED)
+set_target_properties(TSH PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so
+    IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so
+    # LIBRARY_OUTPUT_DIRECTORY  ${INSTALL_DRIVER_LIB_DIR}
+    # RUNTIME_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
+    # ARCHIVE_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
+    IMPORTED_NO_SONAME TRUE
+    )
+
+add_library(TSCANApiOnLinux SHARED IMPORTED)
+set_target_properties(TSCANApiOnLinux PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so
+    IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so
+    LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libs
+    RUNTIME_OUTPUT_DIRECTORY "$<CONFIG>/TSCANApiOnLinux"
+    ARCHIVE_OUTPUT_DIRECTORY "$<CONFIG>/TSCANApiOnLinux"
+    IMPORTED_NO_SONAME TRUE
+    )
+
+# add_custom_command(TARGET tsmaster  POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DRIVERS_LOCATION}/libs/libTSCANApiOnLinux.so 
+# )
+# add_custom_command(TARGET tsmaster  POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DRIVERS_LOCATION}/libs/libTSH.so 
+# )
+
+install(TARGETS tsmaster DESTINATION "${INSTALL_DRIVER_DIR}" COMPONENT Runtime)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so" DESTINATION "${INSTALL_DRIVER_LIB_DIR}" COMPONENT Runtime)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so" DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
+
+
+target_sources(tsmaster
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/tsmaster.c
+
+  PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/tsmaster.h
+  )
+
+target_include_directories(tsmaster
+  PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/3rdparty
+  )
+
+target_link_libraries(tsmaster
+  # INTERFACE 
+  #   controlcan
+  PUBLIC
+    module
+    TSCANApiOnLinux 
+  # PRIVATE
+  #   controlcan
+)
+
+# set_property(TARGET tsmaster PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES controlcan)

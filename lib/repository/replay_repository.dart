@@ -12,7 +12,7 @@ import 'package:can/can.dart' as can;
 typedef ReplayResultCallback(ReplayResult result);
 
 class ReplayRepository extends StateNotifier<ReplayResult?> {
-  final Reader read;
+  final Ref ref;
   Map<String, List<ReplayEntry>> _entries = new Map();
   late ReplaySummary _summary;
   StreamController _streamController = new StreamController();
@@ -26,24 +26,32 @@ class ReplayRepository extends StateNotifier<ReplayResult?> {
   late StreamSubscription _streamSubscription;
   ReplayResultCallback? callback;
 
-  ReplayRepository(this.read, [ReplayResult? meta]) : super(meta) {
+  ReplayRepository(this.ref, [ReplayResult? meta]) : super(meta) {
     // registerEventChannel();
     _streamSubscription = can.eventChannelStream().listen((event) {
       // print("ReplayRepository   onData in $event");
-      final m = Map<String, dynamic>.from(event);
-      if (m["name"] == "summary") {
-        _entries.clear();
-        _summary = ReplaySummary.fromJson(m);
-      } else {
-        ReplayDataChunk chunk = ReplayDataChunk.fromJson(m);
-        processReplayDataChunk(chunk);
-      }
+      final mm = Map<String, dynamic>.from(event);
+      final m = ReplayWrapper.fromJson(mm);
+      _summary = m.summary;
+      ReplayDataChunk chunk = ReplayDataChunk(1, m.data);
+      // _summary = ReplaySummary.fromJson(m["summary"]);
+      // ReplayDataChunk chunk = ReplayDataChunk.fromJson(m["data"]);
+      processReplayDataChunk(chunk);
+      // if (m["name"] == "summary") {
+      //   _entries.clear();
+      //   _summary = ReplaySummary.fromJson(m);
+      // } else {
+      //   ReplayDataChunk chunk = ReplayDataChunk.fromJson(m);
+      //   processReplayDataChunk(chunk);
+      // }
     });
   }
 
   void registerEventChannel() {}
 
   void processReplayDataChunk(ReplayDataChunk chunk) async {
+    int length = chunk.data.length;
+    print("replay data length: ${length}");
     chunk.data.entries.forEach((element) {
       if (_entries[element.key] != null) {
         _entries[element.key] = [..._entries[element.key]!, ...element.value];
@@ -52,31 +60,30 @@ class ReplayRepository extends StateNotifier<ReplayResult?> {
       }
     });
 
-    if (chunk.sequence == 0) {
-      _canvasStart = double.maxFinite;
-      _canvasEnd = double.minPositive;
+    _canvasStart = double.maxFinite;
+    _canvasEnd = double.minPositive;
 
-      _entries.forEach((key, value) {
-        _canvasStart = min(_canvasStart, value.first.time);
-        _canvasEnd = max(_canvasEnd, value.last.time);
-      });
-      _zoom = (_canvasEnd - _canvasStart) / 3;
-      double start = _canvasStart + _zoom;
-      double end = _canvasStart + _zoom * 2;
+    _entries.forEach((key, value) {
+      _canvasStart = min(_canvasStart, value.first.time);
+      _canvasEnd = max(_canvasEnd, value.last.time);
+    });
+    _zoom = (_canvasEnd - _canvasStart) / 3;
+    double start = _canvasStart + _zoom;
+    double end = _canvasStart + _zoom * 2;
 
-      final s = ReplayResult(
-          _summary,
-          _entries.map((key, value) => MapEntry(
-              key,
-              value
-                  .where((element) =>
-                      element.time > _canvasStart && element.time < _canvasEnd)
-                  .toList())));
-      s.start = start;
-      s.end = end;
-      state = s;
-      // if (callback != null) callback(s);
-    }
+    final s = ReplayResult(
+        _summary,
+        _entries.map((key, value) => MapEntry(
+            key,
+            value
+                .where((element) =>
+                    element.time > _canvasStart && element.time < _canvasEnd)
+                .toList())));
+    s.start = start;
+    s.end = end;
+    state = s;
+    print("replay data updated : ${state.toString()}");
+    // if (callback != null) callback(s);
   }
 
   bool visbleTimeBoundariesChanged(

@@ -6,7 +6,7 @@ import 'i18n.dart';
 
 final startSending = StateProvider((_) => false);
 
-class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
+class HomeAppbarView extends HookConsumerWidget implements PreferredSizeWidget {
   final double height;
   HomeAppbarView({
     Key? key,
@@ -17,14 +17,14 @@ class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(height);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
-    final sending = useProvider(startSending);
-    final controller = useProvider(canRepository);
+    final sending = ref.watch(startSending);
+    final controller = ref.watch(canRepository);
     return Container(
         height: 50,
         decoration: new BoxDecoration(
@@ -44,11 +44,11 @@ class HomeAppbarView extends HookWidget implements PreferredSizeWidget {
                   },
                 ),
           Checkbox(
-            value: sending.state,
+            value: sending,
             activeColor: Colors.blue,
             onChanged: (bool? val) {
-              final state = !sending.state;
-              context.read(startSending).state = state;
+              final state = !sending;
+              ref.read(startSending.notifier).state = state;
               state ? controller.startSending() : controller.stopSending();
             },
           ),

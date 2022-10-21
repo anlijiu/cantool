@@ -6,17 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:can/can.dart' as can;
 
 class DbcMetaRepository extends StateNotifier<DbcMeta?> {
-  final Reader read;
+  final Ref ref;
 
   final _dbcKey = 'dbc';
   final _dbName = 'dbc_database';
 
-  DbcMetaRepository(this.read, [DbcMeta? meta]) : super(meta) {
+  DbcMetaRepository(this.ref, [DbcMeta? meta]) : super(meta) {
     _loadFromLocalStorage();
   }
 
   void _loadFromLocalStorage() async {
-    final storage = await read(localStorageProvider(_dbName).future);
+    final storage = await ref.read(localStorageProvider(_dbName).future);
     storage.watchItem(_dbcKey).listen((event) {
       if (event == null) return;
       state = DbcMeta.fromJson(event);
@@ -54,7 +54,7 @@ class DbcMetaRepository extends StateNotifier<DbcMeta?> {
   }
 
   Future<void> _saveDbcMeta(Map<String, dynamic> dbcJson) async {
-    final storage = await read(localStorageProvider(_dbName).future);
+    final storage = await ref.read(localStorageProvider(_dbName).future);
 
     print("_saveDbcMeta   json : " + dbcJson.toString());
 

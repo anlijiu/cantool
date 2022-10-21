@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'signal_meta.dart';
 
@@ -10,58 +12,11 @@ part of 'signal_meta.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 SignalMeta _$SignalMetaFromJson(Map<String, dynamic> json) {
   return _SignalMeta.fromJson(json);
 }
-
-/// @nodoc
-class _$SignalMetaTearOff {
-  const _$SignalMetaTearOff();
-
-  _SignalMeta call(
-      {required String name,
-      required int start_bit,
-      required int length,
-      required int little_endian,
-      required int is_signed,
-      required String value_type,
-      required double scaling,
-      required double offset,
-      required double minimum,
-      required double maximum,
-      String? unit,
-      required String comment,
-      required int mid,
-      Map<int, String>? options,
-      Map<String, dynamic>? attributes}) {
-    return _SignalMeta(
-      name: name,
-      start_bit: start_bit,
-      length: length,
-      little_endian: little_endian,
-      is_signed: is_signed,
-      value_type: value_type,
-      scaling: scaling,
-      offset: offset,
-      minimum: minimum,
-      maximum: maximum,
-      unit: unit,
-      comment: comment,
-      mid: mid,
-      options: options,
-      attributes: attributes,
-    );
-  }
-
-  SignalMeta fromJson(Map<String, Object> json) {
-    return SignalMeta.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $SignalMeta = _$SignalMetaTearOff();
 
 /// @nodoc
 mixin _$SignalMeta {
@@ -91,7 +46,8 @@ mixin _$SignalMeta {
 abstract class $SignalMetaCopyWith<$Res> {
   factory $SignalMetaCopyWith(
           SignalMeta value, $Res Function(SignalMeta) then) =
-      _$SignalMetaCopyWithImpl<$Res>;
+      _$SignalMetaCopyWithImpl<$Res, SignalMeta>;
+  @useResult
   $Res call(
       {String name,
       int start_bit,
@@ -111,102 +67,107 @@ abstract class $SignalMetaCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SignalMetaCopyWithImpl<$Res> implements $SignalMetaCopyWith<$Res> {
+class _$SignalMetaCopyWithImpl<$Res, $Val extends SignalMeta>
+    implements $SignalMetaCopyWith<$Res> {
   _$SignalMetaCopyWithImpl(this._value, this._then);
 
-  final SignalMeta _value;
   // ignore: unused_field
-  final $Res Function(SignalMeta) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? start_bit = freezed,
-    Object? length = freezed,
-    Object? little_endian = freezed,
-    Object? is_signed = freezed,
-    Object? value_type = freezed,
-    Object? scaling = freezed,
-    Object? offset = freezed,
-    Object? minimum = freezed,
-    Object? maximum = freezed,
+    Object? name = null,
+    Object? start_bit = null,
+    Object? length = null,
+    Object? little_endian = null,
+    Object? is_signed = null,
+    Object? value_type = null,
+    Object? scaling = null,
+    Object? offset = null,
+    Object? minimum = null,
+    Object? maximum = null,
     Object? unit = freezed,
-    Object? comment = freezed,
-    Object? mid = freezed,
+    Object? comment = null,
+    Object? mid = null,
     Object? options = freezed,
     Object? attributes = freezed,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      start_bit: start_bit == freezed
+      start_bit: null == start_bit
           ? _value.start_bit
           : start_bit // ignore: cast_nullable_to_non_nullable
               as int,
-      length: length == freezed
+      length: null == length
           ? _value.length
           : length // ignore: cast_nullable_to_non_nullable
               as int,
-      little_endian: little_endian == freezed
+      little_endian: null == little_endian
           ? _value.little_endian
           : little_endian // ignore: cast_nullable_to_non_nullable
               as int,
-      is_signed: is_signed == freezed
+      is_signed: null == is_signed
           ? _value.is_signed
           : is_signed // ignore: cast_nullable_to_non_nullable
               as int,
-      value_type: value_type == freezed
+      value_type: null == value_type
           ? _value.value_type
           : value_type // ignore: cast_nullable_to_non_nullable
               as String,
-      scaling: scaling == freezed
+      scaling: null == scaling
           ? _value.scaling
           : scaling // ignore: cast_nullable_to_non_nullable
               as double,
-      offset: offset == freezed
+      offset: null == offset
           ? _value.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as double,
-      minimum: minimum == freezed
+      minimum: null == minimum
           ? _value.minimum
           : minimum // ignore: cast_nullable_to_non_nullable
               as double,
-      maximum: maximum == freezed
+      maximum: null == maximum
           ? _value.maximum
           : maximum // ignore: cast_nullable_to_non_nullable
               as double,
-      unit: unit == freezed
+      unit: freezed == unit
           ? _value.unit
           : unit // ignore: cast_nullable_to_non_nullable
               as String?,
-      comment: comment == freezed
+      comment: null == comment
           ? _value.comment
           : comment // ignore: cast_nullable_to_non_nullable
               as String,
-      mid: mid == freezed
+      mid: null == mid
           ? _value.mid
           : mid // ignore: cast_nullable_to_non_nullable
               as int,
-      options: options == freezed
+      options: freezed == options
           ? _value.options
           : options // ignore: cast_nullable_to_non_nullable
               as Map<int, String>?,
-      attributes: attributes == freezed
+      attributes: freezed == attributes
           ? _value.attributes
           : attributes // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$SignalMetaCopyWith<$Res> implements $SignalMetaCopyWith<$Res> {
-  factory _$SignalMetaCopyWith(
-          _SignalMeta value, $Res Function(_SignalMeta) then) =
-      __$SignalMetaCopyWithImpl<$Res>;
+abstract class _$$_SignalMetaCopyWith<$Res>
+    implements $SignalMetaCopyWith<$Res> {
+  factory _$$_SignalMetaCopyWith(
+          _$_SignalMeta value, $Res Function(_$_SignalMeta) then) =
+      __$$_SignalMetaCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String name,
       int start_bit,
@@ -226,105 +187,104 @@ abstract class _$SignalMetaCopyWith<$Res> implements $SignalMetaCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$SignalMetaCopyWithImpl<$Res> extends _$SignalMetaCopyWithImpl<$Res>
-    implements _$SignalMetaCopyWith<$Res> {
-  __$SignalMetaCopyWithImpl(
-      _SignalMeta _value, $Res Function(_SignalMeta) _then)
-      : super(_value, (v) => _then(v as _SignalMeta));
+class __$$_SignalMetaCopyWithImpl<$Res>
+    extends _$SignalMetaCopyWithImpl<$Res, _$_SignalMeta>
+    implements _$$_SignalMetaCopyWith<$Res> {
+  __$$_SignalMetaCopyWithImpl(
+      _$_SignalMeta _value, $Res Function(_$_SignalMeta) _then)
+      : super(_value, _then);
 
-  @override
-  _SignalMeta get _value => super._value as _SignalMeta;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
-    Object? start_bit = freezed,
-    Object? length = freezed,
-    Object? little_endian = freezed,
-    Object? is_signed = freezed,
-    Object? value_type = freezed,
-    Object? scaling = freezed,
-    Object? offset = freezed,
-    Object? minimum = freezed,
-    Object? maximum = freezed,
+    Object? name = null,
+    Object? start_bit = null,
+    Object? length = null,
+    Object? little_endian = null,
+    Object? is_signed = null,
+    Object? value_type = null,
+    Object? scaling = null,
+    Object? offset = null,
+    Object? minimum = null,
+    Object? maximum = null,
     Object? unit = freezed,
-    Object? comment = freezed,
-    Object? mid = freezed,
+    Object? comment = null,
+    Object? mid = null,
     Object? options = freezed,
     Object? attributes = freezed,
   }) {
-    return _then(_SignalMeta(
-      name: name == freezed
+    return _then(_$_SignalMeta(
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      start_bit: start_bit == freezed
+      start_bit: null == start_bit
           ? _value.start_bit
           : start_bit // ignore: cast_nullable_to_non_nullable
               as int,
-      length: length == freezed
+      length: null == length
           ? _value.length
           : length // ignore: cast_nullable_to_non_nullable
               as int,
-      little_endian: little_endian == freezed
+      little_endian: null == little_endian
           ? _value.little_endian
           : little_endian // ignore: cast_nullable_to_non_nullable
               as int,
-      is_signed: is_signed == freezed
+      is_signed: null == is_signed
           ? _value.is_signed
           : is_signed // ignore: cast_nullable_to_non_nullable
               as int,
-      value_type: value_type == freezed
+      value_type: null == value_type
           ? _value.value_type
           : value_type // ignore: cast_nullable_to_non_nullable
               as String,
-      scaling: scaling == freezed
+      scaling: null == scaling
           ? _value.scaling
           : scaling // ignore: cast_nullable_to_non_nullable
               as double,
-      offset: offset == freezed
+      offset: null == offset
           ? _value.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as double,
-      minimum: minimum == freezed
+      minimum: null == minimum
           ? _value.minimum
           : minimum // ignore: cast_nullable_to_non_nullable
               as double,
-      maximum: maximum == freezed
+      maximum: null == maximum
           ? _value.maximum
           : maximum // ignore: cast_nullable_to_non_nullable
               as double,
-      unit: unit == freezed
+      unit: freezed == unit
           ? _value.unit
           : unit // ignore: cast_nullable_to_non_nullable
               as String?,
-      comment: comment == freezed
+      comment: null == comment
           ? _value.comment
           : comment // ignore: cast_nullable_to_non_nullable
               as String,
-      mid: mid == freezed
+      mid: null == mid
           ? _value.mid
           : mid // ignore: cast_nullable_to_non_nullable
               as int,
-      options: options == freezed
-          ? _value.options
+      options: freezed == options
+          ? _value._options
           : options // ignore: cast_nullable_to_non_nullable
               as Map<int, String>?,
-      attributes: attributes == freezed
-          ? _value.attributes
+      attributes: freezed == attributes
+          ? _value._attributes
           : attributes // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
     ));
   }
 }
+
+/// @nodoc
 
 @JsonSerializable(
     fieldRename: FieldRename.snake,
     explicitToJson: true,
     createToJson: true,
     anyMap: true)
-
-/// @nodoc
 class _$_SignalMeta implements _SignalMeta {
   _$_SignalMeta(
       {required this.name,
@@ -340,11 +300,13 @@ class _$_SignalMeta implements _SignalMeta {
       this.unit,
       required this.comment,
       required this.mid,
-      this.options,
-      this.attributes});
+      final Map<int, String>? options,
+      final Map<String, dynamic>? attributes})
+      : _options = options,
+        _attributes = attributes;
 
   factory _$_SignalMeta.fromJson(Map<String, dynamic> json) =>
-      _$_$_SignalMetaFromJson(json);
+      _$$_SignalMetaFromJson(json);
 
   @override
   final String name;
@@ -372,10 +334,23 @@ class _$_SignalMeta implements _SignalMeta {
   final String comment;
   @override
   final int mid;
+  final Map<int, String>? _options;
   @override
-  final Map<int, String>? options;
+  Map<int, String>? get options {
+    final value = _options;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final Map<String, dynamic>? _attributes;
   @override
-  final Map<String, dynamic>? attributes;
+  Map<String, dynamic>? get attributes {
+    final value = _attributes;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
@@ -385,132 +360,117 @@ class _$_SignalMeta implements _SignalMeta {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _SignalMeta &&
-            (identical(other.name, name) ||
-                const DeepCollectionEquality().equals(other.name, name)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$_SignalMeta &&
+            (identical(other.name, name) || other.name == name) &&
             (identical(other.start_bit, start_bit) ||
-                const DeepCollectionEquality()
-                    .equals(other.start_bit, start_bit)) &&
-            (identical(other.length, length) ||
-                const DeepCollectionEquality().equals(other.length, length)) &&
+                other.start_bit == start_bit) &&
+            (identical(other.length, length) || other.length == length) &&
             (identical(other.little_endian, little_endian) ||
-                const DeepCollectionEquality()
-                    .equals(other.little_endian, little_endian)) &&
+                other.little_endian == little_endian) &&
             (identical(other.is_signed, is_signed) ||
-                const DeepCollectionEquality()
-                    .equals(other.is_signed, is_signed)) &&
+                other.is_signed == is_signed) &&
             (identical(other.value_type, value_type) ||
-                const DeepCollectionEquality()
-                    .equals(other.value_type, value_type)) &&
-            (identical(other.scaling, scaling) ||
-                const DeepCollectionEquality()
-                    .equals(other.scaling, scaling)) &&
-            (identical(other.offset, offset) ||
-                const DeepCollectionEquality().equals(other.offset, offset)) &&
-            (identical(other.minimum, minimum) ||
-                const DeepCollectionEquality()
-                    .equals(other.minimum, minimum)) &&
-            (identical(other.maximum, maximum) ||
-                const DeepCollectionEquality()
-                    .equals(other.maximum, maximum)) &&
-            (identical(other.unit, unit) ||
-                const DeepCollectionEquality().equals(other.unit, unit)) &&
-            (identical(other.comment, comment) ||
-                const DeepCollectionEquality()
-                    .equals(other.comment, comment)) &&
-            (identical(other.mid, mid) ||
-                const DeepCollectionEquality().equals(other.mid, mid)) &&
-            (identical(other.options, options) ||
-                const DeepCollectionEquality()
-                    .equals(other.options, options)) &&
-            (identical(other.attributes, attributes) ||
-                const DeepCollectionEquality()
-                    .equals(other.attributes, attributes)));
+                other.value_type == value_type) &&
+            (identical(other.scaling, scaling) || other.scaling == scaling) &&
+            (identical(other.offset, offset) || other.offset == offset) &&
+            (identical(other.minimum, minimum) || other.minimum == minimum) &&
+            (identical(other.maximum, maximum) || other.maximum == maximum) &&
+            (identical(other.unit, unit) || other.unit == unit) &&
+            (identical(other.comment, comment) || other.comment == comment) &&
+            (identical(other.mid, mid) || other.mid == mid) &&
+            const DeepCollectionEquality().equals(other._options, _options) &&
+            const DeepCollectionEquality()
+                .equals(other._attributes, _attributes));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(name) ^
-      const DeepCollectionEquality().hash(start_bit) ^
-      const DeepCollectionEquality().hash(length) ^
-      const DeepCollectionEquality().hash(little_endian) ^
-      const DeepCollectionEquality().hash(is_signed) ^
-      const DeepCollectionEquality().hash(value_type) ^
-      const DeepCollectionEquality().hash(scaling) ^
-      const DeepCollectionEquality().hash(offset) ^
-      const DeepCollectionEquality().hash(minimum) ^
-      const DeepCollectionEquality().hash(maximum) ^
-      const DeepCollectionEquality().hash(unit) ^
-      const DeepCollectionEquality().hash(comment) ^
-      const DeepCollectionEquality().hash(mid) ^
-      const DeepCollectionEquality().hash(options) ^
-      const DeepCollectionEquality().hash(attributes);
 
   @JsonKey(ignore: true)
   @override
-  _$SignalMetaCopyWith<_SignalMeta> get copyWith =>
-      __$SignalMetaCopyWithImpl<_SignalMeta>(this, _$identity);
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      start_bit,
+      length,
+      little_endian,
+      is_signed,
+      value_type,
+      scaling,
+      offset,
+      minimum,
+      maximum,
+      unit,
+      comment,
+      mid,
+      const DeepCollectionEquality().hash(_options),
+      const DeepCollectionEquality().hash(_attributes));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_SignalMetaCopyWith<_$_SignalMeta> get copyWith =>
+      __$$_SignalMetaCopyWithImpl<_$_SignalMeta>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_SignalMetaToJson(this);
+    return _$$_SignalMetaToJson(
+      this,
+    );
   }
 }
 
 abstract class _SignalMeta implements SignalMeta {
   factory _SignalMeta(
-      {required String name,
-      required int start_bit,
-      required int length,
-      required int little_endian,
-      required int is_signed,
-      required String value_type,
-      required double scaling,
-      required double offset,
-      required double minimum,
-      required double maximum,
-      String? unit,
-      required String comment,
-      required int mid,
-      Map<int, String>? options,
-      Map<String, dynamic>? attributes}) = _$_SignalMeta;
+      {required final String name,
+      required final int start_bit,
+      required final int length,
+      required final int little_endian,
+      required final int is_signed,
+      required final String value_type,
+      required final double scaling,
+      required final double offset,
+      required final double minimum,
+      required final double maximum,
+      final String? unit,
+      required final String comment,
+      required final int mid,
+      final Map<int, String>? options,
+      final Map<String, dynamic>? attributes}) = _$_SignalMeta;
 
   factory _SignalMeta.fromJson(Map<String, dynamic> json) =
       _$_SignalMeta.fromJson;
 
   @override
-  String get name => throw _privateConstructorUsedError;
+  String get name;
   @override
-  int get start_bit => throw _privateConstructorUsedError;
+  int get start_bit;
   @override
-  int get length => throw _privateConstructorUsedError;
+  int get length;
   @override
-  int get little_endian => throw _privateConstructorUsedError;
+  int get little_endian;
   @override
-  int get is_signed => throw _privateConstructorUsedError;
+  int get is_signed;
   @override
-  String get value_type => throw _privateConstructorUsedError;
+  String get value_type;
   @override
-  double get scaling => throw _privateConstructorUsedError;
+  double get scaling;
   @override
-  double get offset => throw _privateConstructorUsedError;
+  double get offset;
   @override
-  double get minimum => throw _privateConstructorUsedError;
+  double get minimum;
   @override
-  double get maximum => throw _privateConstructorUsedError;
+  double get maximum;
   @override
-  String? get unit => throw _privateConstructorUsedError;
+  String? get unit;
   @override
-  String get comment => throw _privateConstructorUsedError;
+  String get comment;
   @override
-  int get mid => throw _privateConstructorUsedError;
+  int get mid;
   @override
-  Map<int, String>? get options => throw _privateConstructorUsedError;
+  Map<int, String>? get options;
   @override
-  Map<String, dynamic>? get attributes => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get attributes;
   @override
   @JsonKey(ignore: true)
-  _$SignalMetaCopyWith<_SignalMeta> get copyWith =>
+  _$$_SignalMetaCopyWith<_$_SignalMeta> get copyWith =>
       throw _privateConstructorUsedError;
 }

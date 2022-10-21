@@ -8,12 +8,12 @@ import 'i18n.dart';
 
 final drawerKeyProvider = Provider((ref) => GlobalKey<NavigatorState>());
 
-class AppDrawer extends HookWidget {
+class AppDrawer extends HookConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final controller = useProvider(dbcMetaProvider.notifier);
-    final drawerKey = useProvider(drawerKeyProvider);
-    final currentTab = useProvider(currentTabInDrawerProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(dbcMetaProvider.notifier);
+    final drawerKey = ref.watch(drawerKeyProvider);
+    final currentTab = ref.watch(currentTabInDrawerProvider.notifier);
     return Drawer(
       key: drawerKey,
       // Add a ListView to the drawer. This ensures the user can scroll

@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'message_meta.dart';
 
@@ -10,40 +12,11 @@ part of 'message_meta.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 MessageMeta _$MessageMetaFromJson(Map<String, dynamic> json) {
   return _MessageMeta.fromJson(json);
 }
-
-/// @nodoc
-class _$MessageMetaTearOff {
-  const _$MessageMetaTearOff();
-
-  _MessageMeta call(
-      {required int id,
-      required String name,
-      required String sender,
-      required int length,
-      required Map<String, dynamic> attributes,
-      required List<String> signalIds}) {
-    return _MessageMeta(
-      id: id,
-      name: name,
-      sender: sender,
-      length: length,
-      attributes: attributes,
-      signalIds: signalIds,
-    );
-  }
-
-  MessageMeta fromJson(Map<String, Object> json) {
-    return MessageMeta.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $MessageMeta = _$MessageMetaTearOff();
 
 /// @nodoc
 mixin _$MessageMeta {
@@ -65,7 +38,8 @@ mixin _$MessageMeta {
 abstract class $MessageMetaCopyWith<$Res> {
   factory $MessageMetaCopyWith(
           MessageMeta value, $Res Function(MessageMeta) then) =
-      _$MessageMetaCopyWithImpl<$Res>;
+      _$MessageMetaCopyWithImpl<$Res, MessageMeta>;
+  @useResult
   $Res call(
       {int id,
       String name,
@@ -76,58 +50,62 @@ abstract class $MessageMetaCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$MessageMetaCopyWithImpl<$Res> implements $MessageMetaCopyWith<$Res> {
+class _$MessageMetaCopyWithImpl<$Res, $Val extends MessageMeta>
+    implements $MessageMetaCopyWith<$Res> {
   _$MessageMetaCopyWithImpl(this._value, this._then);
 
-  final MessageMeta _value;
   // ignore: unused_field
-  final $Res Function(MessageMeta) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? name = freezed,
-    Object? sender = freezed,
-    Object? length = freezed,
-    Object? attributes = freezed,
-    Object? signalIds = freezed,
+    Object? id = null,
+    Object? name = null,
+    Object? sender = null,
+    Object? length = null,
+    Object? attributes = null,
+    Object? signalIds = null,
   }) {
     return _then(_value.copyWith(
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      sender: sender == freezed
+      sender: null == sender
           ? _value.sender
           : sender // ignore: cast_nullable_to_non_nullable
               as String,
-      length: length == freezed
+      length: null == length
           ? _value.length
           : length // ignore: cast_nullable_to_non_nullable
               as int,
-      attributes: attributes == freezed
+      attributes: null == attributes
           ? _value.attributes
           : attributes // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
-      signalIds: signalIds == freezed
+      signalIds: null == signalIds
           ? _value.signalIds
           : signalIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$MessageMetaCopyWith<$Res>
+abstract class _$$_MessageMetaCopyWith<$Res>
     implements $MessageMetaCopyWith<$Res> {
-  factory _$MessageMetaCopyWith(
-          _MessageMeta value, $Res Function(_MessageMeta) then) =
-      __$MessageMetaCopyWithImpl<$Res>;
+  factory _$$_MessageMetaCopyWith(
+          _$_MessageMeta value, $Res Function(_$_MessageMeta) then) =
+      __$$_MessageMetaCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {int id,
       String name,
@@ -138,68 +116,69 @@ abstract class _$MessageMetaCopyWith<$Res>
 }
 
 /// @nodoc
-class __$MessageMetaCopyWithImpl<$Res> extends _$MessageMetaCopyWithImpl<$Res>
-    implements _$MessageMetaCopyWith<$Res> {
-  __$MessageMetaCopyWithImpl(
-      _MessageMeta _value, $Res Function(_MessageMeta) _then)
-      : super(_value, (v) => _then(v as _MessageMeta));
+class __$$_MessageMetaCopyWithImpl<$Res>
+    extends _$MessageMetaCopyWithImpl<$Res, _$_MessageMeta>
+    implements _$$_MessageMetaCopyWith<$Res> {
+  __$$_MessageMetaCopyWithImpl(
+      _$_MessageMeta _value, $Res Function(_$_MessageMeta) _then)
+      : super(_value, _then);
 
-  @override
-  _MessageMeta get _value => super._value as _MessageMeta;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
-    Object? name = freezed,
-    Object? sender = freezed,
-    Object? length = freezed,
-    Object? attributes = freezed,
-    Object? signalIds = freezed,
+    Object? id = null,
+    Object? name = null,
+    Object? sender = null,
+    Object? length = null,
+    Object? attributes = null,
+    Object? signalIds = null,
   }) {
-    return _then(_MessageMeta(
-      id: id == freezed
+    return _then(_$_MessageMeta(
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      name: name == freezed
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      sender: sender == freezed
+      sender: null == sender
           ? _value.sender
           : sender // ignore: cast_nullable_to_non_nullable
               as String,
-      length: length == freezed
+      length: null == length
           ? _value.length
           : length // ignore: cast_nullable_to_non_nullable
               as int,
-      attributes: attributes == freezed
-          ? _value.attributes
+      attributes: null == attributes
+          ? _value._attributes
           : attributes // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
-      signalIds: signalIds == freezed
-          ? _value.signalIds
+      signalIds: null == signalIds
+          ? _value._signalIds
           : signalIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
     ));
   }
 }
+
+/// @nodoc
 
 @JsonSerializable(
     fieldRename: FieldRename.snake, createToJson: true, anyMap: true)
-
-/// @nodoc
 class _$_MessageMeta implements _MessageMeta {
   _$_MessageMeta(
       {required this.id,
       required this.name,
       required this.sender,
       required this.length,
-      required this.attributes,
-      required this.signalIds});
+      required final Map<String, dynamic> attributes,
+      required final List<String> signalIds})
+      : _attributes = attributes,
+        _signalIds = signalIds;
 
   factory _$_MessageMeta.fromJson(Map<String, dynamic> json) =>
-      _$_$_MessageMetaFromJson(json);
+      _$$_MessageMetaFromJson(json);
 
   @override
   final int id;
@@ -209,10 +188,21 @@ class _$_MessageMeta implements _MessageMeta {
   final String sender;
   @override
   final int length;
+  final Map<String, dynamic> _attributes;
   @override
-  final Map<String, dynamic> attributes;
-  @override // @required List<SignalMeta> signals;
-  final List<String> signalIds;
+  Map<String, dynamic> get attributes {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_attributes);
+  }
+
+// @required List<SignalMeta> signals;
+  final List<String> _signalIds;
+// @required List<SignalMeta> signals;
+  @override
+  List<String> get signalIds {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_signalIds);
+  }
 
   @override
   String toString() {
@@ -222,70 +212,69 @@ class _$_MessageMeta implements _MessageMeta {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _MessageMeta &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)) &&
-            (identical(other.name, name) ||
-                const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.sender, sender) ||
-                const DeepCollectionEquality().equals(other.sender, sender)) &&
-            (identical(other.length, length) ||
-                const DeepCollectionEquality().equals(other.length, length)) &&
-            (identical(other.attributes, attributes) ||
-                const DeepCollectionEquality()
-                    .equals(other.attributes, attributes)) &&
-            (identical(other.signalIds, signalIds) ||
-                const DeepCollectionEquality()
-                    .equals(other.signalIds, signalIds)));
+        (other.runtimeType == runtimeType &&
+            other is _$_MessageMeta &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.sender, sender) || other.sender == sender) &&
+            (identical(other.length, length) || other.length == length) &&
+            const DeepCollectionEquality()
+                .equals(other._attributes, _attributes) &&
+            const DeepCollectionEquality()
+                .equals(other._signalIds, _signalIds));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(id) ^
-      const DeepCollectionEquality().hash(name) ^
-      const DeepCollectionEquality().hash(sender) ^
-      const DeepCollectionEquality().hash(length) ^
-      const DeepCollectionEquality().hash(attributes) ^
-      const DeepCollectionEquality().hash(signalIds);
 
   @JsonKey(ignore: true)
   @override
-  _$MessageMetaCopyWith<_MessageMeta> get copyWith =>
-      __$MessageMetaCopyWithImpl<_MessageMeta>(this, _$identity);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      sender,
+      length,
+      const DeepCollectionEquality().hash(_attributes),
+      const DeepCollectionEquality().hash(_signalIds));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MessageMetaCopyWith<_$_MessageMeta> get copyWith =>
+      __$$_MessageMetaCopyWithImpl<_$_MessageMeta>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_MessageMetaToJson(this);
+    return _$$_MessageMetaToJson(
+      this,
+    );
   }
 }
 
 abstract class _MessageMeta implements MessageMeta {
   factory _MessageMeta(
-      {required int id,
-      required String name,
-      required String sender,
-      required int length,
-      required Map<String, dynamic> attributes,
-      required List<String> signalIds}) = _$_MessageMeta;
+      {required final int id,
+      required final String name,
+      required final String sender,
+      required final int length,
+      required final Map<String, dynamic> attributes,
+      required final List<String> signalIds}) = _$_MessageMeta;
 
   factory _MessageMeta.fromJson(Map<String, dynamic> json) =
       _$_MessageMeta.fromJson;
 
   @override
-  int get id => throw _privateConstructorUsedError;
+  int get id;
   @override
-  String get name => throw _privateConstructorUsedError;
+  String get name;
   @override
-  String get sender => throw _privateConstructorUsedError;
+  String get sender;
   @override
-  int get length => throw _privateConstructorUsedError;
+  int get length;
   @override
-  Map<String, dynamic> get attributes => throw _privateConstructorUsedError;
+  Map<String, dynamic> get attributes;
   @override // @required List<SignalMeta> signals;
-  List<String> get signalIds => throw _privateConstructorUsedError;
+  List<String> get signalIds;
   @override
   @JsonKey(ignore: true)
-  _$MessageMetaCopyWith<_MessageMeta> get copyWith =>
+  _$$_MessageMetaCopyWith<_$_MessageMeta> get copyWith =>
       throw _privateConstructorUsedError;
 }

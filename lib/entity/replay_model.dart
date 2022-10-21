@@ -1,3 +1,4 @@
+import 'package:cantool/entity/signal_meta.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:intl/intl.dart';
@@ -63,11 +64,29 @@ class ReplayDataChunk {
 }
 
 @JsonSerializable(anyMap: true)
+class ReplayWrapper {
+  final ReplaySummary /*Map<String, dynamic>*/ summary;
+  //key 是信号名字  value是该信号所有的点
+  final Map<String, List<ReplayEntry>> data;
+  ReplayWrapper(this.summary, this.data);
+
+  factory ReplayWrapper.fromJson(Map<String, dynamic> json) {
+    return _$ReplayWrapperFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$ReplayWrapperToJson(this);
+
+  String toString() {
+    return 'ReplayWrapper summary: $summary, data:$data';
+  }
+}
+
+@JsonSerializable(anyMap: true)
 class ReplayResult {
   final ReplaySummary summary;
   //key 是信号名字  value是该信号所有的点
   final Map<String, List<ReplayEntry>> data;
-  late double start, end;
+  late double start = 0, end = 0;
   ReplayResult(this.summary, this.data);
 
   factory ReplayResult.fromJson(Map<String, dynamic> json) {
@@ -77,7 +96,7 @@ class ReplayResult {
   Map<String, dynamic> toJson() => _$ReplayResultToJson(this);
 
   String toString() {
-    return 'ReplayResult summary: $summary, data:$data';
+    return 'ReplayResult summary: $summary, data:$data,  start:$start, end:$end';
   }
 }
 
@@ -89,7 +108,8 @@ class ReplaySummary {
   final Numbase numbase;
   final int size;
   final int chunks;
-  ReplaySummary(this.date, this.numbase, this.size, this.chunks);
+  ReplaySummary(this.date,
+      {this.numbase = Numbase.Hex, this.size = 1, this.chunks = 1});
 
   factory ReplaySummary.fromJson(Map<String, dynamic> json) =>
       _$ReplaySummaryFromJson(json);

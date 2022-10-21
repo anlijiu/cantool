@@ -16,8 +16,8 @@ class SignalMetaVisualItem {
   late TextSpan tail;
 }
 
-final _currentSignalMeta = ScopedProvider<SignalMetaVisualItem>(null);
-
+final _currentSignalMeta =
+    Provider<SignalMetaVisualItem>((ref) => throw UnimplementedError());
 final filteredSignalProvider =
     Provider.autoDispose.family<List<SignalMetaVisualItem>, Map>((ref, m) {
   print("m $m");
@@ -25,7 +25,6 @@ final filteredSignalProvider =
   TextStyle posRes = m['posRes'], negRes = m['negRes'];
   return ref
       .watch(signalMetasProvider)
-      .state
       .values
       .where((s) =>
           s.name.toLowerCase().contains(search.toLowerCase()) ||
@@ -41,16 +40,15 @@ final filteredSignalProvider =
   }).toList();
 });
 
-class SignalTile extends HookWidget {
+class SignalTile extends HookConsumerWidget {
   const SignalTile();
 
   @override
-  Widget build(BuildContext context) {
-    final signalVisualItem = useProvider(_currentSignalMeta);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final signalVisualItem = ref.watch(_currentSignalMeta);
     final signal = signalVisualItem.meta;
-    final filteredMsgState = useProvider(filterMsgSignalProvider);
-    final filteredMsg = filteredMsgState.state;
-    final viewController = useProvider(viewControllerProvider);
+    final filteredMsgNotifer = ref.watch(filterMsgSignalProvider.notifier);
+    final filteredMsg = ref.watch(filterMsgSignalProvider);
     final checked =
         filteredMsg.messages[signal.mid]?.signals.keys.contains(signal.name) ==
             true;
@@ -64,28 +62,25 @@ class SignalTile extends HookWidget {
             onPressed: () {
               print(" SignalTile  onPressed  " + signal.toString());
               checked
-                  ? viewController.removeSignalByMeta(signal)
-                  : viewController.addSignalByMeta(signal);
-
-              // context.read(viewController).toggleStatus(message);
+                  ? filteredMsgNotifer.removeSignalByMeta(signal)
+                  : filteredMsgNotifer.addSignalByMeta(signal);
             },
           ),
           trailing: RichText(textScaleFactor: 2, text: signalVisualItem.tail),
           onTap: () {
             checked
-                ? viewController.removeSignalByMeta(signal)
-                : viewController.addSignalByMeta(signal);
-            // context.read(viewController).focusMessage(message);
+                ? filteredMsgNotifer.removeSignalByMeta(signal)
+                : filteredMsgNotifer.addSignalByMeta(signal);
           }),
     );
   }
 }
 
-class ReplayFilterDialog extends HookWidget {
+class ReplayFilterDialog extends HookConsumerWidget {
   const ReplayFilterDialog({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     ScrollController _signalListController = ScrollController();
     // final signalMetas = useProvider(signalMetasProvider).state.values.toList();
     final textController = useTextEditingController();
@@ -115,7 +110,7 @@ class ReplayFilterDialog extends HookWidget {
     //         inherit: true)),
     //     negRes = defaultTextStyle.style.merge(TextStyle(
     //         fontSize: 12, fontWeight: FontWeight.normal, inherit: true));
-    final signalMetaVisualItems = useProvider(filteredSignalProvider(
+    final signalMetaVisualItems = ref.watch(filteredSignalProvider(
         {'search': search, 'posRes': posRes, 'negRes': negRes}));
     return Material(
         child: Center(

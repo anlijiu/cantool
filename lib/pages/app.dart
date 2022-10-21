@@ -20,18 +20,21 @@ import 'package:cantool/repository/can_repository.dart';
 import '../providers.dart';
 import 'home/home_appbar_view.dart';
 
-class AppPage extends HookWidget {
+class AppPage extends HookConsumerWidget {
   const AppPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final currentTab = useProvider(currentTabInDrawerProvider).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTab = ref.watch(currentTabInDrawerProvider);
+
     PreferredSizeWidget appBar;
     if (currentTab == 0) {
       appBar = HomeAppbarView();
     } else if (currentTab == 1) {
+      print("app.dart currentTab: ${currentTab} replay");
       appBar = ReplayAppbarView();
     } else if (currentTab == 2) {
+      print("app.dart currentTab: ${currentTab} about");
       appBar = AboutAppbarView();
     } else {
       appBar = HomeAppbarView();

@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'dbc_meta.dart';
 
@@ -10,36 +12,11 @@ part of 'dbc_meta.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 DbcMeta _$DbcMetaFromJson(Map<String, dynamic> json) {
   return _DbcMeta.fromJson(json);
 }
-
-/// @nodoc
-class _$DbcMetaTearOff {
-  const _$DbcMetaTearOff();
-
-  _DbcMeta call(
-      {required String filename,
-      String version = "",
-      required Map<int, MessageMeta> messages,
-      @JsonKey(name: 'signals') required Map<String, SignalMeta> signals}) {
-    return _DbcMeta(
-      filename: filename,
-      version: version,
-      messages: messages,
-      signals: signals,
-    );
-  }
-
-  DbcMeta fromJson(Map<String, Object> json) {
-    return DbcMeta.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $DbcMeta = _$DbcMetaTearOff();
 
 /// @nodoc
 mixin _$DbcMeta {
@@ -57,7 +34,8 @@ mixin _$DbcMeta {
 /// @nodoc
 abstract class $DbcMetaCopyWith<$Res> {
   factory $DbcMetaCopyWith(DbcMeta value, $Res Function(DbcMeta) then) =
-      _$DbcMetaCopyWithImpl<$Res>;
+      _$DbcMetaCopyWithImpl<$Res, DbcMeta>;
+  @useResult
   $Res call(
       {String filename,
       String version,
@@ -66,46 +44,51 @@ abstract class $DbcMetaCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$DbcMetaCopyWithImpl<$Res> implements $DbcMetaCopyWith<$Res> {
+class _$DbcMetaCopyWithImpl<$Res, $Val extends DbcMeta>
+    implements $DbcMetaCopyWith<$Res> {
   _$DbcMetaCopyWithImpl(this._value, this._then);
 
-  final DbcMeta _value;
   // ignore: unused_field
-  final $Res Function(DbcMeta) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? filename = freezed,
-    Object? version = freezed,
-    Object? messages = freezed,
-    Object? signals = freezed,
+    Object? filename = null,
+    Object? version = null,
+    Object? messages = null,
+    Object? signals = null,
   }) {
     return _then(_value.copyWith(
-      filename: filename == freezed
+      filename: null == filename
           ? _value.filename
           : filename // ignore: cast_nullable_to_non_nullable
               as String,
-      version: version == freezed
+      version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
-      messages: messages == freezed
+      messages: null == messages
           ? _value.messages
           : messages // ignore: cast_nullable_to_non_nullable
               as Map<int, MessageMeta>,
-      signals: signals == freezed
+      signals: null == signals
           ? _value.signals
           : signals // ignore: cast_nullable_to_non_nullable
               as Map<String, SignalMeta>,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$DbcMetaCopyWith<$Res> implements $DbcMetaCopyWith<$Res> {
-  factory _$DbcMetaCopyWith(_DbcMeta value, $Res Function(_DbcMeta) then) =
-      __$DbcMetaCopyWithImpl<$Res>;
+abstract class _$$_DbcMetaCopyWith<$Res> implements $DbcMetaCopyWith<$Res> {
+  factory _$$_DbcMetaCopyWith(
+          _$_DbcMeta value, $Res Function(_$_DbcMeta) then) =
+      __$$_DbcMetaCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String filename,
       String version,
@@ -114,66 +97,76 @@ abstract class _$DbcMetaCopyWith<$Res> implements $DbcMetaCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$DbcMetaCopyWithImpl<$Res> extends _$DbcMetaCopyWithImpl<$Res>
-    implements _$DbcMetaCopyWith<$Res> {
-  __$DbcMetaCopyWithImpl(_DbcMeta _value, $Res Function(_DbcMeta) _then)
-      : super(_value, (v) => _then(v as _DbcMeta));
+class __$$_DbcMetaCopyWithImpl<$Res>
+    extends _$DbcMetaCopyWithImpl<$Res, _$_DbcMeta>
+    implements _$$_DbcMetaCopyWith<$Res> {
+  __$$_DbcMetaCopyWithImpl(_$_DbcMeta _value, $Res Function(_$_DbcMeta) _then)
+      : super(_value, _then);
 
-  @override
-  _DbcMeta get _value => super._value as _DbcMeta;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? filename = freezed,
-    Object? version = freezed,
-    Object? messages = freezed,
-    Object? signals = freezed,
+    Object? filename = null,
+    Object? version = null,
+    Object? messages = null,
+    Object? signals = null,
   }) {
-    return _then(_DbcMeta(
-      filename: filename == freezed
+    return _then(_$_DbcMeta(
+      filename: null == filename
           ? _value.filename
           : filename // ignore: cast_nullable_to_non_nullable
               as String,
-      version: version == freezed
+      version: null == version
           ? _value.version
           : version // ignore: cast_nullable_to_non_nullable
               as String,
-      messages: messages == freezed
-          ? _value.messages
+      messages: null == messages
+          ? _value._messages
           : messages // ignore: cast_nullable_to_non_nullable
               as Map<int, MessageMeta>,
-      signals: signals == freezed
-          ? _value.signals
+      signals: null == signals
+          ? _value._signals
           : signals // ignore: cast_nullable_to_non_nullable
               as Map<String, SignalMeta>,
     ));
   }
 }
+
+/// @nodoc
 
 @JsonSerializable(
     fieldRename: FieldRename.snake, createToJson: true, anyMap: true)
-
-/// @nodoc
 class _$_DbcMeta implements _DbcMeta {
   _$_DbcMeta(
       {required this.filename,
       this.version = "",
-      required this.messages,
-      @JsonKey(name: 'signals') required this.signals});
+      required final Map<int, MessageMeta> messages,
+      @JsonKey(name: 'signals') required final Map<String, SignalMeta> signals})
+      : _messages = messages,
+        _signals = signals;
 
   factory _$_DbcMeta.fromJson(Map<String, dynamic> json) =>
-      _$_$_DbcMetaFromJson(json);
+      _$$_DbcMetaFromJson(json);
 
   @override
   final String filename;
-  @JsonKey(defaultValue: "")
   @override
+  @JsonKey()
   final String version;
+  final Map<int, MessageMeta> _messages;
   @override
-  final Map<int, MessageMeta> messages;
+  Map<int, MessageMeta> get messages {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_messages);
+  }
+
+  final Map<String, SignalMeta> _signals;
   @override
   @JsonKey(name: 'signals')
-  final Map<String, SignalMeta> signals;
+  Map<String, SignalMeta> get signals {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_signals);
+  }
 
   @override
   String toString() {
@@ -183,60 +176,59 @@ class _$_DbcMeta implements _DbcMeta {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _DbcMeta &&
+        (other.runtimeType == runtimeType &&
+            other is _$_DbcMeta &&
             (identical(other.filename, filename) ||
-                const DeepCollectionEquality()
-                    .equals(other.filename, filename)) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality()
-                    .equals(other.version, version)) &&
-            (identical(other.messages, messages) ||
-                const DeepCollectionEquality()
-                    .equals(other.messages, messages)) &&
-            (identical(other.signals, signals) ||
-                const DeepCollectionEquality().equals(other.signals, signals)));
+                other.filename == filename) &&
+            (identical(other.version, version) || other.version == version) &&
+            const DeepCollectionEquality().equals(other._messages, _messages) &&
+            const DeepCollectionEquality().equals(other._signals, _signals));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(filename) ^
-      const DeepCollectionEquality().hash(version) ^
-      const DeepCollectionEquality().hash(messages) ^
-      const DeepCollectionEquality().hash(signals);
 
   @JsonKey(ignore: true)
   @override
-  _$DbcMetaCopyWith<_DbcMeta> get copyWith =>
-      __$DbcMetaCopyWithImpl<_DbcMeta>(this, _$identity);
+  int get hashCode => Object.hash(
+      runtimeType,
+      filename,
+      version,
+      const DeepCollectionEquality().hash(_messages),
+      const DeepCollectionEquality().hash(_signals));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_DbcMetaCopyWith<_$_DbcMeta> get copyWith =>
+      __$$_DbcMetaCopyWithImpl<_$_DbcMeta>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_DbcMetaToJson(this);
+    return _$$_DbcMetaToJson(
+      this,
+    );
   }
 }
 
 abstract class _DbcMeta implements DbcMeta {
   factory _DbcMeta(
-          {required String filename,
-          String version,
-          required Map<int, MessageMeta> messages,
-          @JsonKey(name: 'signals') required Map<String, SignalMeta> signals}) =
-      _$_DbcMeta;
+      {required final String filename,
+      final String version,
+      required final Map<int, MessageMeta> messages,
+      @JsonKey(name: 'signals')
+          required final Map<String, SignalMeta> signals}) = _$_DbcMeta;
 
   factory _DbcMeta.fromJson(Map<String, dynamic> json) = _$_DbcMeta.fromJson;
 
   @override
-  String get filename => throw _privateConstructorUsedError;
+  String get filename;
   @override
-  String get version => throw _privateConstructorUsedError;
+  String get version;
   @override
-  Map<int, MessageMeta> get messages => throw _privateConstructorUsedError;
+  Map<int, MessageMeta> get messages;
   @override
   @JsonKey(name: 'signals')
-  Map<String, SignalMeta> get signals => throw _privateConstructorUsedError;
+  Map<String, SignalMeta> get signals;
   @override
   @JsonKey(ignore: true)
-  _$DbcMetaCopyWith<_DbcMeta> get copyWith =>
+  _$$_DbcMetaCopyWith<_$_DbcMeta> get copyWith =>
       throw _privateConstructorUsedError;
 }

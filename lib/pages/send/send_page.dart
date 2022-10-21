@@ -19,29 +19,28 @@ import 'send_page.i18n.dart';
 
 final filteredMessageProvider =
     Provider.autoDispose.family<List<MessageItem>, String>((ref, search) {
-  final signalMetas = ref.watch(signalMetasProvider).state;
+  final signalMetas = ref.watch(signalMetasProvider);
   final List<MessageItem> msgs = ref
       .watch(messages)
-      .state!
       .where((m) =>
           m.meta.name.contains(search.toLowerCase()) ||
           "0x${m.meta.id.toRadixString(16)}".contains(search.toLowerCase()) ||
-          m.meta.signalIds.firstWhereOrNull((sid) =>
+          m.meta.signalIds.indexWhere((sid) =>
                   sid.toLowerCase().contains(search.toLowerCase()) ||
                   signalMetas[sid]!.comment.contains(search.toLowerCase())) !=
-              null)
+              -1)
       .toList();
   return msgs;
 });
 
-class SendPage extends HookWidget {
+class SendPage extends HookConsumerWidget {
   const SendPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textController = useTextEditingController();
     final search = useDecouncedSearch(textController);
-    final msgs = useProvider(filteredMessageProvider(search));
+    final msgs = ref.watch(filteredMessageProvider(search));
     // useEffect(() {
     //   context.read(messagesViewController).initState();
     //   return context.read(messagesViewController).dispose;

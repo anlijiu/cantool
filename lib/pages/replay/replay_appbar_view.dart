@@ -1,3 +1,4 @@
+import 'package:cantool/entity/replay_file_entity.dart';
 import 'package:cantool/entity/signal_meta.dart';
 import 'package:cantool/pages/replay/replay_filter_dialog.dart';
 import 'package:cantool/providers.dart';
@@ -11,7 +12,8 @@ import 'dart:convert';
 import 'package:cantool/entity/replay_model.dart';
 import 'providers.dart';
 
-class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
+class ReplayAppbarView extends HookConsumerWidget
+    implements PreferredSizeWidget {
   final double height;
 
   ReplayAppbarView({
@@ -24,18 +26,33 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
-    final filterMsgSignal = useProvider(filterMsgSignalProvider);
-    final result = useProvider(replayResultProvider);
-    final replayFile = useProvider(replayFileProvider.notifier);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filterMsgSignal = ref.watch(filterMsgSignalProvider);
+    final filterMsgSignalNotifier = ref.read(filterMsgSignalProvider.notifier);
+    final result = ref.watch(replayResultProvider);
+    final resultNotifier = ref.read(replayResultProvider.notifier);
+    final replayFile = ref.watch(replayFileProvider.notifier);
     final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
     final bool canPop = parentRoute?.canPop ?? false;
     final bool useCloseButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
-    final replay = useProvider(replayRepoProvider);
+    final replay = ref.watch(replayRepoProvider);
 
     final needRefresh = useState(false);
+
+    ref.listen<ReplayFileEntity?>(replayFileProvider,
+        (ReplayFileEntity? prevState, ReplayFileEntity? newState) {
+      print('This function have been called');
+      filterMsgSignalNotifier.state = FilteredMessageMap({}, "");
+      resultNotifier.state = null;
+    });
+
+    ref.listen<FilteredMessageMap>(filterMsgSignalProvider,
+        (prevState, newState) {
+      needRefresh.value = true;
+    });
+
     return Container(
         height: 50,
         decoration: new BoxDecoration(
@@ -54,51 +71,39 @@ class ReplayAppbarView extends HookWidget implements PreferredSizeWidget {
                     Scaffold.of(context).openDrawer();
                   },
                 ),
-          ProviderListener(
-            provider: replayFileProvider,
-            onChange: (context, value) {
-              print("replayFileProvider  changed ");
-              filterMsgSignal.state = FilteredMessageMap({}, "");
-              result.state = null;
-            },
-            child: FlatButton.icon(
-                onPressed: () {
-                  replayFile.load();
-                },
-                label: Text('Open'),
-                icon: Icon(Icons.folder_open)),
-          ),
-          FlatButton.icon(
+          ElevatedButton.icon(
+              onPressed: () {
+                replayFile.load();
+              },
+              label: Text('Open'),
+              icon: Icon(Icons.folder_open)),
+          ElevatedButton.icon(
               onPressed: () => showAddSignalDialog(context),
               icon: Icon(Icons.add),
               label: Text('Add')),
-          ProviderListener(
-              provider: filterMsgSignalProvider,
-              onChange: (context, value) {
-                needRefresh.value = true;
-              },
-              child: FlatButton.icon(
-                  onPressed: needRefresh.value
-                      ? () async {
-                          needRefresh.value = false;
-                          var j = json.encode(
-                              filterMsgSignal.state.messages.values.toList());
-                          print('j is ' + j);
-                          var filter = json.decode(j);
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  primary: needRefresh.value ? Colors.blue : Colors.white),
+              onPressed: needRefresh.value
+                  ? () async {
+                      needRefresh.value = false;
+                      var j =
+                          json.encode(filterMsgSignal.messages.values.toList());
+                      print('j is ' + j);
+                      var filter = json.decode(j);
 
-                          ///filterMsgSignal.state.values.toList();
+                      ///filterMsgSignal.state.values.toList();
 
-                          var sss = await can.replayParseFiltedSignals(filter);
-                          print('sss is ' + sss.toString());
-                          // result.state = ReplayResult.fromJson(sss);
-                          // print('sss summary is ' +
-                          // result.state.summary.toString());
-                          // print('sss data is ' + result.state.data.toString());
-                        }
-                      : null,
-                  color: needRefresh.value ? Colors.blue : Colors.white,
-                  icon: Icon(Icons.add),
-                  label: Text('Sync')))
+                      var sss = await can.replayParseFiltedSignals(filter);
+                      print('sss is ' + sss.toString());
+                      // result.state = ReplayResult.fromJson(sss);
+                      // print('sss summary is ' +
+                      // result.state.summary.toString());
+                      // print('sss data is ' + result.state.data.toString());
+                    }
+                  : null,
+              icon: Icon(Icons.add),
+              label: Text('Sync'))
         ]));
   } //这里设置控件（appBar）的高度
 

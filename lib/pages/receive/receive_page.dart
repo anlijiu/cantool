@@ -13,22 +13,22 @@ import 'package:cantool/entity/signal_meta.dart';
 import 'package:cantool/repository/can_repository.dart';
 import 'receive_page.i18n.dart';
 
-final _currentMessage = ScopedProvider<MessageSection>(null);
+final _currentMessage =
+    Provider<MessageSection>((ref) => throw UnimplementedError());
 
 final receiveMsgStreamProvider = StreamProvider.autoDispose
     .family<List<MessageSection>, String>((ref, search) {
   final transformer =
       StreamTransformer<List<Message>, List<Message>>.fromHandlers(
           handleData: (msgs, sink) {
-    final result = msgs
-        .where((msg) =>
-            msg.name.contains(search.toLowerCase()) ||
-            "0x${msg.id.toRadixString(16)}".contains(search.toLowerCase()) ||
-            msg.signals.firstWhereOrNull((s) =>
-                    s.name.toLowerCase().contains(search.toLowerCase()) ||
-                    s.comment.contains(search.toLowerCase())) !=
-                null)
-        .toList();
+    final result = msgs.where((msg) {
+      return msg.name.contains(search.toLowerCase()) ||
+          "0x${msg.id.toRadixString(16)}".contains(search.toLowerCase()) ||
+          (msg.signals.indexWhere((s) =>
+                  s.name.toLowerCase().contains(search.toLowerCase()) ||
+                  s.comment.contains(search.toLowerCase())) !=
+              -1);
+    }).toList();
     sink.add(result);
   });
 
@@ -41,14 +41,14 @@ final receiveMsgStreamProvider = StreamProvider.autoDispose
 
 final collapsMsgProvider = StateProvider<List<int>>((ref) => []);
 
-class MessageTile extends HookWidget {
-  const MessageTile();
+class MessageItemView extends HookConsumerWidget {
+  const MessageItemView();
 
   @override
-  Widget build(BuildContext context) {
-    final section = useProvider(_currentMessage);
-    final collapsMsgIds = useProvider(collapsMsgProvider);
-    final isExpanded = !collapsMsgIds.state.contains(section.msg.id);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final section = ref.watch(_currentMessage);
+    final collapsMsgIds = ref.watch(collapsMsgProvider);
+    final isExpanded = !collapsMsgIds.contains(section.msg.id);
     final msgView = InkWell(
         child: Container(
             color: Colors.lightBlue,
@@ -61,12 +61,15 @@ class MessageTile extends HookWidget {
             )),
         onTap: () {
           print("receive  message click !!   ${section.msg.id}");
-          List<int> collapseIds = collapsMsgIds.state;
+          List<int> collapseIds = collapsMsgIds;
           if (collapseIds.contains(section.msg.id)) {
             collapseIds.remove(section.msg.id);
-            collapsMsgIds.state = collapseIds;
+            ref.read(collapsMsgProvider.notifier).state = collapseIds;
           } else {
-            collapsMsgIds.state = [section.msg.id, ...collapseIds];
+            ref.read(collapsMsgProvider.notifier).state = [
+              section.msg.id,
+              ...collapseIds
+            ];
           }
           //toggle section expand state
         });
@@ -109,22 +112,22 @@ class MessageTile extends HookWidget {
   }
 }
 
-class ReceiveListPage extends HookWidget {
+class ReceiveListPage extends HookConsumerWidget {
   String search;
   ReceiveListPage(this.search, {Key? key}) : super(key: key);
 
   @override
-  Widget build(Object context) {
-    final receiveMsg = useProvider(receiveMsgStreamProvider(search));
-    ScrollController _messageListController = ScrollController();
+  Widget build(Object context, WidgetRef ref) {
+    final receiveMsg = ref.watch(receiveMsgStreamProvider(search));
+    ScrollController messageListController = ScrollController();
     return receiveMsg.maybeWhen(
         data: (msgList) {
           return Flexible(
               child: DraggableScrollbar.semicircle(
-                  controller: _messageListController,
+                  controller: messageListController,
                   child: ListView.separated(
                     scrollDirection: Axis.vertical,
-                    controller: _messageListController,
+                    controller: messageListController,
                     itemCount: msgList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       return Divider(color: Colors.transparent);
@@ -133,7 +136,7 @@ class ReceiveListPage extends HookWidget {
                       overrides: [
                         _currentMessage.overrideWithValue(msgList[idx]),
                       ],
-                      child: const MessageTile(),
+                      child: const MessageItemView(),
                     ),
                   )));
         },

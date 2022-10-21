@@ -10,8 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cantool/entity/dbc_meta.dart';
 import 'package:cantool/entity/message_meta.dart';
 
-final canRepository =
-    Provider<CanRepository>((ref) => CanRepositoryImpl(ref.read));
+final canRepository = Provider<CanRepository>((ref) => CanRepositoryImpl(ref));
 
 abstract class CanRepository {
   void startSending();
@@ -53,9 +52,9 @@ class Signal {
 }
 
 class CanRepositoryImpl implements CanRepository {
-  final Reader read;
+  final Ref ref;
 
-  CanRepositoryImpl(this.read) {
+  CanRepositoryImpl(this.ref) {
     can.openDevice();
     can.addCanDataListener(this.onReceiveCanData);
   }
@@ -94,8 +93,8 @@ class CanRepositoryImpl implements CanRepository {
   }
 
   List<Message> mapReceiveSignalToMessage() {
-    final msgMetaMap = read(messageMetasProvider).state;
-    final signalMetaMap = read(signalMetasProvider).state;
+    final msgMetaMap = ref.read(messageMetasProvider.notifier).state;
+    final signalMetaMap = ref.read(signalMetasProvider.notifier).state;
     final Map<int, Message> result = new Map();
     receivedSignalMap.values.forEach((element) {
       final signalMeta = signalMetaMap[element.name];

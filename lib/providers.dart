@@ -9,18 +9,18 @@ import 'entity/replay_model.dart';
 import 'entity/signal_meta.dart';
 
 final replayFileProvider =
-    StateNotifierProvider<ReplayFile, ReplayFileEntity?>((ref) {
-  return ReplayFile(ref.read);
+    StateNotifierProvider<ReplayFile, ReplayFileEntity>((ref) {
+  return ReplayFile();
 });
 
 final dbcMetaProvider =
     StateNotifierProvider<DbcMetaRepository, DbcMeta?>((ref) {
-  return DbcMetaRepository(ref.read);
+  return DbcMetaRepository(ref);
 });
 
 final replayRepoProvider =
     StateNotifierProvider<ReplayRepository, ReplayResult?>((ref) {
-  return ReplayRepository(ref.read);
+  return ReplayRepository(ref);
 });
 
 final messageMetasProvider = StateProvider<Map<int, MessageMeta>>((ref) {

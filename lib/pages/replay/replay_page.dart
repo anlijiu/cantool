@@ -8,37 +8,48 @@ import 'providers.dart';
 import 'replay_chart_view.dart';
 
 final replayFileExistProvider = Provider<bool>((ref) {
-  return ref.watch(replayFileProvider) == null;
+  final replayFile = ref.watch(replayFileProvider);
+  print("sssssssssssssssssssssssssssssssssssssssss replayFileExistProvider path : ${replayFile.path}");
+  return ref.watch(replayFileProvider).path == null;
 });
 
-class ReplayPage extends HookWidget {
+class ReplayPage extends HookConsumerWidget {
   const ReplayPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final currentTab = useProvider(currentTabInDrawerProvider).state;
-    final replayFile = useProvider(replayFileExistProvider);
-    final filterMsgSignal = useProvider(filterMsgSignalProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTab = ref.watch(currentTabInDrawerProvider);
+    final replayFile = ref.watch(replayFileExistProvider);
+    final filterMsgSignal = ref.watch(filterMsgSignalProvider);
 
     print("sssssssssssssssssssssssssssssssssssssssss replayFile.state is " +
-        replayFile.toString());
+        replayFile.toString() + " currentTab: ${currentTab}");
     return Offstage(
       offstage: currentTab != 1,
-      child: ProviderListener<bool>(
-          provider: replayFileExistProvider,
-          onChange: (context, exist) {},
-          child: replayFile ? ReplayFilePage() : ReplayDetailPage()),
+      child: replayFile ? ReplayFilePage() : ReplayDetailPage(),
     );
   }
 }
 
-class ReplayFilePage extends HookWidget {
+
+class ReplayFilePage extends HookConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final replayFile = useProvider(replayFileProvider.notifier);
+  Widget build(BuildContext context, WidgetRef ref) {
+    print(" ReplayFilePage  build in");
+
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+        primary: Colors.black87,
+        minimumSize: Size(88, 36),
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(2.0)),
+        ),
+    );
+    final replayFile = ref.watch(replayFileProvider.notifier);
     return Center(
-      child: FlatButton(
-          child: const Text('open'),
+      child: TextButton(
+          style: flatButtonStyle,
+          child: Text('Load can trace'),
           onPressed: () {
             replayFile.load();
           }),

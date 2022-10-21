@@ -18,6 +18,7 @@ const String _unloadAmmo = 'Can.RemomveAmmo';
 const String _setConstStrategy = 'Can.SetConstStrategy';
 const String _parseDbcFileMethod = "Can.ParseDbcFile";
 const String _canReceiveCallbackMethod = "Can.ReceiveCallback";
+const String _canfdReceiveCallbackMethod = "Can.FD.ReceiveCallback";
 
 const String _replaySetFile = "Can.ReplaySetFile";
 const String _replayGetFiltedSignals = "Can.ReplayGetFiltedSignals";
@@ -65,7 +66,7 @@ class CanChannel {
   }
 
   Future<Null> _handleCanData(MethodCall methodCall) async {
-    if (methodCall.method == _canReceiveCallbackMethod) {
+    if (methodCall.method == _canReceiveCallbackMethod || methodCall.method == _canfdReceiveCallbackMethod ) {
       final List<CanSignalData> arg = (methodCall.arguments as List)
           .map((e) => CanSignalData(e["name"], e["value"], e["mid"]))
           .toList();
@@ -215,7 +216,8 @@ class CanChannel {
           onStart(data);
           break;
         case "data":
-          onData(data["data"]);
+          // onData(data["data"]);
+          onData(data);
           break;
         case "end":
           onEnd();

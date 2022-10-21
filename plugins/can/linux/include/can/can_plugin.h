@@ -1,5 +1,5 @@
-#ifndef PLUGINS_CAN_LINUX_CAN_H_
-#define PLUGINS_CAN_LINUX_CAN_H_
+#ifndef FLUTTER_PLUGIN_CAN_PLUGIN_H_
+#define FLUTTER_PLUGIN_CAN_PLUGIN_H_
 
 #include <flutter_linux/flutter_linux.h>
 
@@ -11,17 +11,16 @@ G_BEGIN_DECLS
 #define FLUTTER_PLUGIN_EXPORT
 #endif
 
+typedef struct _CanPlugin CanPlugin;
+typedef struct {
+  GObjectClass parent_class;
+} CanPluginClass;
 
-G_DECLARE_FINAL_TYPE(FLCanPlugin, fl_can_plugin, FL,
-                     CAN_PLUGIN, GObject)
-
-FLUTTER_PLUGIN_EXPORT FLCanPlugin* fl_can_plugin_new(
-    FlPluginRegistrar* registrar);
+FLUTTER_PLUGIN_EXPORT GType can_plugin_get_type();
 
 FLUTTER_PLUGIN_EXPORT void can_plugin_register_with_registrar(
     FlPluginRegistrar* registrar);
 
 G_END_DECLS
 
-
-#endif  // PLUGINS_CAN_LINUX_CAN_H_
+#endif  // FLUTTER_PLUGIN_CAN_PLUGIN_H_

@@ -1,0 +1,292 @@
+#include <stddef.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include "libusb.h"
+#include "kernel.h"
+#include "usbcanii.h"
+
+struct can_device_ops usbcanii_device_ops;
+// static int (*notify_listener)(struct can_frame_s *, unsigned int num) = NULL;
+static on_recv_fun_t _on_recv = NULL;
+
+// static char uuid[4][40];
+// static const char *driver_name = "usbcanii";
+const int timing_table[16][2] = {
+    { 0xBF, 0xFF }, //KBPS_5 = 
+    { 0x31, 0x1C }, //KBPS_10,
+    { 0x18, 0x1C }, //KBPS_20,
+    { 0x87, 0xFF }, //KBPS_40,
+    { 0x09, 0x1C }, //KBPS_50,
+    { 0x83, 0Xff }, //KBPS_80,
+    { 0x04, 0x1C }, //KBPS_100,
+    { 0x03, 0x1C }, //KBPS_125,
+    { 0x81, 0xFA }, //KBPS_200,
+    { 0x01, 0x1C }, //KBPS_250,
+    { 0x80, 0xFA }, //KBPS_400,
+    { 0x00, 0x1C }, //KBPS_500,
+    { 0x80, 0xB6 }, //KBPS_666,
+    { 0x00, 0x16 }, //KBPS_800,
+    { 0x00, 0x14 }, //KBPS_1000
+    { 0x00, 0x14 }  //KBPS_2000
+};
+
+static const struct usbcanii_device default_usbcanii_device = {
+    // .name = driver_name,
+    // .name = "usbcanii",
+    .name = USBCANII_NAME,
+    .idx = 0,
+    .serial = { '\0' },
+    .device = {
+        .name = USBCANII_NAME,
+        .support_canfd = false,
+	    .bittiming = {
+            .bitrate = KBPS_500
+        },
+        .ops = &usbcanii_device_ops,
+    },
+    .ports = {
+        {
+            .inited = false,
+            .conf =  {
+                .AccCode = 0x80000008,
+                .AccMask = 0xFFFFFFFF,
+                .Filter = 1,//receive all frames
+                .Timing0 = 0x00,
+                .Timing1 = 0x1C,//baudrate 500kbps
+                .Mode = 0,//normal mode
+            }
+        },
+        {
+            .inited = false,
+            .conf =  {
+                .AccCode = 0x80000008,
+                .AccMask = 0xFFFFFFFF,
+                .Filter = 1,//receive all frames
+                .Timing0 = 0x00,
+                .Timing1 = 0x1C,//baudrate 500kbps
+                .Mode = 0,//normal mode
+            }
+        }
+    },
+};
+
+static bool is_serials_equal(char *s1, char *s2) {
+    for(int i = 0; i < 3; ++i) {
+        if(s1[i] != s2[i]) return false;
+    }
+    return true;
+}
+
+static int usbcanii_set_bittiming(struct can_device *dev, enum BAUDRATE baudrate) {
+
+    struct usbcanii_device *udev = container_of((void *)dev,
+			struct usbcanii_device, device);
+    udev->device.bittiming.bitrate = baudrate;
+    for(int i = 0; i < 2; ++i) {
+        udev->ports[i].conf.Timing0 = timing_table[baudrate][0];
+        udev->ports[i].conf.Timing1 = timing_table[baudrate][1];
+        VCI_InitCAN(USB_CAN_DEVICE_TYPE, udev->idx, i, &udev->ports[i].conf);
+    }
+    printf("%s start\n", __func__);
+}
+
+// typedef struct can_frame_s {
+// 	uint16_t can_id;
+// 	uint8_t can_dlc;
+// 	uint8_t data[CAN_FRAME_MAX_DATA_LEN];
+// } __attribute__((packed)) can_frame_t;
+
+static can_frame_t* calloc_can_frame_from_vci_can_obj(PVCI_CAN_OBJ pObj, size_t len) {
+    can_frame_t* frames = malloc(sizeof(struct can_frame_s) * len);
+    can_frame_t* p = frames;
+    for(int i = 0; i < len; ++i,++p,++pObj) {
+        p->can_id = pObj->ID;
+        p->can_dlc = pObj->DataLen;
+        memcpy(p->data, pObj->Data, 8);
+    }
+    return frames;
+}
+
+static PVCI_CAN_OBJ calloc_vci_can_obj_from_can_frame(can_frame_t* frames, size_t len) {
+    PVCI_CAN_OBJ pObj = malloc(sizeof(VCI_CAN_OBJ) * len);
+    PVCI_CAN_OBJ p = pObj;
+    for(int i = 0; i < len; ++i,++p,++frames) {
+        p->ID = frames->can_id;
+        p->DataLen = frames->can_dlc ;
+        memcpy(p->Data, frames->data, 8);
+    }
+    return pObj;
+}
+
+static void *can_receive_func(void *param) {
+    struct usbcanii_device *udev = (struct usbcanii_device *)param;
+    int msg_num = 0;
+    int receive_len = 0;
+    VCI_ERR_INFO vciErrorInfo;
+    while(true) {
+        if(_on_recv) {
+	        msg_num = VCI_GetReceiveNum(USB_CAN_DEVICE_TYPE, udev->idx, 0);
+            if(msg_num > 0) {
+                PVCI_CAN_OBJ pObj = malloc(sizeof(VCI_CAN_OBJ) * msg_num);
+                receive_len = VCI_Receive(USB_CAN_DEVICE_TYPE, udev->idx, 0, pObj, msg_num, 1);
+                if(receive_len < 0) {
+                    int errCode = VCI_ReadErrInfo(USB_CAN_DEVICE_TYPE, udev->idx, 0, &vciErrorInfo);
+                    printf("usbcanii device idx:%d,port:%d read error! errno:%d\n", udev->idx, 0, errCode);
+                } else {
+                    can_frame_t * frames = calloc_can_frame_from_vci_can_obj(pObj, receive_len);
+                    _on_recv(udev->device.uuid, frames, receive_len);
+                    free(frames);
+                }
+                free(pObj); 
+
+                usleep(10000);// 10000ns = 10ms;
+            } else {
+                usleep(1000000);// 1000000ns = 1000ms = 1s;
+            }
+        }
+    }
+}
+
+static int usbcanii_set_data_bittiming(struct can_device *dev, enum BAUDRATE baudrate) {
+    printf("%s start\n", __func__);
+}
+
+// int (*on_receive)(struct can_frame_s *, unsigned int num)) 
+static int usbcanii_set_receive_listener(struct can_device *dev, on_recv_fun_t onrecv) {
+    printf("%s start\n", __func__);
+    _on_recv = onrecv;
+}
+
+static bool usbcanii_send(struct can_device * dev, can_frame_t *frames, unsigned int len) {
+    printf("%s start\n", __func__);
+
+    PVCI_CAN_OBJ pObj = calloc_vci_can_obj_from_can_frame(frames, len);
+    struct usbcanii_device *udev = container_of((void *)dev,
+			struct usbcanii_device, device);
+    int send_len = VCI_Transmit(USB_CAN_DEVICE_TYPE, udev->idx, 0, pObj, len);
+    free(pObj);
+    printf("usb_can_ops_send  deviceIdx: %d, len: %d, send_len:%d", udev->idx, len, send_len);
+    return send_len == len;
+}
+
+int usbcanii_driver_probe(struct can_device *dev) {
+    printf("%s start\n", __func__);
+    return 0;
+}
+int usbcanii_driver_remove(struct can_device * dev) {
+    printf("%s start\n", __func__);
+
+    struct usbcanii_device *udev = container_of((void *)dev,
+			struct usbcanii_device, device);
+    remove_device(dev);
+    free(udev);
+    // remove_device(&udevice->device);
+    return 0;
+}
+
+static const VCI_INIT_CONFIG default_vci_config = {
+    .AccCode = 0x80000008,
+    .AccMask = 0xFFFFFFFF,
+    .Filter = 1,//receive all frames
+    .Timing0 = 0x00,
+    .Timing1 = 0x1C,//baudrate 500kbps
+    .Mode = 0,//normal mode
+};
+static VCI_BOARD_INFO1 boardInfo;
+static unsigned int deviceCount;
+static int /*__init*/ usbcanii_driver_init(void) 
+{
+    // memset(uuid, 0, sizeof(uuid));
+    printf("%s start\n", __func__);
+    deviceCount = VCI_FindUsbDevice(&boardInfo);
+    for(int i = 0; i < deviceCount; ++i) {
+        struct usbcanii_device * udevice = (struct usbcanii_device *)malloc(sizeof(struct usbcanii_device));
+        memcpy(udevice, &default_usbcanii_device, sizeof(default_usbcanii_device) );
+        udevice->idx = i;
+
+        size_t sizeuuid = sizeof(USBCANII_NAME) + sizeof(boardInfo.str_Usb_Serial[i]) + 1;
+        snprintf(udevice->device.uuid, sizeuuid, "%s-%s", USBCANII_NAME, boardInfo.str_Usb_Serial[i]);
+        printf("%s ,   uuid:%s\n", __func__, udevice->device.uuid);
+        // memcpy(uuid[i], udevice->device.uuid, sizeuuid);
+        for(int port_idx = 0; port_idx < USB_CAN_PORT_COUNT; port_idx++) {
+            memcpy(&udevice->ports[port_idx].conf, &default_vci_config, sizeof(default_vci_config));
+            bool result = (VCI_InitCAN(USB_CAN_DEVICE_TYPE, i, port_idx, &udevice->ports[port_idx].conf)==1);
+            udevice->ports[port_idx].inited = result;
+        }
+        int err = pthread_create(&udevice->recv_thread, NULL, &can_receive_func, udevice);
+        pthread_detach(udevice->recv_thread);
+        add_device(&udevice->device);
+        // udevice->name = "usbcanii";
+        // udevice->idx = i;
+        // memcpy(udevice->serial, boardInfo.str_Usb_Serial[deviceCount], 4);
+        // for(int port_idx = 0; port_idx < USB_CAN_PORT_COUNT; port_idx++) {
+        //     memcpy(&udevice->ports[port_idx].conf, &default_vci_config, sizeof(default_vci_config));
+        //     bool result = (VCI_InitCAN(USB_CAN_DEVICE_TYPE, i, port_idx, &udevice->ports[port_idx].conf)==1);
+        //     udevice->ports[port_idx].inited = result;
+        // }
+        // udevice->device.name = udevice->name;
+        // udevice->device.support_canfd = false;
+    }
+    printf("%s end\n", __func__);
+    return 0;
+}
+// struct usbcanii_device {
+//     struct can_device device;
+//     unsigned int idx;
+//     char serial[4];
+//     struct usbcanii_can_device_port ports[2];
+// };
+// struct can_device {
+// 	   const char	*name;
+//     bool support_canfd;
+// 	   struct can_bittiming bittiming, data_bittiming;
+//     struct can_device_ops* ops;
+// };
+
+
+// static void usb_can_new(struct can_device ** dev, unsigned int count) {
+//     *dev = (struct can_device *)malloc(sizeof(struct can_device) * count);
+//     struct can_device * device = *dev;
+//     memset(device, 0, sizeof(*device) * count);
+//     for (int i = 0; i < count; ++i, ++device)
+//     {
+//         device->ports = (struct can_device_port *)malloc(sizeof(struct can_device_port) * USB_CAN_PORT_MAX);
+//         struct can_device_port *port = device->ports;
+//         for (unsigned int j = 0; j < USB_CAN_PORT_MAX; ++j, ++port)
+//         {
+//             usb_can_port_init(port, j);
+//         }
+//         device->ops = &usb_can_device_ops;
+//     }
+// }
+
+// module_init(driver_usbcanii_init);
+static void /*__exit*/ usbcanii_driver_exit(void)
+{
+    printf("%s start\n", __func__);
+}
+// module_exit(driver_usbcanii_exit);
+
+struct can_device_ops usbcanii_device_ops = {
+    .set_bittiming = usbcanii_set_bittiming,
+	.set_data_bittiming = usbcanii_set_data_bittiming,
+	.set_receive_listener = usbcanii_set_receive_listener,//)struct can_device *, int (*on_receive)(struct can_frame_s *, unsigned int num))
+    .send = usbcanii_send,//(struct can_device *, unsigned int, can_frame_t, unsigned int);
+};
+
+static const struct usb_device_id device_table[] = {
+    { USB_DEVICE(0x04d8, 0x0053) },
+	{}/* terminating entry */
+};
+
+static struct usb_can_driver usbcanii_can_driver = {
+    .init     = usbcanii_driver_init,
+    .exit     = usbcanii_driver_exit,
+    .probe    = usbcanii_driver_probe,
+    .remove   = usbcanii_driver_remove,
+	.id_table = device_table,
+    .name	= "usbcanii",
+};
+
+module_usb_driver(usbcanii_can_driver);

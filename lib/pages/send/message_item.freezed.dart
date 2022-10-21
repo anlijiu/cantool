@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'message_item.dart';
 
@@ -10,30 +12,11 @@ part of 'message_item.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 MessageItem _$MessageItemFromJson(Map<String, dynamic> json) {
   return _MessageItem.fromJson(json);
 }
-
-/// @nodoc
-class _$MessageItemTearOff {
-  const _$MessageItemTearOff();
-
-  _MessageItem call(MessageMeta meta, bool selected) {
-    return _MessageItem(
-      meta,
-      selected,
-    );
-  }
-
-  MessageItem fromJson(Map<String, Object> json) {
-    return MessageItem.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $MessageItem = _$MessageItemTearOff();
 
 /// @nodoc
 mixin _$MessageItem {
@@ -50,52 +33,58 @@ mixin _$MessageItem {
 abstract class $MessageItemCopyWith<$Res> {
   factory $MessageItemCopyWith(
           MessageItem value, $Res Function(MessageItem) then) =
-      _$MessageItemCopyWithImpl<$Res>;
+      _$MessageItemCopyWithImpl<$Res, MessageItem>;
+  @useResult
   $Res call({MessageMeta meta, bool selected});
 
   $MessageMetaCopyWith<$Res> get meta;
 }
 
 /// @nodoc
-class _$MessageItemCopyWithImpl<$Res> implements $MessageItemCopyWith<$Res> {
+class _$MessageItemCopyWithImpl<$Res, $Val extends MessageItem>
+    implements $MessageItemCopyWith<$Res> {
   _$MessageItemCopyWithImpl(this._value, this._then);
 
-  final MessageItem _value;
   // ignore: unused_field
-  final $Res Function(MessageItem) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? meta = freezed,
-    Object? selected = freezed,
+    Object? meta = null,
+    Object? selected = null,
   }) {
     return _then(_value.copyWith(
-      meta: meta == freezed
+      meta: null == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
               as MessageMeta,
-      selected: selected == freezed
+      selected: null == selected
           ? _value.selected
           : selected // ignore: cast_nullable_to_non_nullable
               as bool,
-    ));
+    ) as $Val);
   }
 
   @override
+  @pragma('vm:prefer-inline')
   $MessageMetaCopyWith<$Res> get meta {
     return $MessageMetaCopyWith<$Res>(_value.meta, (value) {
-      return _then(_value.copyWith(meta: value));
+      return _then(_value.copyWith(meta: value) as $Val);
     });
   }
 }
 
 /// @nodoc
-abstract class _$MessageItemCopyWith<$Res>
+abstract class _$$_MessageItemCopyWith<$Res>
     implements $MessageItemCopyWith<$Res> {
-  factory _$MessageItemCopyWith(
-          _MessageItem value, $Res Function(_MessageItem) then) =
-      __$MessageItemCopyWithImpl<$Res>;
+  factory _$$_MessageItemCopyWith(
+          _$_MessageItem value, $Res Function(_$_MessageItem) then) =
+      __$$_MessageItemCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({MessageMeta meta, bool selected});
 
   @override
@@ -103,26 +92,25 @@ abstract class _$MessageItemCopyWith<$Res>
 }
 
 /// @nodoc
-class __$MessageItemCopyWithImpl<$Res> extends _$MessageItemCopyWithImpl<$Res>
-    implements _$MessageItemCopyWith<$Res> {
-  __$MessageItemCopyWithImpl(
-      _MessageItem _value, $Res Function(_MessageItem) _then)
-      : super(_value, (v) => _then(v as _MessageItem));
+class __$$_MessageItemCopyWithImpl<$Res>
+    extends _$MessageItemCopyWithImpl<$Res, _$_MessageItem>
+    implements _$$_MessageItemCopyWith<$Res> {
+  __$$_MessageItemCopyWithImpl(
+      _$_MessageItem _value, $Res Function(_$_MessageItem) _then)
+      : super(_value, _then);
 
-  @override
-  _MessageItem get _value => super._value as _MessageItem;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? meta = freezed,
-    Object? selected = freezed,
+    Object? meta = null,
+    Object? selected = null,
   }) {
-    return _then(_MessageItem(
-      meta == freezed
+    return _then(_$_MessageItem(
+      null == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
               as MessageMeta,
-      selected == freezed
+      null == selected
           ? _value.selected
           : selected // ignore: cast_nullable_to_non_nullable
               as bool,
@@ -130,14 +118,13 @@ class __$MessageItemCopyWithImpl<$Res> extends _$MessageItemCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
-
 /// @nodoc
+@JsonSerializable()
 class _$_MessageItem implements _MessageItem {
   const _$_MessageItem(this.meta, this.selected);
 
   factory _$_MessageItem.fromJson(Map<String, dynamic> json) =>
-      _$_$_MessageItemFromJson(json);
+      _$$_MessageItemFromJson(json);
 
   @override
   final MessageMeta meta;
@@ -152,43 +139,44 @@ class _$_MessageItem implements _MessageItem {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _MessageItem &&
-            (identical(other.meta, meta) ||
-                const DeepCollectionEquality().equals(other.meta, meta)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$_MessageItem &&
+            (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.selected, selected) ||
-                const DeepCollectionEquality()
-                    .equals(other.selected, selected)));
+                other.selected == selected));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(meta) ^
-      const DeepCollectionEquality().hash(selected);
 
   @JsonKey(ignore: true)
   @override
-  _$MessageItemCopyWith<_MessageItem> get copyWith =>
-      __$MessageItemCopyWithImpl<_MessageItem>(this, _$identity);
+  int get hashCode => Object.hash(runtimeType, meta, selected);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_MessageItemCopyWith<_$_MessageItem> get copyWith =>
+      __$$_MessageItemCopyWithImpl<_$_MessageItem>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_MessageItemToJson(this);
+    return _$$_MessageItemToJson(
+      this,
+    );
   }
 }
 
 abstract class _MessageItem implements MessageItem {
-  const factory _MessageItem(MessageMeta meta, bool selected) = _$_MessageItem;
+  const factory _MessageItem(final MessageMeta meta, final bool selected) =
+      _$_MessageItem;
 
   factory _MessageItem.fromJson(Map<String, dynamic> json) =
       _$_MessageItem.fromJson;
 
   @override
-  MessageMeta get meta => throw _privateConstructorUsedError;
+  MessageMeta get meta;
   @override
-  bool get selected => throw _privateConstructorUsedError;
+  bool get selected;
   @override
   @JsonKey(ignore: true)
-  _$MessageItemCopyWith<_MessageItem> get copyWith =>
+  _$$_MessageItemCopyWith<_$_MessageItem> get copyWith =>
       throw _privateConstructorUsedError;
 }

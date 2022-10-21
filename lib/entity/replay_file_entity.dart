@@ -18,10 +18,8 @@ class ReplayFileEntity with _$ReplayFileEntity {
       _$ReplayFileEntityFromJson(json);
 }
 
-class ReplayFile extends StateNotifier<ReplayFileEntity?> {
-  final Reader read;
-
-  ReplayFile(this.read, [ReplayFileEntity? entity]) : super(entity);
+class ReplayFile extends StateNotifier<ReplayFileEntity> {
+  ReplayFile() : super(ReplayFileEntity(path: null));
 
   void load() async {
     final file_selector.XTypeGroup typeGroup = file_selector.XTypeGroup(

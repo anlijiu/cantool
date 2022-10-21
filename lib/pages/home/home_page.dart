@@ -9,21 +9,21 @@ import 'package:cantool/pages/receive/receive_page.dart';
 import 'package:cantool/widget/drawer/app_drawer.dart';
 import 'i18n.dart';
 
-class HomePage extends HookWidget {
+class HomePage extends HookConsumerWidget {
   HomePage();
 
   @override
-  Widget build(BuildContext context) {
-    final currentTab = useProvider(currentTabInDrawerProvider).state;
-    final dbcMetaRepository = useProvider(dbcMetaProvider.notifier);
-    final dbcMeta = useProvider(dbcMetaProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentTab = ref.watch(currentTabInDrawerProvider);
+    final dbcMetaRepository = ref.watch(dbcMetaProvider.notifier);
+    final dbcMeta = ref.watch(dbcMetaProvider);
 
     if (dbcMeta == null) {
       return Center(
-          child: FlatButton.icon(
+          child: ElevatedButton.icon(
               onPressed: () {
                 print(" dbcMetaRepository is " + dbcMetaRepository.toString());
-                // dbcMetaRepository.loadDbcFile(context);
+                dbcMetaRepository.loadDbcFile(context);
               },
               icon: Icon(Icons.folder_open),
               label: Text('Load dbc file')));

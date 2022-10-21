@@ -10,18 +10,19 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import './providers.dart';
 import 'strategy_item.dart';
 
-final _currentStrategy = ScopedProvider<Strategy>(null);
+final _currentStrategy =
+    Provider<Strategy>(((ref) => throw UnimplementedError()));
 
-class SignalTile extends HookWidget {
+class SignalTile extends HookConsumerWidget {
   const SignalTile();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textController = useTextEditingController();
 
-    final strategy = useProvider(_currentStrategy);
-    final strategies = useProvider(strategyMap);
-    final signalMetas = useProvider(signalMetasProvider).state;
+    final strategy = ref.watch(_currentStrategy);
+    final strategies = ref.watch(strategyMap);
+    final signalMetas = ref.watch(signalMetasProvider.notifier).state;
 
     final signalMeta = signalMetas[strategy.name];
 
@@ -54,7 +55,7 @@ class SignalTile extends HookWidget {
                         double v = strategy.value;
                         ++v;
                         print("add icon button clicked , ${v.toString()}");
-                        context
+                        ref
                             .read(viewController)
                             .setConstStrategy(signalMeta.name, v);
                       }),
@@ -64,7 +65,7 @@ class SignalTile extends HookWidget {
                     controller: textController,
                     onChanged: (value) {
                       print("hhhhhhhhhhhh   ${value}");
-                      context.read(viewController).setConstStrategy(
+                      ref.read(viewController).setConstStrategy(
                           signalMeta.name, double.parse(value));
                     },
                     autofocus: false,
@@ -75,7 +76,7 @@ class SignalTile extends HookWidget {
                         double v = strategy.value;
                         --v;
                         print("remove icon button clicked , ${v.toString()}");
-                        context
+                        ref
                             .read(viewController)
                             .setConstStrategy(signalMeta.name, v);
                       }),
@@ -83,15 +84,15 @@ class SignalTile extends HookWidget {
   }
 }
 
-class SignalListView extends HookWidget {
+class SignalListView extends HookConsumerWidget {
   ScrollController _signalListController = ScrollController();
 
   @override
-  Widget build(BuildContext context) {
-    final List<Strategy>? strategyList = useProvider(strategies).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<Strategy> strategyList = ref.watch(strategies);
 
     print("SignalListView, signalIds: " + strategyList.toString());
-    if (strategyList == null) {
+    if (strategyList.isEmpty) {
       return Flexible(
           child: Container(
         child: Center(

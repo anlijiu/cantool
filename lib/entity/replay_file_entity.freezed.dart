@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'replay_file_entity.dart';
 
@@ -10,29 +12,11 @@ part of 'replay_file_entity.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 ReplayFileEntity _$ReplayFileEntityFromJson(Map<String, dynamic> json) {
   return _ReplayFileEntity.fromJson(json);
 }
-
-/// @nodoc
-class _$ReplayFileEntityTearOff {
-  const _$ReplayFileEntityTearOff();
-
-  _ReplayFileEntity call({String? path}) {
-    return _ReplayFileEntity(
-      path: path,
-    );
-  }
-
-  ReplayFileEntity fromJson(Map<String, Object> json) {
-    return ReplayFileEntity.fromJson(json);
-  }
-}
-
-/// @nodoc
-const $ReplayFileEntity = _$ReplayFileEntityTearOff();
 
 /// @nodoc
 mixin _$ReplayFileEntity {
@@ -48,59 +32,61 @@ mixin _$ReplayFileEntity {
 abstract class $ReplayFileEntityCopyWith<$Res> {
   factory $ReplayFileEntityCopyWith(
           ReplayFileEntity value, $Res Function(ReplayFileEntity) then) =
-      _$ReplayFileEntityCopyWithImpl<$Res>;
+      _$ReplayFileEntityCopyWithImpl<$Res, ReplayFileEntity>;
+  @useResult
   $Res call({String? path});
 }
 
 /// @nodoc
-class _$ReplayFileEntityCopyWithImpl<$Res>
+class _$ReplayFileEntityCopyWithImpl<$Res, $Val extends ReplayFileEntity>
     implements $ReplayFileEntityCopyWith<$Res> {
   _$ReplayFileEntityCopyWithImpl(this._value, this._then);
 
-  final ReplayFileEntity _value;
   // ignore: unused_field
-  final $Res Function(ReplayFileEntity) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? path = freezed,
   }) {
     return _then(_value.copyWith(
-      path: path == freezed
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
               as String?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$ReplayFileEntityCopyWith<$Res>
+abstract class _$$_ReplayFileEntityCopyWith<$Res>
     implements $ReplayFileEntityCopyWith<$Res> {
-  factory _$ReplayFileEntityCopyWith(
-          _ReplayFileEntity value, $Res Function(_ReplayFileEntity) then) =
-      __$ReplayFileEntityCopyWithImpl<$Res>;
+  factory _$$_ReplayFileEntityCopyWith(
+          _$_ReplayFileEntity value, $Res Function(_$_ReplayFileEntity) then) =
+      __$$_ReplayFileEntityCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({String? path});
 }
 
 /// @nodoc
-class __$ReplayFileEntityCopyWithImpl<$Res>
-    extends _$ReplayFileEntityCopyWithImpl<$Res>
-    implements _$ReplayFileEntityCopyWith<$Res> {
-  __$ReplayFileEntityCopyWithImpl(
-      _ReplayFileEntity _value, $Res Function(_ReplayFileEntity) _then)
-      : super(_value, (v) => _then(v as _ReplayFileEntity));
+class __$$_ReplayFileEntityCopyWithImpl<$Res>
+    extends _$ReplayFileEntityCopyWithImpl<$Res, _$_ReplayFileEntity>
+    implements _$$_ReplayFileEntityCopyWith<$Res> {
+  __$$_ReplayFileEntityCopyWithImpl(
+      _$_ReplayFileEntity _value, $Res Function(_$_ReplayFileEntity) _then)
+      : super(_value, _then);
 
-  @override
-  _ReplayFileEntity get _value => super._value as _ReplayFileEntity;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? path = freezed,
   }) {
-    return _then(_ReplayFileEntity(
-      path: path == freezed
+    return _then(_$_ReplayFileEntity(
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -108,14 +94,13 @@ class __$ReplayFileEntityCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
-
 /// @nodoc
+@JsonSerializable()
 class _$_ReplayFileEntity implements _ReplayFileEntity {
   _$_ReplayFileEntity({this.path});
 
   factory _$_ReplayFileEntity.fromJson(Map<String, dynamic> json) =>
-      _$_$_ReplayFileEntityFromJson(json);
+      _$$_ReplayFileEntityFromJson(json);
 
   @override
   final String? path;
@@ -128,36 +113,39 @@ class _$_ReplayFileEntity implements _ReplayFileEntity {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _ReplayFileEntity &&
-            (identical(other.path, path) ||
-                const DeepCollectionEquality().equals(other.path, path)));
+        (other.runtimeType == runtimeType &&
+            other is _$_ReplayFileEntity &&
+            (identical(other.path, path) || other.path == path));
   }
-
-  @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(path);
 
   @JsonKey(ignore: true)
   @override
-  _$ReplayFileEntityCopyWith<_ReplayFileEntity> get copyWith =>
-      __$ReplayFileEntityCopyWithImpl<_ReplayFileEntity>(this, _$identity);
+  int get hashCode => Object.hash(runtimeType, path);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_ReplayFileEntityCopyWith<_$_ReplayFileEntity> get copyWith =>
+      __$$_ReplayFileEntityCopyWithImpl<_$_ReplayFileEntity>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_ReplayFileEntityToJson(this);
+    return _$$_ReplayFileEntityToJson(
+      this,
+    );
   }
 }
 
 abstract class _ReplayFileEntity implements ReplayFileEntity {
-  factory _ReplayFileEntity({String? path}) = _$_ReplayFileEntity;
+  factory _ReplayFileEntity({final String? path}) = _$_ReplayFileEntity;
 
   factory _ReplayFileEntity.fromJson(Map<String, dynamic> json) =
       _$_ReplayFileEntity.fromJson;
 
   @override
-  String? get path => throw _privateConstructorUsedError;
+  String? get path;
   @override
   @JsonKey(ignore: true)
-  _$ReplayFileEntityCopyWith<_ReplayFileEntity> get copyWith =>
+  _$$_ReplayFileEntityCopyWith<_$_ReplayFileEntity> get copyWith =>
       throw _privateConstructorUsedError;
 }

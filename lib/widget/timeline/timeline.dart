@@ -237,7 +237,7 @@ class Timeline {
     if (!_isFrameScheduled) {
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
     }
   }
 
@@ -369,7 +369,7 @@ class Timeline {
     } else if (!_isFrameScheduled) {
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
     }
   }
 
@@ -385,7 +385,7 @@ class Timeline {
           if (!_isFrameScheduled) {
             _isFrameScheduled = true;
             _lastFrameTime = 0.0;
-            SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+            SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
           }
         }
       }
@@ -402,7 +402,7 @@ class Timeline {
     if (_lastFrameTime == 0.0) {
       _lastFrameTime = t;
       _isFrameScheduled = true;
-      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
       return;
     }
 
@@ -411,7 +411,7 @@ class Timeline {
 
     if (!advance(elapsed, true) && !_isFrameScheduled) {
       _isFrameScheduled = true;
-      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
     }
 
     if (onNeedPaint != null) {
@@ -831,7 +831,7 @@ class Timeline {
       print("timeline reloadData and scheduleFrameCallback");
       _isFrameScheduled = true;
       _lastFrameTime = 0.0;
-      SchedulerBinding.instance!.scheduleFrameCallback(beginFrame);
+      SchedulerBinding.instance.scheduleFrameCallback(beginFrame);
     }
   }
 

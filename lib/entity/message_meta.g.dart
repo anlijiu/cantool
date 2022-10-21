@@ -6,19 +6,18 @@ part of 'message_meta.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_MessageMeta _$_$_MessageMetaFromJson(Map json) {
-  return _$_MessageMeta(
-    id: json['id'] as int,
-    name: json['name'] as String,
-    sender: json['sender'] as String,
-    length: json['length'] as int,
-    attributes: Map<String, dynamic>.from(json['attributes'] as Map),
-    signalIds:
-        (json['signal_ids'] as List<dynamic>).map((e) => e as String).toList(),
-  );
-}
+_$_MessageMeta _$$_MessageMetaFromJson(Map json) => _$_MessageMeta(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      sender: json['sender'] as String,
+      length: json['length'] as int,
+      attributes: Map<String, dynamic>.from(json['attributes'] as Map),
+      signalIds: (json['signal_ids'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+    );
 
-Map<String, dynamic> _$_$_MessageMetaToJson(_$_MessageMeta instance) =>
+Map<String, dynamic> _$$_MessageMetaToJson(_$_MessageMeta instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

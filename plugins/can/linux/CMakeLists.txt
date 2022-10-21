@@ -1,80 +1,92 @@
-cmake_minimum_required(VERSION 3.10)
-set(PROJECT_NAME "can")
-project(${PROJECT_NAME} LANGUAGES CXX)
+# The Flutter tooling requires that developers have CMake 3.10 or later
+# installed. You should not increase this version, as doing so will cause
+# the plugin to fail to compile for some customers of the plugin.
+cmake_minimum_required(VERSION 3.23)
 
-set(PLUGIN_NAME "${PROJECT_NAME}_plugin")
+# Project-level configuration.
+set(PLUGIN_NAME "can_plugin")
+project(${PLUGIN_NAME} LANGUAGES C)
 
-# set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
-# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
-set(CMAKE_INSTALL_RPATH "")
-SET(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
-set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
-ADD_DEFINITIONS(
-  -Wno-unused-function
-)
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+FIND_PACKAGE(PkgConfig REQUIRED) #想用pkg相关命令需要先引入这个 
 find_package(ZLIB)
 find_package(Iconv)
+find_package(LibUSB)
 
-add_library(${PLUGIN_NAME} SHARED
-  "${PLUGIN_NAME}.cc"
-  "can_device.cc"
-  "can_operator.cc"
-  "replay_operator.cc"
-  "cstr.cc"
-  "hashmap.cc"
-  "libwecan.cc"
-  "pipe.c"
-  "list/list.cc"
-  "list/list_node.cc"
-  "list/list_iterator.cc"
-  "asc/asc_reader.cc"
-  "blf/blfapi.cc"
-  "blf/blfparser.cc"
-  "blf/blfreader.cc"
-  "blf/blfstream.cc"
-  "dbc_parser.cc"
-)
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/list
-  ${CMAKE_CURRENT_SOURCE_DIR}/blf
-  ${CMAKE_CURRENT_SOURCE_DIR}/asc
-  ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/includes
-)
+include_directories(${LIBUSB_INCLUDE_DIR})
+include_directories(${THIRD_PARTY_INCLUDE_DIR})
 
-message("hello")
-message(${CMAKE_CURRENT_SOURCE_DIR})
-message(${CMAKE_BINARY_DIR})
+set(DRIVERS_LOCATION "drivers")
+
+add_subdirectory(common)
+add_subdirectory(module)
+add_subdirectory(main)
+
+add_subdirectory(usbcanii)
+add_subdirectory(tsmaster)
+
+# Apply a standard set of build settings that are configured in the
+# application-level CMakeLists.txt. This can be removed for plugins that want
+# full control over build settings.
 apply_standard_settings(${PLUGIN_NAME})
-set_target_properties(${PLUGIN_NAME} PROPERTIES
-  CXX_VISIBILITY_PRESET hidden
-  C_STANDARD 11)
-set_target_properties(${PLUGIN_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,./,-rpath,./lib,--enable-new-dtags")
 
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcontrolcan.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcandbc.so.0" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libusb-1.0.so.0" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
-
-
-message(flutter)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
+
+# Source include directories and library dependencies. Add any plugin-specific
+# dependencies here.
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(${PLUGIN_NAME} PRIVATE ZLIB::ZLIB)
-target_link_libraries(${PLUGIN_NAME} PRIVATE Iconv::Iconv)
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
-# target_link_libraries(${PLUGIN_NAME} PRIVATE libcontrolcan)
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcontrolcan.so)
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcandbc.so.0)
-target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libusb-1.0.so.0)
+target_link_libraries(${PLUGIN_NAME} PRIVATE ZLIB::ZLIB)
+target_link_libraries(${PLUGIN_NAME} PRIVATE Iconv::Iconv)
 
+# Symbols are hidden by default to reduce the chance of accidental conflicts
+# between plugins. This should not be removed; any symbols that should be
+# exported should be explicitly exported with the FLUTTER_PLUGIN_EXPORT macro.
+# set_target_properties(${PLUGIN_NAME} PROPERTIES
+#   CXX_VISIBILITY_PRESET hidden)
+
+# set_target_properties(${PLUGIN_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,./,-rpath,./lib,--enable-new-dtags")
+
+# # 安装动态库的目标目录
+# set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}")
+# 
+# # 安装动态库，到执行目录
+# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcontrolcan.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+#   COMPONENT Runtime)
+# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcandbc.so.0" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+#   COMPONENT Runtime)
+# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libusb-1.0.so.0" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+#   COMPONENT Runtime)
+# 
+# target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
+# 
+# # Source include directories and library dependencies. Add any plugin-specific
+# # dependencies here.
+# target_include_directories(${PLUGIN_NAME} INTERFACE
+#   "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE ZLIB::ZLIB)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE Iconv::Iconv)
+# # target_link_libraries(${PLUGIN_NAME} PRIVATE libcontrolcan)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcontrolcan.so)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libcandbc.so.0)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/libs/libusb-1.0.so.0)
+# 
+# # List of absolute paths to libraries that should be bundled with the plugin.
+# # This list could contain prebuilt libraries, or libraries created by an
+# # external build triggered from this build file.
+set(can_bundled_libraries
+  ""
+  PARENT_SCOPE
+)
+# 

@@ -13,15 +13,16 @@ import './message_item.dart';
 import './strategy_item.dart';
 import 'package:cantool/utils/text.dart';
 
-final _currentMessage = ScopedProvider<MessageItem>(null);
+final _currentMessage =
+    Provider<MessageItem>((ref) => throw UnimplementedError());
 
-class MessageTile extends HookWidget {
+class MessageTile extends HookConsumerWidget {
   const MessageTile();
 
   @override
-  Widget build(BuildContext context) {
-    final message = useProvider(_currentMessage);
-    final msgID = useProvider(selectedMsgId).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final message = ref.watch(_currentMessage);
+    final msgID = ref.watch(selectedMsgId);
     return Material(
       color: msgID == message.meta.id
           ? Colors.lightBlue.withOpacity(0.15)
@@ -34,12 +35,12 @@ class MessageTile extends HookWidget {
                 : const Icon(Icons.check_box_outline_blank),
             onPressed: () {
               print(" MessageTile  onPressed  " + message.toString());
-              context.read(viewController).toggleStatus(message);
+              ref.read(messages.notifier).toggle(message.meta.id);
             },
           ),
           trailing: Text(message.meta.name),
           onTap: () {
-            context.read(viewController).focusMessage(message);
+            ref.read(viewController).focusMessage(message);
           }),
     );
   }

@@ -73,9 +73,9 @@ final timelineProvider = Provider<Timeline>((ref) {
   final timeline = Timeline(TargetPlatform.linux);
   final replayRepo = ref.watch(replayRepoProvider.notifier);
   final result = ref.watch(replayRepoProvider);
-  final signalMetas = ref.watch(signalMetasProvider).state;
+  final signalMetas = ref.watch(signalMetasProvider);
   // final result = ref.watch(replayResultProvider).state;
-  final filterMessage = ref.watch(filterMsgSignalProvider).state;
+  final filterMessage = ref.watch(filterMsgSignalProvider);
 
   timeline.onViewPortChanged = (start, end, width) =>
       replayRepo.visbleTimeBoundariesChanged(start, end, width);
@@ -124,16 +124,16 @@ final timelineProvider = Provider<Timeline>((ref) {
   return timeline;
 });
 
-class ReplayChartView extends HookWidget {
+class ReplayChartView extends HookConsumerWidget {
   const ReplayChartView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final filterMsgSignal = useProvider(filterMsgSignalProvider);
-    final timeline = useProvider(timelineProvider);
-    final signals = filterMsgSignal.state.messages.values.fold<List<Signal>>(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filterMsgSignal = ref.watch(filterMsgSignalProvider);
+    final timeline = ref.watch(timelineProvider);
+    final signals = filterMsgSignal.messages.values.fold<List<Signal>>(
         [], (value, element) => [...value, ...element.signals.values]);
-    final result = useProvider(replayRepoProvider.notifier).state;
+    final result = ref.watch(replayRepoProvider);
     if (result == null)
       return Center(child: Text("Add filter signals"));
     else if (result.data.isEmpty)
