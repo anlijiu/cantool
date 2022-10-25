@@ -8,7 +8,8 @@ set(PLUGIN_NAME "can_plugin")
 project(${PLUGIN_NAME} LANGUAGES C)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+# set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE ASAN)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
 set(CMAKE_MODULE_PATH
@@ -18,6 +19,7 @@ FIND_PACKAGE(PkgConfig REQUIRED) #想用pkg相关命令需要先引入这个
 find_package(ZLIB)
 find_package(Iconv)
 find_package(LibUSB)
+find_package(LibFFI REQUIRED)
 
 include_directories(${LIBUSB_INCLUDE_DIR})
 include_directories(${THIRD_PARTY_INCLUDE_DIR})
@@ -38,6 +40,7 @@ apply_standard_settings(${PLUGIN_NAME})
 
 
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.

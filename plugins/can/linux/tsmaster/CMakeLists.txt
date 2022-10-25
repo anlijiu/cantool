@@ -46,6 +46,8 @@ install(TARGETS tsmaster DESTINATION "${INSTALL_DRIVER_DIR}" COMPONENT Runtime)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so" DESTINATION "${INSTALL_DRIVER_LIB_DIR}" COMPONENT Runtime)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so" DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
 
+target_compile_options(tsmaster PRIVATE -fsanitize=address)
+target_link_options(tsmaster  PRIVATE -fsanitize=address)
 
 target_sources(tsmaster
   PRIVATE
@@ -57,9 +59,12 @@ target_sources(tsmaster
 
 target_include_directories(tsmaster
   PUBLIC
+    ${LIBFFI_INCLUDE_DIRS}
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/3rdparty
   )
+    # SET(LIBFFI_LIBRARIES)
+    # SET(LIBFFI_INCLUDE_DIRS)
 
 target_link_libraries(tsmaster
   # INTERFACE 
@@ -67,6 +72,7 @@ target_link_libraries(tsmaster
   PUBLIC
     module
     TSCANApiOnLinux 
+    ${LIBFFI_LIBRARIES}
   # PRIVATE
   #   controlcan
 )

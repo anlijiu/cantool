@@ -66,9 +66,9 @@ void *can_send_func(void *param)
 
     struct timeval now;
     struct timespec outtime;
-    pthread_mutex_lock(&sender.mutex);
-    struct can_frame_s * frames = malloc(sizeof(struct can_frame_s) * len);
-    struct canfd_frame_s * fdframes = malloc(sizeof(struct canfd_frame_s) * len);
+    // pthread_mutex_lock(&sender.mutex);
+    struct can_frame_s * frames = calloc(sizeof(struct can_frame_s), len);
+    struct canfd_frame_s * fdframes = calloc(sizeof(struct canfd_frame_s), len);
     while (sender.flag) {
         index = 0;
         struct can_frame_s * frame = frames;
@@ -109,11 +109,11 @@ void *can_send_func(void *param)
         gettimeofday(&now, NULL);
         outtime.tv_sec = now.tv_sec;
         outtime.tv_nsec = 100000 + now.tv_usec * 1000;
-        pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
+        // pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
     }
     free(frames);
     free(fdframes);
-    pthread_mutex_unlock(&sender.mutex);
+    // pthread_mutex_unlock(&sender.mutex);
     return 0;
 }
 
@@ -195,6 +195,7 @@ void can_operator_clear_canfd_listener() {
 
 
 static int on_recv(char* uuid, struct can_frame_s *frames, unsigned int num) {
+    printf("%s start , uuid: %s\n", __func__, uuid);
     list_iterator_t *it = list_iterator_new(receiver.listeners, LIST_HEAD);
     list_node_t *t = list_iterator_next(it);
     while(t) {
@@ -215,6 +216,7 @@ static int on_recv(char* uuid, struct can_frame_s *frames, unsigned int num) {
 }
 
 static int on_canfd_recv(char* uuid, struct canfd_frame_s *frames, unsigned int num) {
+    printf("%s start , uuid: %s\n", __func__, uuid);
     list_iterator_t *it = list_iterator_new(receiver.canfd_listeners, LIST_HEAD);
     list_node_t *t = list_iterator_next(it);
     while(t) {
