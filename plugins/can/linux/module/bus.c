@@ -19,7 +19,6 @@ static int LIBUSB_CALL hotplug_callback(libusb_context *ctx, libusb_device *dev,
 static void handle_libusb_event_loop_task(void *arg){
     int rc;
     while(g_hotplug_enable) {
-	    printf("Thread #%u working on %ld\n", (int)pthread_self(), (intptr_t) arg);
 		rc = libusb_handle_events (NULL);
 		if (rc < 0)
 			printf("libusb_handle_events() failed: %s\n", libusb_error_name(rc));

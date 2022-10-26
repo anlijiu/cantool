@@ -35,7 +35,7 @@ const char kSyncMetaDatas[] = "Can.SyncMetaDatas";
 
 const char kSetConstStrategy[] = "Can.SetConstStrategy";
 const char kCanReceiveCallbackMethod[] = "Can.ReceiveCallback";
-const char kCanFdReceiveCallbackMethod[] = "Can.FD.ReceiveCallback";
+const char kCanFdReceiveCallbackMethod[] = "CanFD.ReceiveCallback";
 
 const char kReplaySetFile[] = "Can.ReplaySetFile";
 const char kReplayGetFiltedSignals[] = "Can.ReplayGetFiltedSignals";
@@ -79,7 +79,8 @@ GtkWindow *get_window(CanPlugin *self)
 
 static int can_receiver_cb(char* uuid, struct can_frame_s *frame, unsigned int num) {
 
-  g_autoptr(FlValue) result = can_frame_to_flvalue(frame, num);
+  g_autoptr(FlValue) result = fl_value_new_list();
+  can_frame_to_flvalue(frame, num, result);
 // static bool can_receiver_cb(FlValue * result) {
   // debug_info("can_plugin.cc   can_receiver_cb");
   fl_method_channel_invoke_method(channel, kCanReceiveCallbackMethod,
@@ -88,10 +89,13 @@ static int can_receiver_cb(char* uuid, struct can_frame_s *frame, unsigned int n
 }
 static int canfd_receiver_cb(char* uuid, struct canfd_frame_s *frame, unsigned int num) {
 
-  g_autoptr(FlValue) result = canfd_frame_to_flvalue(frame, num);
+  debug_info("canfd_receiver_cb  receive %u frame\n", num);
+  g_autoptr(FlValue) result = fl_value_new_list();
+
+  canfd_frame_to_flvalue(frame, num, result);
 // static bool can_receiver_cb(FlValue * result) {
   // debug_info("can_plugin.cc   can_receiver_cb");
-  fl_method_channel_invoke_method(channel, kCanFdReceiveCallbackMethod,
+  fl_method_channel_invoke_method(channel, kCanReceiveCallbackMethod,
                                      result, NULL, NULL, NULL);
   return true;
 }
@@ -340,6 +344,7 @@ CanPlugin *can_plugin_new(FlPluginRegistrar *registrar)
     g_signal_connect(G_OBJECT(window),
         "destroy", can_destroy, NULL);
 
+  init_dbc_parser();
   thread_pool_init();
   init_buses();
   init_devices();

@@ -18,7 +18,7 @@ const String _unloadAmmo = 'Can.RemomveAmmo';
 const String _setConstStrategy = 'Can.SetConstStrategy';
 const String _parseDbcFileMethod = "Can.ParseDbcFile";
 const String _canReceiveCallbackMethod = "Can.ReceiveCallback";
-const String _canfdReceiveCallbackMethod = "Can.FD.ReceiveCallback";
+const String _canfdReceiveCallbackMethod = "CanFD.ReceiveCallback";
 
 const String _replaySetFile = "Can.ReplaySetFile";
 const String _replayGetFiltedSignals = "Can.ReplayGetFiltedSignals";
@@ -31,7 +31,7 @@ class CanChannel {
   /// Private constructor.
   CanChannel._() {
     // _eventChannel.setMessageHandler(_handleCanData);
-    _platformChannel.setMethodCallHandler(_handleCanData);
+    _platformChannel.setMethodCallHandler(this._handleCanData);
     // _eventChannel.receiveBroadcastStream().listen(_handleEventChannelOnData,
     //     onError: _handleEventChannelOnError,
     //     onDone: _handleEventChannelOnDone,

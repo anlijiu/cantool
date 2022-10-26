@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.23)
 
 # Project-level configuration.
 set(PLUGIN_NAME "can_plugin")
-project(${PLUGIN_NAME} LANGUAGES C)
+project(${PLUGIN_NAME} LANGUAGES CXX C)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
 # set(CMAKE_BUILD_TYPE RelWithDebInfo)
@@ -19,7 +19,6 @@ FIND_PACKAGE(PkgConfig REQUIRED) #想用pkg相关命令需要先引入这个
 find_package(ZLIB)
 find_package(Iconv)
 find_package(LibUSB)
-find_package(LibFFI REQUIRED)
 
 include_directories(${LIBUSB_INCLUDE_DIR})
 include_directories(${THIRD_PARTY_INCLUDE_DIR})

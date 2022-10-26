@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <ffi.h>
 #include "libusb.h"
 #include "tsmaster.h"
 #include "kernel.h"
@@ -63,11 +62,13 @@ static can_frame_t* calloc_can_frame_from_t_lib_can(const TLibCAN* pObj, size_t 
     return frames;
 }
 static canfd_frame_t* calloc_canfd_frame_from_t_lib_can(const TLibCANFD* pObj, size_t len) {
+    printf("%s in len:%d\n ", __func__, len);
     canfd_frame_t* frames = malloc(sizeof(struct canfd_frame_s) * len);
     canfd_frame_t* p = frames;
     for(int i = 0; i < len; ++i,++p,++pObj) {
         p->can_id = pObj->FIdentifier;
         p->can_dlc = pObj->FDLC;
+        printf("%s i:%d   id: %x \n ", __func__, i, p->can_id);
         memcpy(p->data, pObj->FData.d, 64);
     }
     return frames;
@@ -88,9 +89,11 @@ static TLibCAN* calloc_t_lib_can_from_can_frame(can_frame_t* frames, size_t len)
 }
 
 static TLibCANFD* calloc_t_lib_canfd_from_can_frame(canfd_frame_t* frames, size_t len) {
+    printf("%s in len:%d\n ", __func__, len);
     TLibCANFD* pObj = malloc(sizeof(TLibCANFD) * len);
     TLibCANFD* p = pObj;
     for(int i = 0; i < len; ++i,++p,++frames) {
+        printf("%s i:%d   id: %x \n ", __func__, i, frames->can_id);
         p->FIdentifier = frames->can_id;
         p->FDLC = frames->can_dlc ;
         p->FProperties.bits.remoteframe = 0x00; //not remote frame,standard frame
@@ -154,15 +157,17 @@ static bool tsmaster_send(struct can_device * dev, can_frame_t *frames, unsigned
 }
 
 static bool tsmaster_sendfd(struct can_device * dev, canfd_frame_t *frames, unsigned int len) {
-    printf("%s start\n", __func__);
+    printf("%s start, len: %u\n", __func__, len);
     TLibCANFD* pObj = calloc_t_lib_canfd_from_can_frame(frames, len);
     TLibCANFD* p = pObj;
     struct tsmaster_device *tdev = container_of((void *)dev,
 			struct tsmaster_device, device);
     uint32_t result = 0;
-    for(int i = 0; i < len; ++i, p++) {
-        result = tscan_transmit_canfd_sync(tdev->ADeviceHandle, p, 10);
-    }
+
+    result = tscan_transmit_canfd_sync(tdev->ADeviceHandle, p, 10);
+    // for(int i = 0; i < len; ++i, p++) {
+    //     result = tscan_transmit_canfd_sync(tdev->ADeviceHandle, p, 10);
+    // }
     free(pObj);
     return true;
 }
@@ -198,7 +203,7 @@ uint8_t * curry_one_param_device_func(
     printf("%s in  dev addr: %p \n", __func__, dev);
     uintptr_t fp = (uintptr_t)two_param_func;
     uint8_t template[] = {
-        0xbe, 0, 0, 0, 0, 0, 0,                             /* movl $imm32, %esi */
+        0x48, 0xbe, 0, 0, 0, 0, 0, 0, 0, 0,                 /* movq $imm64,%rsi */
         0x48, 0xb8, fp >>  0, fp >>  8, fp >> 16, fp >> 24, /* movq fp, %rax */
                     fp >> 32, fp >> 40, fp >> 48, fp >> 56,
         0xff, 0xe0                                          /* jmpq *%rax */
@@ -210,12 +215,12 @@ uint8_t * curry_one_param_device_func(
     
     memcpy(buf, template, sizeof(template));
     uintptr_t second_param = (uintptr_t)dev;
-    buf[1] = second_param >> 0;
-    buf[2] = second_param >> 8;
-    buf[3] = second_param >> 16;
-    buf[4] = second_param >> 24;
-    buf[5] = second_param >> 32;
-    buf[6] = second_param >> 40;
+    buf[2] = second_param >> 0;
+    buf[3] = second_param >> 8;
+    buf[4] = second_param >> 16;
+    buf[5] = second_param >> 24;
+    buf[6] = second_param >> 32;
+    buf[7] = second_param >> 40;
     
     uintptr_t pagesize = sysconf(_SC_PAGE_SIZE);
     mprotect((void *)PAGE_START(buf),
@@ -229,21 +234,19 @@ uint8_t * curry_one_param_device_func(
 static void receive_can_message(const TLibCAN* aData, struct can_device* dev) {
     printf("%s in ,  can id: %u", __func__, aData->FIdentifier);
 
-    if(_on_recv) {
+    if(_on_recv && aData->FProperties.bits.istx == false) {
         can_frame_t * frames = calloc_can_frame_from_t_lib_can(aData, 1);
         _on_recv(dev->uuid, frames, 1);
+        free(frames);
     }
 }
 
 static void receive_canfd_message(const TLibCANFD* aData, struct can_device* dev) {
-    printf("%s in ,  aData addr: %p,  dev addr: %p\n", __func__, aData, dev);
-    printf("%s in ,  can id: %u,  dev addr: %p\n", __func__, aData->FIdentifier, dev);
-    if(_on_canfd_recv) {
-        printf("%s in ,  111\n", __func__);
+    if(_on_canfd_recv && aData->FProperties.bits.istx == false) {
         canfd_frame_t * frames = calloc_canfd_frame_from_t_lib_can(aData, 1);
-        printf("%s in ,  222\n", __func__);
+        printf("receive_canfd_message id:%x\n", frames->can_id);
         _on_canfd_recv(dev->uuid, frames, 1);
-        printf("%s in ,  333\n", __func__);
+        free(frames);
     }
 }
 
@@ -252,18 +255,6 @@ typedef void (*canfd_callback_t)(const TLibCANFD* aData, struct can_device* dev)
 
 static void canfd_test(const TLibCANFD * aData) {
     printf("%s in ,  can id: %u\n", __func__, aData->FIdentifier);
-}
-
-static void _canfd_callback(ffi_cif *cif, void *ret, void *args[], void *userdata) {
-    printf("%s 111\n", __func__);
-    struct can_device* dev = (struct can_device*)userdata;
-    printf("%s 222  dev addr:%p\n", __func__, dev);
-    const TLibCANFD* frame = (TLibCANFD*) args[0];
-    printf("%s 333  frame addr:%p, dev addr:%p\n", __func__, frame, dev);
-    if(frame && dev) {
-        receive_canfd_message(frame, dev);
-    }
-    printf("%s 444\n", __func__);
 }
 
 static uint32_t deviceCount;
@@ -304,27 +295,10 @@ static int /*__init*/ tsmaster_driver_init(void)
 
             sync_canfd_bittiming(tdevice);
 
-            void *callback_code;
-            int argumentCount = 1;
-            ffi_cif cif1;
-            ffi_type *argsTyps[1];
-            ffi_closure *pointer_and_callback_closure = ffi_closure_alloc(sizeof *pointer_and_callback_closure, &callback_code);
-
-            if (pointer_and_callback_closure) {
-                argsTyps[0] = &ffi_type_pointer;
-                if(ffi_prep_cif(&cif1, FFI_DEFAULT_ABI, (unsigned int)argumentCount, &ffi_type_void, argsTyps) == FFI_OK) {
-                    if (ffi_prep_closure_loc(callback_code, &cif1, _canfd_callback, &tdevice->device, callback_code) == FFI_OK) {
-                        printf("%s  dev addr:%p\n", __func__, &tdevice->device);
-                        // ((void (*)(const TLibCANFD*))callback_code)(aaa);
-                        // retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, (TCANFDQueueEvent_Win32_t)callback_code);
-                        retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, canfd_test);
-                    }
-                }
-            }
-            // TCANQueueEvent_Win32_t can_listener = (TCANQueueEvent_Win32_t)curry_one_param_device_func(receive_can_message, &tdevice->device);
-            // TCANFDQueueEvent_Win32_t canfd_listener = (TCANFDQueueEvent_Win32_t)curry_one_param_device_func(receive_canfd_message, &tdevice->device);
-            // retValue = tscan_register_event_can(tdevice->ADeviceHandle, can_listener);
-            // retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, canfd_listener);
+            TCANQueueEvent_Win32_t can_listener = (TCANQueueEvent_Win32_t)curry_one_param_device_func(receive_can_message, &tdevice->device);
+            TCANFDQueueEvent_Win32_t canfd_listener = (TCANFDQueueEvent_Win32_t)curry_one_param_device_func(receive_canfd_message, &tdevice->device);
+            retValue = tscan_register_event_can(tdevice->ADeviceHandle, can_listener);
+            retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, canfd_listener);
             add_device(&tdevice->device);
         } else {
             printf("*** tsmaster device connect error!  ret:%lu ***\n", retValue);

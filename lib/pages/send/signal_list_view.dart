@@ -22,7 +22,7 @@ class SignalTile extends HookConsumerWidget {
 
     final strategy = ref.watch(_currentStrategy);
     final strategies = ref.watch(strategyMap);
-    final signalMetas = ref.watch(signalMetasProvider.notifier).state;
+    final signalMetas = ref.watch(signalMetasProvider);
 
     final signalMeta = signalMetas[strategy.name];
 

@@ -195,6 +195,8 @@ static const VCI_INIT_CONFIG default_vci_config = {
 };
 static VCI_BOARD_INFO1 boardInfo;
 static unsigned int deviceCount;
+
+// module_init(driver_usbcanii_init);
 static int /*__init*/ usbcanii_driver_init(void) 
 {
     // memset(uuid, 0, sizeof(uuid));
@@ -217,56 +219,16 @@ static int /*__init*/ usbcanii_driver_init(void)
         int err = pthread_create(&udevice->recv_thread, NULL, &can_receive_func, udevice);
         pthread_detach(udevice->recv_thread);
         add_device(&udevice->device);
-        // udevice->name = "usbcanii";
-        // udevice->idx = i;
-        // memcpy(udevice->serial, boardInfo.str_Usb_Serial[deviceCount], 4);
-        // for(int port_idx = 0; port_idx < USB_CAN_PORT_COUNT; port_idx++) {
-        //     memcpy(&udevice->ports[port_idx].conf, &default_vci_config, sizeof(default_vci_config));
-        //     bool result = (VCI_InitCAN(USB_CAN_DEVICE_TYPE, i, port_idx, &udevice->ports[port_idx].conf)==1);
-        //     udevice->ports[port_idx].inited = result;
-        // }
-        // udevice->device.name = udevice->name;
-        // udevice->device.support_canfd = false;
     }
     printf("%s end\n", __func__);
     return 0;
 }
-// struct usbcanii_device {
-//     struct can_device device;
-//     unsigned int idx;
-//     char serial[4];
-//     struct usbcanii_can_device_port ports[2];
-// };
-// struct can_device {
-// 	   const char	*name;
-//     bool support_canfd;
-// 	   struct can_bittiming bittiming, data_bittiming;
-//     struct can_device_ops* ops;
-// };
 
-
-// static void usb_can_new(struct can_device ** dev, unsigned int count) {
-//     *dev = (struct can_device *)malloc(sizeof(struct can_device) * count);
-//     struct can_device * device = *dev;
-//     memset(device, 0, sizeof(*device) * count);
-//     for (int i = 0; i < count; ++i, ++device)
-//     {
-//         device->ports = (struct can_device_port *)malloc(sizeof(struct can_device_port) * USB_CAN_PORT_MAX);
-//         struct can_device_port *port = device->ports;
-//         for (unsigned int j = 0; j < USB_CAN_PORT_MAX; ++j, ++port)
-//         {
-//             usb_can_port_init(port, j);
-//         }
-//         device->ops = &usb_can_device_ops;
-//     }
-// }
-
-// module_init(driver_usbcanii_init);
+// module_exit(driver_usbcanii_exit);
 static void /*__exit*/ usbcanii_driver_exit(void)
 {
     printf("%s start\n", __func__);
 }
-// module_exit(driver_usbcanii_exit);
 
 struct can_device_ops usbcanii_device_ops = {
     .set_bittiming = usbcanii_set_bittiming,

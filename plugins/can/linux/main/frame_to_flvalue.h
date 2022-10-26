@@ -5,9 +5,9 @@
 #include "can_defs.h"
 
 
-FlValue* can_frame_to_flvalue(struct can_frame_s *frame, unsigned int num);
+FlValue* can_frame_to_flvalue(struct can_frame_s *frame, unsigned int num, FlValue*);
 
-FlValue* canfd_frame_to_flvalue(struct canfd_frame_s *frame, unsigned int num);
+FlValue* canfd_frame_to_flvalue(struct canfd_frame_s *frame, unsigned int num, FlValue*);
 
 
 #endif//__FRAME_TO_FLVALUE_H__

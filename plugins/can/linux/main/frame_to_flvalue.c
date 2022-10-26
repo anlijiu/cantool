@@ -2,12 +2,11 @@
 #include "list/list.h"
 #include "dbc_parser.h"
 #include "libwecan.h"
+#include "log.h"
 
 
 
-FlValue* can_frame_to_flvalue(struct can_frame_s *frame, unsigned int num) {
-    g_autoptr(FlValue) result = fl_value_new_list();
-
+FlValue* can_frame_to_flvalue(struct can_frame_s *frame, unsigned int num, FlValue* result) {
     for(int i = 0; i < num; ++i, ++frame) {
         struct message_meta * m_meta = get_message_meta_by_id(frame->can_id);
         // debug_info("notifyListeners  msg id:%d", p->ID);
@@ -30,9 +29,9 @@ FlValue* can_frame_to_flvalue(struct can_frame_s *frame, unsigned int num) {
     return result;
 }
 
-FlValue* canfd_frame_to_flvalue(struct canfd_frame_s *frame, unsigned int num) {
-    g_autoptr(FlValue) result = fl_value_new_list();
+FlValue* canfd_frame_to_flvalue(struct canfd_frame_s *frame, unsigned int num, FlValue* result) {
     for(int i = 0; i < num; ++i, ++frame) {
+        debug_info("canfd_frame_to_flvalue msg id:%d\n", frame->can_id);
         struct message_meta * m_meta = get_message_meta_by_id(frame->can_id);
         // debug_info("notifyListeners  msg id:%d", p->ID);
         if(m_meta == NULL) continue;

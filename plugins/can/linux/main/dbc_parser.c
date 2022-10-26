@@ -390,6 +390,12 @@ struct signal_meta * get_signal_meta_by_id(const char * name) {
     return hashmap_get(&s_repo, name);
 }
 
+void
+init_dbc_parser() {
+    hashmap_init(&m_repo, hashmap_hash_integer, hash_integer_compare);
+    hashmap_init(&s_repo, hashmap_hash_string, strcmp);
+}
+
 bool
 dbc_parser_sync_meta_data(FlValue *args)
 {

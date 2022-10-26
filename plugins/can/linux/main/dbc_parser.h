@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 
-
+void init_dbc_parser();
 int parse_dbc(const char *path, FlValue* result);
 bool dbc_parser_sync_meta_data(FlValue* result);
 struct message_meta * get_message_meta_by_id(uint32_t id);

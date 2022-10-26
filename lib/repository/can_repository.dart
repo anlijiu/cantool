@@ -93,8 +93,8 @@ class CanRepositoryImpl implements CanRepository {
   }
 
   List<Message> mapReceiveSignalToMessage() {
-    final msgMetaMap = ref.read(messageMetasProvider.notifier).state;
-    final signalMetaMap = ref.read(signalMetasProvider.notifier).state;
+    final msgMetaMap = ref.read(messageMetasProvider);
+    final signalMetaMap = ref.read(signalMetasProvider);
     final Map<int, Message> result = new Map();
     receivedSignalMap.values.forEach((element) {
       final signalMeta = signalMetaMap[element.name];
@@ -104,11 +104,11 @@ class CanRepositoryImpl implements CanRepository {
             .indexWhere((s) => s.name == element.name);
         if (index == -1) {
           result[element.mid]!.signals.add(Signal(element.name, element.value,
-              signalMeta!.comment, signalMeta.options!));
+              signalMeta!.comment, signalMeta.options ?? new Map()));
         } else {
           result[element.mid]!.signals.replaceRange(index, index + 1, [
             Signal(element.name, element.value, signalMeta!.comment,
-                signalMeta.options!)
+                signalMeta.options ?? new Map())
           ]);
         }
       } else {

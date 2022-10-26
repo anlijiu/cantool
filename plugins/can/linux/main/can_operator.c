@@ -20,7 +20,7 @@ struct can_operator_sender
     pthread_cond_t cond;
     pthread_mutex_t mutex;
     bool flag;
-};
+}__attribute__ ((aligned(4)));
 
 struct can_operator_receiver
 {
@@ -31,7 +31,7 @@ struct can_operator_receiver
     pthread_mutex_t mutex;
     struct mpscq queue;
     bool flag;
-};
+}__attribute__ ((aligned(4)));
 
 static struct can_operator_sender sender;
 static struct can_operator_receiver receiver;
@@ -57,63 +57,68 @@ static signal_assembler* get_signal_assembler_by_id(const char * name) {
 //     printf("%s end\n", __func__);
 // }
 
+void fill_sending_data(uint8_t* data, list_t* signal_ids) {
+    list_iterator_t *it = list_iterator_new(signal_ids, LIST_HEAD);
+    struct list_node *t = list_iterator_next(it);
+    while(t) {
+        if(t == NULL) break;
+        const char * sname = (const char *)t->val;
+        signal_assembler * sassembler = get_signal_assembler_by_id(sname);
+        if(sassembler != NULL) {
+            struct signal_meta * smeta = get_signal_meta_by_id(sname);
+            insert(data, smeta->start_bit, smeta->length, sassembler->raw_value, MOTOROLA);
+        }
+        t = list_iterator_next(it);
+    }
+    list_iterator_destroy(it);
+}
+
 void *can_send_func(void *param)
 {
-    size_t index = 0;
-    size_t len = message_meta_size();
     const uint32_t* m_key;
     message_assembler* m_assembler;
 
     struct timeval now;
     struct timespec outtime;
-    // pthread_mutex_lock(&sender.mutex);
-    struct can_frame_s * frames = calloc(sizeof(struct can_frame_s), len);
-    struct canfd_frame_s * fdframes = calloc(sizeof(struct canfd_frame_s), len);
+    pthread_mutex_lock(&sender.mutex);
     while (sender.flag) {
-        index = 0;
-        struct can_frame_s * frame = frames;
-        struct canfd_frame_s * fdframe = fdframes;
+        size_t len = hashmap_size(&sender.m_assembler_map);
+
+        struct can_frame_s * frame = NULL;
+        struct canfd_frame_s * fdframe = NULL;
         uint8_t * data;
-        hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
-            list_iterator_t *it = list_iterator_new(m_assembler->meta->signal_ids, LIST_HEAD);
-            struct list_node *t = list_iterator_next(it);
-            if(is_synced_dbc_canfd()) {
-                data = fdframe->data;
-            } else {
-                data = frame->data;
-            }
-
-            while(t) {
-                if(t == NULL) break;
-                const char * sname = (const char *)t->val;
-                signal_assembler * sassembler = get_signal_assembler_by_id(sname);
-                if(sassembler != NULL) {
-                    struct signal_meta * smeta = get_signal_meta_by_id(sname);
-                    insert(data, smeta->start_bit, smeta->length, sassembler->raw_value, MOTOROLA);
-                }
-                t = list_iterator_next(it);
-            }
-            frame++;
-            fdframe++;
-            index++;
-
-            list_iterator_destroy(it);
-        }
-
         if(is_synced_dbc_canfd()) {
-            send_canfd_frame(fdframes, index);
+            struct canfd_frame_s * fdframes = calloc(sizeof(struct canfd_frame_s), len);
+            fdframe = fdframes;
+            hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
+                fdframe->can_id = m_assembler->id;
+                fdframe->can_dlc = m_assembler->meta->length;
+                data = fdframe->data;
+                fill_sending_data(data, m_assembler->meta->signal_ids);
+                fdframe++;
+            }
+            send_canfd_frame(fdframes, len);
+            free(fdframes);
         } else {
-            send_can_frame(frames, index);
+            struct can_frame_s * frames = calloc(sizeof(struct can_frame_s), len);
+            frame = frames;
+            hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
+                frame->can_id = m_assembler->id;
+                frame->can_dlc = m_assembler->meta->length;
+                data = frame->data;
+                fill_sending_data(data, m_assembler->meta->signal_ids);
+                frame++;
+            }
+            send_can_frame(frames, len);
+            free(frames);
         }
 
         gettimeofday(&now, NULL);
         outtime.tv_sec = now.tv_sec;
-        outtime.tv_nsec = 100000 + now.tv_usec * 1000;
-        // pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
+        outtime.tv_nsec = 1000000 + now.tv_usec * 1000;
+        pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
     }
-    free(frames);
-    free(fdframes);
-    // pthread_mutex_unlock(&sender.mutex);
+    pthread_mutex_unlock(&sender.mutex);
     return 0;
 }
 

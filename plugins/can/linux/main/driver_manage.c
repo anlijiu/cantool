@@ -103,17 +103,17 @@ void load_drivers() {
       char* fullpath = calloc(sizeof(char), 1000);
       memset(fullpath, 0 , 1000);
       sprintf(fullpath, "%s/%s.so", driverdir, name);
-      // load_driver(fullpath);
-      pthread_t thread;
-      printf("%s, pthread_create fullpath: %s\n", __func__, fullpath);
-      int err = pthread_create(&thread, NULL, &load_driver, fullpath);
-      if (err) {
-          /* Failed */
-          printf("phread_create error in load_drivers errno:%d, error:%s\n", err, strerror(err));
-      } else {
-          /* Succeeded */
-          pthread_detach(thread);
-      }
+      load_driver(fullpath);
+      // pthread_t thread;
+      // printf("%s, pthread_create fullpath: %s\n", __func__, fullpath);
+      // int err = pthread_create(&thread, NULL, &load_driver, fullpath);
+      // if (err) {
+      //     /* Failed */
+      //     printf("phread_create error in load_drivers errno:%d, error:%s\n", err, strerror(err));
+      // } else {
+      //     /* Succeeded */
+      //     pthread_detach(thread);
+      // }
   }
   printf("%s, load driver finished\n", __func__);
 

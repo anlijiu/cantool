@@ -86,7 +86,7 @@ typedef union {
 		u8 tbd : 4;
 		u8 iserrorframe : 1;
 	}bits;
-}TCANProperty;
+} TCANProperty;
 
 //typedef struct _TCAN {
 //	u8 FIdxChn;           // channel index starting from 0
@@ -127,7 +127,7 @@ typedef union {
 		u8 ESI : 1;
 		u8 tbd : 5;
 	}bits;
-}TCANFDProperty;
+} TCANFDProperty;
 // CAN FD frame definition = 80 B
   // CAN FD frame definition = 80 B
 typedef struct _TLibCANFD {
