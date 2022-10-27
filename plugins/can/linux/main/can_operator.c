@@ -137,6 +137,7 @@ bool start_sending_message() {
 }
 
 void stop_sending_message() {
+    printf("%s in \n", __func__);
     sender.flag = false;
     pthread_mutex_lock(&sender.mutex);
     pthread_cond_signal(&sender.cond);

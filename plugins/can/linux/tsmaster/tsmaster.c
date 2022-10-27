@@ -42,6 +42,7 @@ static const struct tsmaster_device default_tsmaster_device = {
         },
         .ops = &tsmaster_device_ops,
     },
+    .ADeviceHandle = 0,
 };
 
 static bool is_serials_equal(char *s1, char *s2) {
@@ -234,7 +235,7 @@ uint8_t * curry_one_param_device_func(
 static void receive_can_message(const TLibCAN* aData, struct can_device* dev) {
     printf("%s in ,  can id: %u", __func__, aData->FIdentifier);
 
-    if(_on_recv && aData->FProperties.bits.istx == false) {
+    if(_on_recv && aData->FProperties.bits.istx == false && aData->FProperties.bits.iserrorframe == false) {
         can_frame_t * frames = calloc_can_frame_from_t_lib_can(aData, 1);
         _on_recv(dev->uuid, frames, 1);
         free(frames);
@@ -242,7 +243,7 @@ static void receive_can_message(const TLibCAN* aData, struct can_device* dev) {
 }
 
 static void receive_canfd_message(const TLibCANFD* aData, struct can_device* dev) {
-    if(_on_canfd_recv && aData->FProperties.bits.istx == false) {
+    if(_on_canfd_recv && aData->FProperties.bits.istx == false && aData->FProperties.bits.iserrorframe == false) {
         canfd_frame_t * frames = calloc_canfd_frame_from_t_lib_can(aData, 1);
         printf("receive_canfd_message id:%x\n", frames->can_id);
         _on_canfd_recv(dev->uuid, frames, 1);
@@ -301,7 +302,9 @@ static int /*__init*/ tsmaster_driver_init(void)
             retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, canfd_listener);
             add_device(&tdevice->device);
         } else {
-            printf("*** tsmaster device connect error!  ret:%lu ***\n", retValue);
+            char err[255];
+            tscan_get_error_description(retValue, &err);
+            printf("*** tsmaster device connect error!  ret:%lu, detail: %s***\n", retValue, err);
         }
 
     }

@@ -40,17 +40,17 @@ void fini_usb_bus() {
 void register_usb_hotplugin(int (*probe)(), int vendor_id, int product_id) {
     printf("%s begin\n", __func__);
     int class_id = LIBUSB_HOTPLUG_MATCH_ANY;
-    libusb_hotplug_callback_handle hp;
+    libusb_hotplug_callback_handle * hp = calloc(sizeof(libusb_hotplug_callback_handle), 1);
     int rc = libusb_hotplug_register_callback (NULL, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED, 0, vendor_id,
-		product_id, class_id, hotplug_callback, probe, &hp);
+		product_id, class_id, hotplug_callback, probe, hp);
 }
 
 void register_usb_hotplugout(int (*remove)(), int vendor_id, int product_id) {
     printf("%s begin\n", __func__);
     int class_id = LIBUSB_HOTPLUG_MATCH_ANY;
-    libusb_hotplug_callback_handle hp;
+    libusb_hotplug_callback_handle * hp = calloc(sizeof(libusb_hotplug_callback_handle), 1);
     int rc = libusb_hotplug_register_callback (NULL, LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT, 0, vendor_id,
-		product_id, class_id, hotplug_callback, remove, &hp);
+		product_id, class_id, hotplug_callback, remove, hp);
 }
 
 void init_buses() {

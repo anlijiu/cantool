@@ -11,12 +11,12 @@
 
 
 struct tsmaster_device {
-    const char *name;
     struct can_device device;
+    uint64_t ADeviceHandle;
+    const char *name;
     char* AFManufacturer;
     char* AFProduct;
     char* AFSerial;
-    uint64_t ADeviceHandle;
 };
 
 
