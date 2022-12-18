@@ -304,7 +304,7 @@ static void can_plugin_class_init(CanPluginClass *klass)
 static void can_destroy() {
   unload_drivers();
   fini_buses();
-  thread_pool_fini();
+  // thread_pool_fini();
   g_message("\n\ncan_destroy in\n\n");
 }
 
@@ -345,7 +345,7 @@ CanPlugin *can_plugin_new(FlPluginRegistrar *registrar)
         "destroy", can_destroy, NULL);
 
   init_dbc_parser();
-  thread_pool_init();
+  // thread_pool_init();
   init_buses();
   init_devices();
   load_drivers();

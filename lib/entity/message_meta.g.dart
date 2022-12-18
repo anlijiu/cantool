@@ -12,9 +12,10 @@ _$_MessageMeta _$$_MessageMetaFromJson(Map json) => _$_MessageMeta(
       sender: json['sender'] as String,
       length: json['length'] as int,
       attributes: Map<String, dynamic>.from(json['attributes'] as Map),
-      signalIds: (json['signal_ids'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      signalIds: (json['signal_ids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$_MessageMetaToJson(_$_MessageMeta instance) =>

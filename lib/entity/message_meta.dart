@@ -15,7 +15,7 @@ class MessageMeta with _$MessageMeta {
       required int length,
       required Map<String, dynamic> attributes,
       // @required List<SignalMeta> signals;
-      required List<String> signalIds}) = _MessageMeta;
+      @Default(const []) List<String> signalIds}) = _MessageMeta;
 
   factory MessageMeta.fromJson(Map<String, dynamic> json) =>
       _$MessageMetaFromJson(json);

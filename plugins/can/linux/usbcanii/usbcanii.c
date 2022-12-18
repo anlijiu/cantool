@@ -31,6 +31,12 @@ const int timing_table[16][2] = {
     { 0x00, 0x14 }  //KBPS_2000
 };
 
+void printCharArray(uint8_t* arr, size_t len) {
+    for(long i = 0; i < len; ++i) {
+      printf(" \%02hhx ", arr[i]);
+    }
+}
+
 static const struct usbcanii_device default_usbcanii_device = {
     // .name = driver_name,
     // .name = "usbcanii",
@@ -165,8 +171,10 @@ static bool usbcanii_send(struct can_device * dev, can_frame_t *frames, unsigned
     struct usbcanii_device *udev = container_of((void *)dev,
 			struct usbcanii_device, device);
     int send_len = VCI_Transmit(USB_CAN_DEVICE_TYPE, udev->idx, 0, pObj, len);
+
+    printCharArray(pObj->Data, 8);
     free(pObj);
-    printf("usb_can_ops_send  deviceIdx: %d, len: %d, send_len:%d", udev->idx, len, send_len);
+    printf("usb_can_ops_send  deviceIdx: %d, len: %d, send_len:%d\n", udev->idx, len, send_len);
     return send_len == len;
 }
 
@@ -196,6 +204,11 @@ static const VCI_INIT_CONFIG default_vci_config = {
 static VCI_BOARD_INFO1 boardInfo;
 static unsigned int deviceCount;
 
+static void printf_VCI_INIT_CONFIG(VCI_INIT_CONFIG * config) {
+    printf("AccCode %#x, ", config->AccCode);
+    printf("Timing0 %#x, ", config->Timing0);
+    printf("Timing1 %#x \n", config->Timing1);
+} 
 // module_init(driver_usbcanii_init);
 static int /*__init*/ usbcanii_driver_init(void) 
 {
@@ -210,11 +223,19 @@ static int /*__init*/ usbcanii_driver_init(void)
         size_t sizeuuid = sizeof(USBCANII_NAME) + sizeof(boardInfo.str_Usb_Serial[i]) + 1;
         snprintf(udevice->device.uuid, sizeuuid, "%s-%s", USBCANII_NAME, boardInfo.str_Usb_Serial[i]);
         printf("%s ,   uuid:%s\n", __func__, udevice->device.uuid);
+
+        bool open_result = (VCI_OpenDevice(USB_CAN_DEVICE_TYPE, i, 0) == 1);
+        if(!open_result) {
+            printf("VCI_OpenDevice %s device %d failed \n", udevice->device.uuid, i);
+            // continue;
+        }
         // memcpy(uuid[i], udevice->device.uuid, sizeuuid);
         for(int port_idx = 0; port_idx < USB_CAN_PORT_COUNT; port_idx++) {
             memcpy(&udevice->ports[port_idx].conf, &default_vci_config, sizeof(default_vci_config));
             bool result = (VCI_InitCAN(USB_CAN_DEVICE_TYPE, i, port_idx, &udevice->ports[port_idx].conf)==1);
             udevice->ports[port_idx].inited = result;
+            printf("VCI_InitCAN %s device %d ,port_idx:%d,  result :%s\n", udevice->device.uuid, i, port_idx, result ? "true" : "false");
+            printf_VCI_INIT_CONFIG(&udevice->ports[port_idx].conf);
         }
         int err = pthread_create(&udevice->recv_thread, NULL, &can_receive_func, udevice);
         pthread_detach(udevice->recv_thread);

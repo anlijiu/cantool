@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <sys/time.h>
+#include <math.h>
 #include "dbc_parser.h"
 #include "list/list.h"
 #include "hashmap/hashmap.h"
@@ -73,6 +74,29 @@ void fill_sending_data(uint8_t* data, list_t* signal_ids) {
     list_iterator_destroy(it);
 }
 
+int utc_system_timestamp(char buf[]) {
+    const int tmpsize = 21;
+    struct timespec now;
+    struct tm tm;
+    int retval = clock_gettime(CLOCK_REALTIME, &now);
+    gmtime_r(&now.tv_sec, &tm);
+    strftime(buf, tmpsize, "%Y-%m-%dT%H:%M:%S.", &tm);
+    sprintf(buf + tmpsize -1, "%09luZ", now.tv_nsec);
+    return retval;
+}
+
+void x_ms_later(long ms_later, struct timeval * anchor, struct timespec * outtime) {
+    /* if msec is 1 s or more, add its integer part to tv_sec */
+    outtime->tv_sec = anchor->tv_sec + (long)floor((double)ms_later / 1000);
+    /* for now, these are really µsec, not nsec, to prevent overflow */
+    outtime->tv_nsec = anchor->tv_usec + (ms_later % 1000) * 1000000;
+    /* if tv_nsec is 1s or more, move integer second part to tv_sec */
+    outtime->tv_sec += floor(outtime->tv_nsec / 1000000);
+    outtime->tv_nsec %= 1000000;
+    /* and finally, convert µsec to nsec */
+    outtime->tv_nsec *= 1000;
+}
+
 void *can_send_func(void *param)
 {
     const uint32_t* m_key;
@@ -80,6 +104,7 @@ void *can_send_func(void *param)
 
     struct timeval now;
     struct timespec outtime;
+    char timestampbuf[31];
     pthread_mutex_lock(&sender.mutex);
     while (sender.flag) {
         size_t len = hashmap_size(&sender.m_assembler_map);
@@ -113,9 +138,22 @@ void *can_send_func(void *param)
             free(frames);
         }
 
+        utc_system_timestamp(timestampbuf);
+        printf("time %s\n", timestampbuf);
+
         gettimeofday(&now, NULL);
-        outtime.tv_sec = now.tv_sec;
-        outtime.tv_nsec = 1000000 + now.tv_usec * 1000;
+        long ms_later = 1000L;
+        x_ms_later(ms_later, &now, &outtime);
+        // /* if msec is 1 s or more, add its integer part to tv_sec */
+        // outtime.tv_sec = now.tv_sec + floor(ms_later / 1000);
+        // /* for now, these are really µsec, not nsec, to prevent overflow */
+        // outtime.tv_nsec = now.tv_usec + (ms_later % 1000) * 1000000;
+        // /* if tv_nsec is 1s or more, move integer second part to tv_sec */
+        // outtime.tv_sec += floor(outtime.tv_nsec / 1000000);
+        // outtime.tv_nsec %= 1000000;
+        // /* and finally, convert µsec to nsec */
+        // outtime.tv_nsec *= 1000;
+
         pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
     }
     pthread_mutex_unlock(&sender.mutex);
@@ -123,6 +161,7 @@ void *can_send_func(void *param)
 }
 
 bool start_sending_message() {
+    printf("%s in !", __func__);
     sender.flag = true;
     pthread_mutex_init(&sender.mutex, NULL);
     pthread_cond_init(&sender.cond, NULL);

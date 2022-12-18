@@ -173,7 +173,7 @@ class _$_MessageMeta implements _MessageMeta {
       required this.sender,
       required this.length,
       required final Map<String, dynamic> attributes,
-      required final List<String> signalIds})
+      final List<String> signalIds = const []})
       : _attributes = attributes,
         _signalIds = signalIds;
 
@@ -199,6 +199,7 @@ class _$_MessageMeta implements _MessageMeta {
   final List<String> _signalIds;
 // @required List<SignalMeta> signals;
   @override
+  @JsonKey()
   List<String> get signalIds {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_signalIds);
@@ -256,7 +257,7 @@ abstract class _MessageMeta implements MessageMeta {
       required final String sender,
       required final int length,
       required final Map<String, dynamic> attributes,
-      required final List<String> signalIds}) = _$_MessageMeta;
+      final List<String> signalIds}) = _$_MessageMeta;
 
   factory _MessageMeta.fromJson(Map<String, dynamic> json) =
       _$_MessageMeta.fromJson;

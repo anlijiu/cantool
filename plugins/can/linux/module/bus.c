@@ -28,7 +28,7 @@ static void handle_libusb_event_loop_task(void *arg){
 
 void init_usb_bus() {
 	int rc = libusb_init (NULL);
-    thread_pool_add_work(handle_libusb_event_loop_task, NULL);
+    // thread_pool_add_work(handle_libusb_event_loop_task, NULL);
 }
 
 void fini_usb_bus() {

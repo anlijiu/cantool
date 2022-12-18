@@ -62,9 +62,9 @@ dependencies:
   state_notifier: ^0.7.2+1
   sticky_and_expandable_list: ^1.1.2
   time: ^2.1.1
-  url_launcher: ^6.1.5
   fl_chart: ^0.55.1
   collection: ^1.16.0
+  url_launcher: ^6.1.5
 
 
   # The following adds the Cupertino Icons font to your application.
