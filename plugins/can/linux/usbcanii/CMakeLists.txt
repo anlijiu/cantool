@@ -17,7 +17,7 @@ set_target_properties(usbcanii PROPERTIES
   # LIBRARY_OUTPUT_DIRECTORY "${INSTALL_DRIVER_DIR}/"
 )
 
-add_library(controlcan SHARED IMPORTED)
+add_library(controlcan SHARED IMPORTED GLOBAL)
 set_target_properties(controlcan PROPERTIES
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libcontrolcan.so
     IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libcontrolcan.so
@@ -55,9 +55,9 @@ target_link_libraries(usbcanii
   #   controlcan
   PUBLIC
     module
+    # controlcan
+  PRIVATE
     controlcan
-  # PRIVATE
-  #   controlcan
 )
 
 # set_property(TARGET usbcanii PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES controlcan)

@@ -127,29 +127,37 @@ static PVCI_CAN_OBJ calloc_vci_can_obj_from_can_frame(can_frame_t* frames, size_
 
 static void *can_receive_func(void *param) {
     struct usbcanii_device *udev = (struct usbcanii_device *)param;
+    unsigned int cache_len = 100;
+    VCI_CAN_OBJ can0_cache[cache_len];
+    VCI_CAN_OBJ can1_cache[cache_len];
+
     int msg_num = 0;
     int receive_len = 0;
     VCI_ERR_INFO vciErrorInfo;
     while(true) {
         if(_on_recv) {
-	        msg_num = VCI_GetReceiveNum(USB_CAN_DEVICE_TYPE, udev->idx, 0);
-            if(msg_num > 0) {
-                PVCI_CAN_OBJ pObj = malloc(sizeof(VCI_CAN_OBJ) * msg_num);
-                receive_len = VCI_Receive(USB_CAN_DEVICE_TYPE, udev->idx, 0, pObj, msg_num, 1);
+	        // msg_num = VCI_GetReceiveNum(USB_CAN_DEVICE_TYPE, udev->idx, 0);
+            // printf("%s received %d frames \n", __func__, msg_num );
+            // if(msg_num > 0) {
+                // PVCI_CAN_OBJ pObj = malloc(sizeof(VCI_CAN_OBJ) * msg_num);
+                memset(can0_cache, 0, cache_len * sizeof(VCI_CAN_OBJ));
+                // 也可以这样memset(&can0_cache, 0, sizeof can0_cache);
+                receive_len = VCI_Receive(USB_CAN_DEVICE_TYPE, udev->idx, 0, can0_cache, cache_len, 20);
+                printf("%s received %d frames.  device type: %d,  idx: %d \n", __func__, receive_len, USB_CAN_DEVICE_TYPE, udev->idx );
                 if(receive_len < 0) {
                     int errCode = VCI_ReadErrInfo(USB_CAN_DEVICE_TYPE, udev->idx, 0, &vciErrorInfo);
                     printf("usbcanii device idx:%d,port:%d read error! errno:%d\n", udev->idx, 0, errCode);
-                } else {
-                    can_frame_t * frames = calloc_can_frame_from_vci_can_obj(pObj, receive_len);
+                } else if(receive_len > 0) {
+                    can_frame_t * frames = calloc_can_frame_from_vci_can_obj(can0_cache, receive_len);
                     _on_recv(udev->device.uuid, frames, receive_len);
                     free(frames);
                 }
-                free(pObj); 
+                // free(pObj); 
 
                 usleep(10000);// 10000ns = 10ms;
-            } else {
-                usleep(1000000);// 1000000ns = 1000ms = 1s;
-            }
+            // } else {
+            //     usleep(1000000);// 1000000ns = 1000ms = 1s;
+            // }
         }
     }
 }
@@ -160,7 +168,6 @@ static int usbcanii_set_data_bittiming(struct can_device *dev, enum BAUDRATE bau
 
 // int (*on_receive)(struct can_frame_s *, unsigned int num)) 
 static int usbcanii_set_receive_listener(struct can_device *dev, on_recv_fun_t onrecv) {
-    printf("%s start\n", __func__);
     _on_recv = onrecv;
 }
 
@@ -224,15 +231,16 @@ static int /*__init*/ usbcanii_driver_init(void)
         snprintf(udevice->device.uuid, sizeuuid, "%s-%s", USBCANII_NAME, boardInfo.str_Usb_Serial[i]);
         printf("%s ,   uuid:%s\n", __func__, udevice->device.uuid);
 
-        bool open_result = (VCI_OpenDevice(USB_CAN_DEVICE_TYPE, i, 0) == 1);
-        if(!open_result) {
-            printf("VCI_OpenDevice %s device %d failed \n", udevice->device.uuid, i);
+        unsigned int open_result = VCI_OpenDevice(USB_CAN_DEVICE_TYPE, i, 0);
+        if(open_result != 1) {
+            printf("VCI_OpenDevice %s device %d failed ,  result: %d \n", udevice->device.uuid, i, open_result);
             // continue;
         }
         // memcpy(uuid[i], udevice->device.uuid, sizeuuid);
         for(int port_idx = 0; port_idx < USB_CAN_PORT_COUNT; port_idx++) {
             memcpy(&udevice->ports[port_idx].conf, &default_vci_config, sizeof(default_vci_config));
             bool result = (VCI_InitCAN(USB_CAN_DEVICE_TYPE, i, port_idx, &udevice->ports[port_idx].conf)==1);
+            result = (VCI_StartCAN(USB_CAN_DEVICE_TYPE, i, port_idx)==1);
             udevice->ports[port_idx].inited = result;
             printf("VCI_InitCAN %s device %d ,port_idx:%d,  result :%s\n", udevice->device.uuid, i, port_idx, result ? "true" : "false");
             printf_VCI_INIT_CONFIG(&udevice->ports[port_idx].conf);
