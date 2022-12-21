@@ -95,6 +95,7 @@ static int usbcanii_set_bittiming(struct can_device *dev, enum BAUDRATE baudrate
         VCI_InitCAN(USB_CAN_DEVICE_TYPE, udev->idx, i, &udev->ports[i].conf);
     }
     printf("%s start\n", __func__);
+    return 0;
 }
 
 // typedef struct can_frame_s {
@@ -116,6 +117,7 @@ static can_frame_t* calloc_can_frame_from_vci_can_obj(PVCI_CAN_OBJ pObj, size_t 
 
 static PVCI_CAN_OBJ calloc_vci_can_obj_from_can_frame(can_frame_t* frames, size_t len) {
     PVCI_CAN_OBJ pObj = malloc(sizeof(VCI_CAN_OBJ) * len);
+    memset(pObj, 0, sizeof(VCI_CAN_OBJ) * len);
     PVCI_CAN_OBJ p = pObj;
     for(int i = 0; i < len; ++i,++p,++frames) {
         p->ID = frames->can_id;
@@ -127,7 +129,7 @@ static PVCI_CAN_OBJ calloc_vci_can_obj_from_can_frame(can_frame_t* frames, size_
 
 static void *can_receive_func(void *param) {
     struct usbcanii_device *udev = (struct usbcanii_device *)param;
-    unsigned int cache_len = 100;
+    unsigned int cache_len = 2000;
     VCI_CAN_OBJ can0_cache[cache_len];
     VCI_CAN_OBJ can1_cache[cache_len];
 
@@ -143,7 +145,7 @@ static void *can_receive_func(void *param) {
                 memset(can0_cache, 0, cache_len * sizeof(VCI_CAN_OBJ));
                 // 也可以这样memset(&can0_cache, 0, sizeof can0_cache);
                 receive_len = VCI_Receive(USB_CAN_DEVICE_TYPE, udev->idx, 0, can0_cache, cache_len, 20);
-                printf("%s received %d frames.  device type: %d,  idx: %d \n", __func__, receive_len, USB_CAN_DEVICE_TYPE, udev->idx );
+                // printf("%s received %d frames.  device type: %d,  idx: %d \n", __func__, receive_len, USB_CAN_DEVICE_TYPE, udev->idx );
                 if(receive_len < 0) {
                     int errCode = VCI_ReadErrInfo(USB_CAN_DEVICE_TYPE, udev->idx, 0, &vciErrorInfo);
                     printf("usbcanii device idx:%d,port:%d read error! errno:%d\n", udev->idx, 0, errCode);
@@ -153,8 +155,11 @@ static void *can_receive_func(void *param) {
                     free(frames);
                 }
                 // free(pObj); 
-
-                usleep(10000);// 10000ns = 10ms;
+                struct timespec req={0};
+                req.tv_sec=0;
+                req.tv_nsec=30000000; // 30_000_000 ns = 30 microseconds
+                nanosleep(&req, NULL);
+                // usleep(10000);// 10000ns = 10ms;
             // } else {
             //     usleep(1000000);// 1000000ns = 1000ms = 1s;
             // }
@@ -164,24 +169,27 @@ static void *can_receive_func(void *param) {
 
 static int usbcanii_set_data_bittiming(struct can_device *dev, enum BAUDRATE baudrate) {
     printf("%s start\n", __func__);
+    return 0;
 }
 
 // int (*on_receive)(struct can_frame_s *, unsigned int num)) 
 static int usbcanii_set_receive_listener(struct can_device *dev, on_recv_fun_t onrecv) {
     _on_recv = onrecv;
+    return 0;
 }
 
 static bool usbcanii_send(struct can_device * dev, can_frame_t *frames, unsigned int len) {
-    printf("%s start\n", __func__);
+    // printf("%s start\n", __func__);
 
     PVCI_CAN_OBJ pObj = calloc_vci_can_obj_from_can_frame(frames, len);
     struct usbcanii_device *udev = container_of((void *)dev,
 			struct usbcanii_device, device);
     int send_len = VCI_Transmit(USB_CAN_DEVICE_TYPE, udev->idx, 0, pObj, len);
 
-    printCharArray(pObj->Data, 8);
+    // printCharArray(pObj->Data, 8);
     free(pObj);
-    printf("usb_can_ops_send  deviceIdx: %d, len: %d, send_len:%d\n", udev->idx, len, send_len);
+
+    // printf("\n\n usbcanii_send end in sending loop,  time %s\n", timestampbuf);
     return send_len == len;
 }
 

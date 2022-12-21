@@ -85,16 +85,19 @@ int utc_system_timestamp(char buf[]) {
     return retval;
 }
 
-void x_ms_later(long ms_later, struct timeval * anchor, struct timespec * outtime) {
-    /* if msec is 1 s or more, add its integer part to tv_sec */
-    outtime->tv_sec = anchor->tv_sec + (long)floor((double)ms_later / 1000);
-    /* for now, these are really µsec, not nsec, to prevent overflow */
-    outtime->tv_nsec = anchor->tv_usec + (ms_later % 1000) * 1000000;
-    /* if tv_nsec is 1s or more, move integer second part to tv_sec */
-    outtime->tv_sec += floor(outtime->tv_nsec / 1000000);
-    outtime->tv_nsec %= 1000000;
-    /* and finally, convert µsec to nsec */
-    outtime->tv_nsec *= 1000;
+void x_ms_later(long period, struct timespec * outtime) {
+    long sec = (period / 1000);
+    long nsec = (period % 1000) * 1000000;
+    // fprintf(stderr, "[start] sec=%ld ns = %ld     sec:%ld, nsec:%ld\n ", outtime->tv_sec, outtime->tv_nsec, sec, nsec);
+    if ((outtime->tv_nsec + nsec) > 999999999) {
+        outtime->tv_sec += sec + 1;
+        outtime->tv_nsec = nsec - (1000000000 - outtime->tv_nsec);
+        // fprintf(stderr, "[expected end] sec=%ld ns = %ld\n", outtime->tv_sec, outtime->tv_nsec);
+    } else {
+        outtime->tv_sec += sec;
+        outtime->tv_nsec += nsec;
+        // fprintf(stderr, "[expected end] sec=%ld ns = %ld\n", outtime->tv_sec, outtime->tv_nsec);
+    }
 }
 
 void *can_send_func(void *param)
@@ -102,11 +105,13 @@ void *can_send_func(void *param)
     const uint32_t* m_key;
     message_assembler* m_assembler;
 
-    struct timeval now;
     struct timespec outtime;
-    char timestampbuf[31];
+    // char timestampbuf[31];
     pthread_mutex_lock(&sender.mutex);
     while (sender.flag) {
+        // utc_system_timestamp(timestampbuf);
+        // printf("\n\n round start in sending loop,  time %s\n", timestampbuf);
+
         size_t len = hashmap_size(&sender.m_assembler_map);
 
         struct can_frame_s * frame = NULL;
@@ -138,21 +143,14 @@ void *can_send_func(void *param)
             free(frames);
         }
 
-        utc_system_timestamp(timestampbuf);
-        printf("time %s\n", timestampbuf);
+        clock_gettime(CLOCK_MONOTONIC, &outtime);
+        long ms_later = 100L;
+        x_ms_later(ms_later, &outtime);
 
-        gettimeofday(&now, NULL);
-        long ms_later = 1000L;
-        x_ms_later(ms_later, &now, &outtime);
-        // /* if msec is 1 s or more, add its integer part to tv_sec */
-        // outtime.tv_sec = now.tv_sec + floor(ms_later / 1000);
-        // /* for now, these are really µsec, not nsec, to prevent overflow */
-        // outtime.tv_nsec = now.tv_usec + (ms_later % 1000) * 1000000;
-        // /* if tv_nsec is 1s or more, move integer second part to tv_sec */
-        // outtime.tv_sec += floor(outtime.tv_nsec / 1000000);
-        // outtime.tv_nsec %= 1000000;
-        // /* and finally, convert µsec to nsec */
-        // outtime.tv_nsec *= 1000;
+        // fprintf(stderr, "rrr[expected end] sec=%ld ns = %ld\n", outtime.tv_sec, outtime.tv_nsec);
+        // memset(timestampbuf, 0 , 31 * sizeof(char));
+        // utc_system_timestamp(timestampbuf);
+        // printf(" round end in sending loop,  time %s\n\n", timestampbuf);
 
         pthread_cond_timedwait(&sender.cond, &sender.mutex, &outtime);
     }
@@ -163,8 +161,12 @@ void *can_send_func(void *param)
 bool start_sending_message() {
     printf("%s in !", __func__);
     sender.flag = true;
+    pthread_condattr_t cond_attr;
+    pthread_condattr_init (&cond_attr);
+    pthread_condattr_setclock (&cond_attr, CLOCK_MONOTONIC);
+
     pthread_mutex_init(&sender.mutex, NULL);
-    pthread_cond_init(&sender.cond, NULL);
+    pthread_cond_init(&sender.cond, &cond_attr);
     int err = pthread_create(&sender.thread, NULL, &can_send_func, NULL);
     if (err != 0)
     {
