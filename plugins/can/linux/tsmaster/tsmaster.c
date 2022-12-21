@@ -54,6 +54,7 @@ static bool is_serials_equal(char *s1, char *s2) {
 
 static can_frame_t* calloc_can_frame_from_t_lib_can(const TLibCAN* pObj, size_t len) {
     can_frame_t* frames = malloc(sizeof(struct can_frame_s) * len);
+    memset(frames, 0, sizeof(struct can_frame_s) * len);
     can_frame_t* p = frames;
     for(int i = 0; i < len; ++i,++p,++pObj) {
         p->can_id = pObj->FIdentifier;
@@ -65,6 +66,7 @@ static can_frame_t* calloc_can_frame_from_t_lib_can(const TLibCAN* pObj, size_t 
 static canfd_frame_t* calloc_canfd_frame_from_t_lib_can(const TLibCANFD* pObj, size_t len) {
     printf("%s in len:%d\n ", __func__, len);
     canfd_frame_t* frames = malloc(sizeof(struct canfd_frame_s) * len);
+    memset(frames, 0, sizeof(struct canfd_frame_s) * len);
     canfd_frame_t* p = frames;
     for(int i = 0; i < len; ++i,++p,++pObj) {
         p->can_id = pObj->FIdentifier;
@@ -77,6 +79,7 @@ static canfd_frame_t* calloc_canfd_frame_from_t_lib_can(const TLibCANFD* pObj, s
 
 static TLibCAN* calloc_t_lib_can_from_can_frame(can_frame_t* frames, size_t len) {
     TLibCAN* pObj = malloc(sizeof(TLibCAN) * len);
+    memset(pObj, 0, sizeof(TLibCAN) * len);
     TLibCAN* p = pObj;
     for(int i = 0; i < len; ++i,++p,++frames) {
         p->FIdentifier = frames->can_id;
@@ -92,6 +95,7 @@ static TLibCAN* calloc_t_lib_can_from_can_frame(can_frame_t* frames, size_t len)
 static TLibCANFD* calloc_t_lib_canfd_from_can_frame(canfd_frame_t* frames, size_t len) {
     printf("%s in len:%d\n ", __func__, len);
     TLibCANFD* pObj = malloc(sizeof(TLibCANFD) * len);
+    memset(pObj, 0, sizeof(TLibCANFD) * len);
     TLibCANFD* p = pObj;
     for(int i = 0; i < len; ++i,++p,++frames) {
         printf("%s i:%d   id: %x \n ", __func__, i, frames->can_id);

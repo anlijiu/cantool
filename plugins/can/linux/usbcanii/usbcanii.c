@@ -106,6 +106,7 @@ static int usbcanii_set_bittiming(struct can_device *dev, enum BAUDRATE baudrate
 
 static can_frame_t* calloc_can_frame_from_vci_can_obj(PVCI_CAN_OBJ pObj, size_t len) {
     can_frame_t* frames = malloc(sizeof(struct can_frame_s) * len);
+    memset(frames, 0, sizeof(struct can_frame_s) * len);
     can_frame_t* p = frames;
     for(int i = 0; i < len; ++i,++p,++pObj) {
         p->can_id = pObj->ID;
