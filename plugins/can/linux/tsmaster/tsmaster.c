@@ -73,7 +73,7 @@ static can_frame_t* calloc_can_frame_from_t_lib_can(const TLibCAN* pObj, size_t 
     return frames;
 }
 static canfd_frame_t* calloc_canfd_frame_from_t_lib_can(const TLibCANFD* pObj, size_t len) {
-    printf("%s in len:%d\n ", __func__, len);
+    printf("%s in len:%zu\n ", __func__, len);
     canfd_frame_t* frames = malloc(sizeof(struct canfd_frame_s) * len);
     memset(frames, 0, sizeof(struct canfd_frame_s) * len);
     canfd_frame_t* p = frames;
@@ -102,7 +102,7 @@ static TLibCAN* calloc_t_lib_can_from_can_frame(can_frame_t* frames, size_t len)
 }
 
 static TLibCANFD* calloc_t_lib_canfd_from_can_frame(canfd_frame_t* frames, size_t len) {
-    printf("%s in len:%d\n ", __func__, len);
+    printf("%s in len:%zu\n ", __func__, len);
     TLibCANFD* pObj = malloc(sizeof(TLibCANFD) * len);
     memset(pObj, 0, sizeof(TLibCANFD) * len);
     TLibCANFD* p = pObj;
@@ -137,6 +137,7 @@ static int tsmaster_set_bittiming(struct can_device *dev, enum BAUDRATE baudrate
 			struct tsmaster_device, device);
     dev->bittiming.bitrate = baudrate;
     sync_canfd_bittiming(tdev);
+    return 0;
 }
 
 static int tsmaster_set_data_bittiming(struct can_device *dev, enum BAUDRATE baudrate) {
@@ -145,16 +146,28 @@ static int tsmaster_set_data_bittiming(struct can_device *dev, enum BAUDRATE bau
 			struct tsmaster_device, device);
     dev->data_bittiming.bitrate = baudrate;
     sync_canfd_bittiming(tdev);
+    return 0;
 }
 
 static int tsmaster_set_receive_listener(struct can_device *dev, on_recv_fun_t on_recv) {
     printf("%s start\n", __func__);
     _on_recv  = on_recv;
+    return 0;
 }
 
 static int tsmaster_set_canfd_receive_listener(struct can_device *dev, on_canfd_recv_fun_t on_recv) {
     printf("%s start\n", __func__);
     _on_canfd_recv = on_recv;
+    return 0;
+}
+
+static void *can_receive_func(void *param) {
+    struct tsmaster_device *tdev = (struct tsmaster_device *)param;
+    can_frame_t * frames;
+    while(queue_get_wait(tdev->q, (void **)&frames) == 0) {
+        _on_recv(tdev->device.uuid, frames, 1);
+	    free(frames);
+    }
 }
 
 static bool tsmaster_send(struct can_device * dev, can_frame_t *frames, unsigned int len) {
@@ -167,6 +180,7 @@ static bool tsmaster_send(struct can_device * dev, can_frame_t *frames, unsigned
     uint32_t result = 0;
     for(int i = 0; i < len; ++i, p++) {
         result = tscan_transmit_can_async(tdev->ADeviceHandle, p);
+        printf("%s result : %d , id: %d \n", __func__, result, p->FIdentifier);
     }
     free(pObj);
     return true;
@@ -248,12 +262,15 @@ uint8_t * curry_one_param_device_func(
 
 
 static void receive_can_message(const TLibCAN* aData, struct can_device* dev) {
-    printf("%s in ,  can id: %u, %d, %d, %d", __func__, aData->FIdentifier, aData->FProperties.bits.istx, aData->FProperties.bits.iserrorframe, _on_recv);
+    printf("%s in ,  can id: %u, %d, %d, %p", __func__, aData->FIdentifier, aData->FProperties.bits.istx, aData->FProperties.bits.iserrorframe, _on_recv);
 
+    struct tsmaster_device *tdev = container_of((void *)dev,
+			struct tsmaster_device, device);
     if(_on_recv && aData->FProperties.bits.istx == false && aData->FProperties.bits.iserrorframe == false) {
         can_frame_t * frames = calloc_can_frame_from_t_lib_can(aData, 1);
-        _on_recv(dev->uuid, frames, 1);
-        free(frames);
+	    queue_put(tdev->q, frames);
+        // _on_recv(dev->uuid, frames, 1);
+        // free(frames);
     }
 }
 
@@ -288,6 +305,7 @@ static int /*__init*/ tsmaster_driver_init(void)
     {
         struct tsmaster_device * tdevice = (struct tsmaster_device *)malloc(sizeof(struct tsmaster_device));
         memcpy(tdevice, &default_tsmaster_device, sizeof(default_tsmaster_device) );
+        tdevice->q = queue_create_limited(2000);
         tscan_get_device_info(
           i,
           &tdevice->AFManufacturer,
@@ -320,6 +338,9 @@ static int /*__init*/ tsmaster_driver_init(void)
 
             add_device(&tdevice->device);
             sync_canfd_bittiming(tdevice);
+
+            int err = pthread_create(&tdevice->recv_thread, NULL, &can_receive_func, tdevice);
+            pthread_detach(tdevice->recv_thread);
             // tscan_config_canfd_by_baudrate(tdevice->ADeviceHandle, CHN1, 500,2000, lfdtISOCAN, lfdmNormal,1);
             // tscan_config_canfd_by_baudrate(tdevice->ADeviceHandle, CHN2, 500,2000, lfdtISOCAN, lfdmNormal,1);
         } else {

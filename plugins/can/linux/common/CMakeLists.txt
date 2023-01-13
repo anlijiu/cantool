@@ -3,6 +3,7 @@ set_target_properties(common PROPERTIES LINKER_LANGUAGE C)
 
 add_subdirectory(list)
 add_subdirectory(hashmap)
+add_subdirectory(queue)
 
 target_sources(common
   PRIVATE
@@ -25,4 +26,5 @@ target_link_libraries(common
   PRIVATE
     list
     hashmap
+    queue
   )

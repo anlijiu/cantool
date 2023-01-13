@@ -77,6 +77,7 @@ target_link_libraries(tsmaster
     module
     ${LIBFFI_LIBRARIES}
   PRIVATE
+    common
     TSCANApiOnLinux 
   #   controlcan
 )

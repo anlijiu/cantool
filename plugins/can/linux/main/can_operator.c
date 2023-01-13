@@ -134,19 +134,19 @@ void *can_send_func(void *param)
         struct can_frame_s * frame = NULL;
         struct canfd_frame_s * fdframe = NULL;
         uint8_t * data;
-        if(is_synced_dbc_canfd()) {
-            struct canfd_frame_s * fdframes = calloc(sizeof(struct canfd_frame_s), len);
-            fdframe = fdframes;
-            hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
-                fdframe->can_id = m_assembler->id;
-                fdframe->can_dlc = m_assembler->meta->length;
-                data = fdframe->data;
-                fill_sending_data(data, m_assembler->meta->signal_ids);
-                fdframe++;
-            }
-            send_canfd_frame(fdframes, len);
-            free(fdframes);
-        } else {
+        // if(is_synced_dbc_canfd()) {
+            // struct canfd_frame_s * fdframes = calloc(sizeof(struct canfd_frame_s), len);
+            // fdframe = fdframes;
+            // hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
+            //     fdframe->can_id = m_assembler->id;
+            //     fdframe->can_dlc = m_assembler->meta->length;
+            //     data = fdframe->data;
+            //     fill_sending_data(data, m_assembler->meta->signal_ids);
+            //     fdframe++;
+            // }
+            // send_canfd_frame(fdframes, len);
+            // free(fdframes);
+        // } else {
             struct can_frame_s * frames = calloc(sizeof(struct can_frame_s), len);
             frame = frames;
             hashmap_foreach(m_key, m_assembler, &sender.m_assembler_map) {
@@ -158,7 +158,7 @@ void *can_send_func(void *param)
             }
             send_can_frame(frames, len);
             free(frames);
-        }
+        // }
 
         clock_gettime(CLOCK_MONOTONIC, &outtime);
         long ms_later = 100L;

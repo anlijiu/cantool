@@ -2,6 +2,7 @@
 #define __USBCANII_H__
 
 #include "module.h"
+#include "queue/queue.h"
 #include "TSCANDef.h"
 #include <stdbool.h>
 
@@ -17,6 +18,8 @@ struct tsmaster_device {
     char* AFManufacturer;
     char* AFProduct;
     char* AFSerial;
+    pthread_t recv_thread;
+    queue_t *q;
 };
 
 
