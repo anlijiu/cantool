@@ -5,7 +5,7 @@
 
 static devices_map devices;
 
-
+static on_recv_fun_t s_onrecv;
 
 void set_bittiming(enum BAUDRATE baudrate) {
     struct can_device* dev;
@@ -38,6 +38,7 @@ void send_canfd_frame(struct canfd_frame_s * frame, unsigned int len) {
 
 void set_receive_listener(on_recv_fun_t onrecv) {
     struct can_device* dev;
+    s_onrecv = onrecv;
     hashmap_foreach_data(dev, &devices) {
         if(dev->ops->set_receive_listener) {
             dev->ops->set_receive_listener(dev, onrecv);
@@ -57,6 +58,12 @@ void set_canfd_receive_listener(on_canfd_recv_fun_t onrecv) {
 void add_device(struct can_device* dev) {
     printf("%s start , uuid:%s\n", __func__, dev->uuid);
     hashmap_put(&devices, dev->uuid, dev);
+
+    hashmap_foreach_data(dev, &devices) {
+        if(dev->ops->set_receive_listener) {
+            dev->ops->set_receive_listener(dev, s_onrecv);
+        }
+    }
 }
 
 void remove_device(struct can_device* dev) {

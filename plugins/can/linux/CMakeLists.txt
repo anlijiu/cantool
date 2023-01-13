@@ -19,6 +19,7 @@ FIND_PACKAGE(PkgConfig REQUIRED) #想用pkg相关命令需要先引入这个
 find_package(ZLIB)
 find_package(Iconv)
 find_package(LibUSB)
+# find_library(LIBUDEV udev)
 
 include_directories(${LIBUSB_INCLUDE_DIR})
 include_directories(${THIRD_PARTY_INCLUDE_DIR})
@@ -39,7 +40,9 @@ apply_standard_settings(${PLUGIN_NAME})
 
 
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+
+# 检测内存泄露 sanitize
+# set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.
@@ -49,6 +52,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ZLIB::ZLIB)
 target_link_libraries(${PLUGIN_NAME} PRIVATE Iconv::Iconv)
+# target_link_libraries(${PLUGIN_NAME} PRIVATE ${LIBUDEV_LIBRARIES})
 
 # Symbols are hidden by default to reduce the chance of accidental conflicts
 # between plugins. This should not be removed; any symbols that should be

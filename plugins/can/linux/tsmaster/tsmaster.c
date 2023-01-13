@@ -10,7 +10,7 @@ struct can_device_ops tsmaster_device_ops;
 static on_recv_fun_t _on_recv = NULL;
 static on_canfd_recv_fun_t _on_canfd_recv = NULL;
 
-const int timing_table[16] = {
+static int timing_table[16] = {
     5, //KBPS_5 = 
     10, //KBPS_10,
     20, //KBPS_20,
@@ -44,6 +44,15 @@ static const struct tsmaster_device default_tsmaster_device = {
     },
     .ADeviceHandle = 0,
 };
+
+
+void ReceiveCANMessageForTest(const TLibCAN* AData)
+{
+    if(AData->FProperties.bits.istx)
+      printf("tx frame with id %d\n", AData->FIdentifier);
+    else
+      printf("rx frame with id %d\n", AData->FIdentifier);
+}
 
 static bool is_serials_equal(char *s1, char *s2) {
     for(int i = 0; i < 12; ++i) {
@@ -117,6 +126,8 @@ static void sync_canfd_bittiming(struct tsmaster_device *tdev) {
 
     tscan_config_can_by_baudrate(tdev->ADeviceHandle, CHN2, timing_table[tdev->device.bittiming.bitrate], 1);
     tscan_config_canfd_by_baudrate(tdev->ADeviceHandle, CHN2, timing_table[tdev->device.bittiming.bitrate], timing_table[tdev->device.data_bittiming.bitrate], lfdtISOCAN, lfdmNormal,1);
+
+    // printf("tsmaster sync_canfd_bittiming %d %d %d %d \n", tdev->device.bittiming.bitrate, tdev->device.data_bittiming.bitrate,   timing_table[tdev->device.bittiming.bitrate], timing_table[tdev->device.data_bittiming.bitrate]);
 }
 
 static int tsmaster_set_bittiming(struct can_device *dev, enum BAUDRATE baudrate) {
@@ -237,7 +248,7 @@ uint8_t * curry_one_param_device_func(
 
 
 static void receive_can_message(const TLibCAN* aData, struct can_device* dev) {
-    printf("%s in ,  can id: %u", __func__, aData->FIdentifier);
+    printf("%s in ,  can id: %u, %d, %d, %d", __func__, aData->FIdentifier, aData->FProperties.bits.istx, aData->FProperties.bits.iserrorframe, _on_recv);
 
     if(_on_recv && aData->FProperties.bits.istx == false && aData->FProperties.bits.iserrorframe == false) {
         can_frame_t * frames = calloc_can_frame_from_t_lib_can(aData, 1);
@@ -298,13 +309,19 @@ static int /*__init*/ tsmaster_driver_init(void)
 
             printf("%s  ,  dev addr: %p\n", __func__, &tdevice->device);
 
-            sync_canfd_bittiming(tdevice);
 
             TCANQueueEvent_Win32_t can_listener = (TCANQueueEvent_Win32_t)curry_one_param_device_func(receive_can_message, &tdevice->device);
             TCANFDQueueEvent_Win32_t canfd_listener = (TCANFDQueueEvent_Win32_t)curry_one_param_device_func(receive_canfd_message, &tdevice->device);
             retValue = tscan_register_event_can(tdevice->ADeviceHandle, can_listener);
+            // retValue = tscan_register_event_can(tdevice->ADeviceHandle, ReceiveCANMessageForTest);
+            printf("tsmaster tscan_register_event_can ret:%lu\n", retValue );
             retValue = tscan_register_event_canfd(tdevice->ADeviceHandle, canfd_listener);
+            printf("tsmaster tscan_register_event_canfd ret:%lu\n", retValue );
+
             add_device(&tdevice->device);
+            sync_canfd_bittiming(tdevice);
+            // tscan_config_canfd_by_baudrate(tdevice->ADeviceHandle, CHN1, 500,2000, lfdtISOCAN, lfdmNormal,1);
+            // tscan_config_canfd_by_baudrate(tdevice->ADeviceHandle, CHN2, 500,2000, lfdtISOCAN, lfdmNormal,1);
         } else {
             char err[255];
             tscan_get_error_description(retValue, &err);

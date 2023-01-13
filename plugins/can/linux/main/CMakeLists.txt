@@ -54,8 +54,9 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libcandbc.so.0" DESTINATION 
 #     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libcandbc.so.0 ${INSTALL_BUNDLE_LIB_DIR}/libcandbc.so.0
 # )
 
-target_compile_options(${PLUGIN_NAME} PRIVATE -fsanitize=address)
-target_link_options(${PLUGIN_NAME} PRIVATE -fsanitize=address)
+# 检测内存泄露 sanitize
+# target_compile_options(${PLUGIN_NAME} PRIVATE -fsanitize=address)
+# target_link_options(${PLUGIN_NAME} PRIVATE -fsanitize=address)
 
 target_include_directories(${PLUGIN_NAME}
   PUBLIC

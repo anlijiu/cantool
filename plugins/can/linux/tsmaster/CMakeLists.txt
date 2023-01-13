@@ -1,6 +1,6 @@
 add_library(tsmaster MODULE)
 
-# set_target_properties(tsmaster PROPERTIES LINKER_LANGUAGE C)
+# set_target_properties(tsmaster PROPERTIES LINKER_LANGUAGE CXX)
 
 set(INSTALL_DRIVER_DIR "${CMAKE_INSTALL_PREFIX}/${DRIVERS_LOCATION}")
 set(INSTALL_DRIVER_LIB_DIR "${INSTALL_DRIVER_DIR}/lib")
@@ -12,22 +12,22 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bundle)
 
 set_target_properties(tsmaster PROPERTIES
     BUILD_WITH_INSTALL_RPATH FALSE
-    INSTALL_RPATH "\$ORIGIN/lib"
-    LINK_FLAGS "-Wl,--disable-new-dtags"
+    # INSTALL_RPATH "\$ORIGIN/lib"
+    # LINK_FLAGS "-Wl,--disable-new-dtags"
 )
 
-add_library(TSH SHARED IMPORTED)
+add_library(TSH SHARED IMPORTED GLOBAL)
 set_target_properties(TSH PROPERTIES
     LINKER_LANGUAGE CXX
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so
     IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so
-    # LIBRARY_OUTPUT_DIRECTORY  ${INSTALL_DRIVER_LIB_DIR}
-    # RUNTIME_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
-    # ARCHIVE_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
+    LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libs
+    RUNTIME_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
+    ARCHIVE_OUTPUT_DIRECTORY "$<CONFIG>/TSH"
     IMPORTED_NO_SONAME TRUE
     )
 
-add_library(TSCANApiOnLinux SHARED IMPORTED)
+add_library(TSCANApiOnLinux SHARED IMPORTED GLOBAL)
 set_target_properties(TSCANApiOnLinux PROPERTIES
     LINKER_LANGUAGE CXX
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so
@@ -49,8 +49,9 @@ install(TARGETS tsmaster DESTINATION "${INSTALL_DRIVER_DIR}" COMPONENT Runtime)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSCANApiOnLinux.so" DESTINATION "${INSTALL_DRIVER_LIB_DIR}" COMPONENT Runtime)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libTSH.so" DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT Runtime)
 
-target_compile_options(tsmaster PRIVATE -fsanitize=address)
-target_link_options(tsmaster  PRIVATE -fsanitize=address)
+# 检测内存泄露 sanitize
+# target_compile_options(tsmaster PRIVATE -fsanitize=address)
+# target_link_options(tsmaster  PRIVATE -fsanitize=address)
 
 target_sources(tsmaster
   PRIVATE
@@ -74,9 +75,9 @@ target_link_libraries(tsmaster
   #   controlcan
   PUBLIC
     module
-    TSCANApiOnLinux 
     ${LIBFFI_LIBRARIES}
-  # PRIVATE
+  PRIVATE
+    TSCANApiOnLinux 
   #   controlcan
 )
 

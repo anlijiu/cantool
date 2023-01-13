@@ -13,6 +13,21 @@
 typedef HASHMAP(char, signal_assembler) signal_assembler_map;
 typedef HASHMAP(uint32_t, message_assembler) message_assembler_map;
 
+/**
+ * 原文链接：https://blog.csdn.net/JAZZSOLDIER/article/details/104258903
+ * The futex facility returned an unexpected error code
+ * 在 linux 程序执行中若遇到该错误，考虑下是否是如下变量使用了强制内存对齐导致。
+ * 
+ * 比如：在将如上变量包含到结构体中，强制1字节或2字节内存对齐。
+ * 
+ * 如：信号量相关 struct semaphore，线程相关的 pthread_mutex_t，以及 pthread_cond_t 等等。
+ * 
+ * 解决办法：
+ * 
+ * 1、取消强制内存对齐；
+ * 2、不要包含在结构体中或类中；
+*/
+
 struct can_operator_sender
 {
     message_assembler_map m_assembler_map;
@@ -21,7 +36,8 @@ struct can_operator_sender
     pthread_cond_t cond;
     pthread_mutex_t mutex;
     bool flag;
-}__attribute__ ((aligned(4)));
+};
+// }__attribute__ ((aligned(4)));
 
 struct can_operator_receiver
 {
@@ -32,7 +48,8 @@ struct can_operator_receiver
     pthread_mutex_t mutex;
     struct mpscq queue;
     bool flag;
-}__attribute__ ((aligned(4)));
+};
+// }__attribute__ ((aligned(4)));
 
 static struct can_operator_sender sender;
 static struct can_operator_receiver receiver;
@@ -242,7 +259,7 @@ void can_operator_clear_canfd_listener() {
 
 
 static int on_recv(char* uuid, struct can_frame_s *frames, unsigned int num) {
-    // printf("%s start , uuid: %s\n", __func__, uuid);
+    printf("%s start , uuid: %s\n", __func__, uuid);
     list_iterator_t *it = list_iterator_new(receiver.listeners, LIST_HEAD);
     list_node_t *t = list_iterator_next(it);
     while(t) {

@@ -104,6 +104,7 @@ void load_drivers() {
       memset(fullpath, 0 , 1000);
       sprintf(fullpath, "%s/%s.so", driverdir, name);
       // load_driver(fullpath);
+
       pthread_t thread;
       printf("%s, pthread_create fullpath: %s\n", __func__, fullpath);
       int err = pthread_create(&thread, NULL, &load_driver, fullpath);
