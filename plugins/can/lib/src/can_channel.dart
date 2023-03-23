@@ -66,10 +66,13 @@ class CanChannel {
   }
 
   Future<Null> _handleCanData(MethodCall methodCall) async {
-    if (methodCall.method == _canReceiveCallbackMethod || methodCall.method == _canfdReceiveCallbackMethod ) {
+    if (methodCall.method == _canReceiveCallbackMethod ||
+        methodCall.method == _canfdReceiveCallbackMethod) {
       final List<CanSignalData> arg = (methodCall.arguments as List)
           .map((e) => CanSignalData(e["name"], e["value"], e["mid"]))
           .toList();
+
+      // print('_handleCanData in dart: ${arg.toString()}');
       for (ValueChanged<List<CanSignalData>> listener
           in List<ValueChanged<List<CanSignalData>>>.from(_listeners)) {
         if (_listeners.contains(listener)) {

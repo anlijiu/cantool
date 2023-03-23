@@ -71,7 +71,8 @@ class CanRepositoryImpl implements CanRepository {
   }
 
   void onReceiveCanData(List<can.CanSignalData> list) {
-    bool needNotify = false;
+    // print('onReceiveCanData start : ${list.length}  signals');
+    bool needNotify = true;
 
     for (var data in list) {
       if (receivedSignalMap.containsKey(data.name)) {
@@ -87,14 +88,18 @@ class CanRepositoryImpl implements CanRepository {
 
     if (needNotify) {
       final messages = mapReceiveSignalToMessage();
+      // print('onReceiveCanData needNotify : ${messages.length} messages');
       _recvMessageSubject.add(messages);
-      // _recvMessageSubject.add(msgMap.values);
     }
   }
 
   List<Message> mapReceiveSignalToMessage() {
     final msgMetaMap = ref.read(messageMetasProvider);
     final signalMetaMap = ref.read(signalMetasProvider);
+    // print(
+    //     'mapReceiveSignalToMessage msgMetaMap : ${msgMetaMap.length} messages    receivedSignalMap length: ${receivedSignalMap.length}');
+    // print(
+    //     'mapReceiveSignalToMessage signalMetaMap : ${signalMetaMap.length} signals');
     final Map<int, Message> result = new Map();
     receivedSignalMap.values.forEach((element) {
       final signalMeta = signalMetaMap[element.name];
@@ -114,10 +119,13 @@ class CanRepositoryImpl implements CanRepository {
       } else {
         result[element.mid] = Message([
           Signal(element.name, element.value, signalMeta!.comment,
-              signalMeta.options!)
+              signalMeta.options ?? new Map())
         ], name: msgMetaMap[element.mid]!.name, id: element.mid);
       }
     });
+
+    // print(
+    //     'mapReceiveSignalToMessage result.values : ${result.values.length}  results');
 
     // return result.values;
     return List.from(result.values);

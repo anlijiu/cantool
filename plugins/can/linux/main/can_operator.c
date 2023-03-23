@@ -259,7 +259,7 @@ void can_operator_clear_canfd_listener() {
 
 
 static int on_recv(char* uuid, struct can_frame_s *frames, unsigned int num) {
-    printf("%s start , uuid: %s\n", __func__, uuid);
+    // printf("%s start , uuid: %s\n", __func__, uuid);
     list_iterator_t *it = list_iterator_new(receiver.listeners, LIST_HEAD);
     list_node_t *t = list_iterator_next(it);
     while(t) {

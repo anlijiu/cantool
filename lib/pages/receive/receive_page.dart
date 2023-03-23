@@ -29,6 +29,7 @@ final receiveMsgStreamProvider = StreamProvider.autoDispose
                   s.comment.contains(search.toLowerCase())) !=
               -1);
     }).toList();
+
     sink.add(result);
   });
 
